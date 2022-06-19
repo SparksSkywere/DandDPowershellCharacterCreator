@@ -1,26 +1,5 @@
 clear-host
-#Sparks's D&D Character Creator powershell script, this is intended for fun and feel free to edit fields for future use but please keep me credited
-#This is a powershell produced program, it is written in C#
-#Due to the way paths are written in some parts this script is tied to Windows ONLY
-#Remember to comment/remove all "Write-Output" statements as this is only for testing purposes
-#This powershell script follows original 5E rules, the website to get the information is:
-#https://www.dndbeyond.com/sources/basic-rules
-
-#IF YOU HAVEN'T PLEASE READ THE RULEBOOK FOR D&D AS THIS POWERSHELL SCRIPT JUST SIMPLIFIES MAKING A CHARACTER
-#CURRENTLY INDEV SO EXPECT ISSUES / BUGS OR DESIGN WEIRDNESS
-
-#Further down the script you see $value.statement = New-Object System.Drawing.Size(240,50)
-#The (240,50) means width,height for incase you forget
-#(10,50) 50 = up/down, 10 = left/right - Orientation 
-#Every part of the powershell script is changable, this is for custom games, hence why things aren't grouped together
-#Majority of the stats used came from the cards for D&D
-
-# Hey Sparks, 
-# Nice code you've got here >:3
-# - Quasar <3
-
-#START OF THE POWERSHELL SCRIPT
-#Hide powershell's console so only the forms show, only unhide during development
+#Hide powershell's console so only the forms show, unhide during development or need to varify output
 function Show-Console
 {
     param ([Switch]$Show,[Switch]$Hide)
@@ -50,14 +29,39 @@ function Show-Console
 #To show the console change "-hide" to "-show"
 show-console -hide
 
-#Copy PDF Module + Import PDF Reader/Editor
+#Sparks's D&D Character Creator powershell script, this is intended for fun and feel free to edit fields for future use but please keep me credited
+#This is a powershell produced program, it is written in C# and powershell functions
+#Due to the way paths are written in some parts this script is tied to Windows ONLY
+#Remember to comment/remove all "Write-Output" statements as this is only for testing purposes
+#This powershell script follows original 5E rules, the website to get the information is:
+#https://www.dndbeyond.com/sources/basic-rules
+
+#IF YOU HAVEN'T PLEASE READ THE RULEBOOK FOR D&D AS THIS POWERSHELL SCRIPT JUST SIMPLIFIES MAKING A CHARACTER
+#CURRENTLY INDEV SO EXPECT ISSUES / BUGS OR DESIGN WEIRDNESS
+
+#Further down the script you see $value.statement = New-Object System.Drawing.Size(240,50)
+#The (240,50) means width,height for incase you forget
+#(10,50) 50 = up/down, 10 = left/right - Orientation 
+#Every part of the powershell script is changable, this is for custom games, hence why things aren't grouped together
+#Majority of the stats used came from the cards for D&D
+
+# Hey Sparks, 
+# Nice code you've got here >:3
+# - Quasar <3
+
+#START OF THE POWERSHELL SCRIPT
+#Type loader
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName PresentationCore,PresentationFramework
+
+#PDF Module loader
 Import-Module -Name .\Assets\iText\PDFForm | Out-Null
 Add-Type -Path ".\Assets\iText\itextsharp.dll"
 
 #Some default value's for later in the script, this is to fill out empty fields / references for later code
-#DO NOT MODIFY THE DEFAULT VALUE'S, EVEN IF YOU DO IT WOULDN'T SAVE AT THE END UPON CHOOSING STATS
-#These values can also be used for indexing
-#Do not delete any of the values as they are needed
+#These values can also be used for indexing | Verify Output
+#DO NOT DELETE, any of the values as they are needed
 #-Basic Character Information-
 $charactername = "No-Name"
 $playername = "No-Name"
@@ -65,19 +69,15 @@ $age = "Unknown"
 $characterbackground = "Unknown"
 #-Character Stats-
 $ChosenRace = "None Selected"
+$ExportRace = "None Selected"
 $ChosenSubRace = "None Selected"
 $RaceDescription = "Unknown"
-$RacialTraits = "Unknown"
 $RacialSpecialAbility = "Unknown"
 $PersonalityTraits = "Unknown"
 $ProficencyBonus = "+0"
 $ClassLevel = "N/A"
-$Ideals = "Unknown"
-$Bonds = "Unknown"
-$Flaws = "Unknown"
 $HP = "0"
 $SpeedTotal = "0"
-$RaceLifeTime = "Unknown"
 $PlayerSize = "Unknown"
 $Playerheight = "Unknown"
 $STR = "0"
@@ -86,9 +86,9 @@ $CON = "0"
 $INT = "0"
 $WIS = "0"
 $CHA = "0"
+$SpokenLanguages = "Unknown"
 $Skills = "Unknown"
 $Senses = "Unknown"
-$SpokenLanguages = "Unknown"
 $ChosenClass = "None Selected"
 $ChosenSubClass = "None Selected"
 $ChosenAlignment = "None Selected"
@@ -151,9 +151,6 @@ $Check40 = 'Yes'
 
 #End of default value's
 #Basic user information gathering - Basic Information
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(500,350)
@@ -213,33 +210,33 @@ Add-Type -AssemblyName System.Drawing
     $form.Controls.Add($charactername)
     $form.Topmost = $true
 
-    $playerlabel = New-Object System.Windows.Forms.Label
-    $playerlabel.Location = New-Object System.Drawing.Point(10,67)
-    $playerlabel.Size = New-Object System.Drawing.Size(100,18)
-    $playerlabel.Text = 'Player Name:'
-    $form.Controls.Add($playerlabel)
-
-    $playername = New-Object System.Windows.Forms.TextBox
-    $playername.Location = New-Object System.Drawing.Point(10,85)
-    $playername.Size = New-Object System.Drawing.Size(180,20)
-    $playername.MaxLength = 30
-    $form.Controls.Add($playername)
-    $form.Topmost = $true
-
     $ageform = New-Object System.Windows.Forms.Label
-    $ageform.Location = New-Object System.Drawing.Point(10,108)
-    $ageform.Size = New-Object System.Drawing.Size(50,18)
-    $ageform.Text = 'Age:'
+    $ageform.Location = New-Object System.Drawing.Point(10,67)
+    $ageform.Size = New-Object System.Drawing.Size(80,18)
+    $ageform.Text = 'Character Age:'
     $form.Controls.Add($ageform)
 
     $age = New-Object System.Windows.Forms.TextBox
-    $age.Location = New-Object System.Drawing.Point(10,127)
+    $age.Location = New-Object System.Drawing.Point(10,85)
     $age.Size = New-Object System.Drawing.Size(58,20)
     $age.MaxLength = 5
     $form.Controls.Add($age)
     $form.Topmost = $true
     $age.Add_TextChanged({
         $age.Text = $age.Text -replace '\D'})
+    
+    $playerlabel = New-Object System.Windows.Forms.Label
+    $playerlabel.Location = New-Object System.Drawing.Point(10,108)
+    $playerlabel.Size = New-Object System.Drawing.Size(100,18)
+    $playerlabel.Text = 'Player Name:'
+    $form.Controls.Add($playerlabel)
+
+    $playername = New-Object System.Windows.Forms.TextBox
+    $playername.Location = New-Object System.Drawing.Point(10,127)
+    $playername.Size = New-Object System.Drawing.Size(180,20)
+    $playername.MaxLength = 30
+    $form.Controls.Add($playername)
+    $form.Topmost = $true
     
     #REMEMBER TO ADD THE ONLY LETTERS FUNCTION, NO NUMBERS ALLOWED
     #$form.Add_Shown({$charactername.Select()})
@@ -273,13 +270,10 @@ Add-Type -AssemblyName System.Drawing
         {
             Exit
         }
-#Basic user information gathering - Background
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-
+#Basic user information gathering - Class and race
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Sparks D&D Character Creator'
-    $form.Size = New-Object System.Drawing.Size(500,350)
+    $form.Size = New-Object System.Drawing.Size(450,350)
     $form.StartPosition = 'CenterScreen'
     $objIcon = New-Object system.drawing.icon (".\Assets\installer.ico")
     $form.Icon = $objIcon
@@ -288,9 +282,6 @@ Add-Type -AssemblyName System.Drawing
     $form.BackgroundImage = $objImage
     $form.BackgroundImageLayout = "Center"
  
-    $form.Width = $objImage.Width
-    $form.Height = $objImage.Height
-
     $okButton = New-Object System.Windows.Forms.Button
     $okButton.Location = New-Object System.Drawing.Point(75,270)
     $okButton.Size = New-Object System.Drawing.Size(75,23)
@@ -330,9 +321,20 @@ Add-Type -AssemblyName System.Drawing
     $form.Controls.Add($characterbackground)
 
     $characterbackgroundselect = New-Object System.Windows.Forms.ListBox
-    $characterbackgroundselect.Location = New-Object System.Drawing.Point(10,50)
-    $characterbackgroundselect.Size = New-Object System.Drawing.Size(260,65)
+    $characterbackgroundselect.Location = New-Object System.Drawing.Point(10,40)
+    $characterbackgroundselect.Size = New-Object System.Drawing.Size(160,65)
     $characterbackgroundselect.Height = 170
+
+    $racelabel = New-Object System.Windows.Forms.Label
+    $racelabel.Location = New-Object System.Drawing.Point(220,20)
+    $racelabel.Size = New-Object System.Drawing.Size(118,18)
+    $racelabel.Text = 'Please select a Race:'
+    $form.Controls.Add($racelabel)
+
+    $ChosenRace = New-Object System.Windows.Forms.ListBox
+    $ChosenRace.Location = New-Object System.Drawing.Point(220,40)
+    $ChosenRace.Size = New-Object System.Drawing.Size(200,20)
+    $ChosenRace.Height = 200
 
     #Background List
         $characterbackgroundselect.Items.Add('Acolyte') | Out-Null
@@ -345,103 +347,11 @@ Add-Type -AssemblyName System.Drawing
         $characterbackgroundselect.Items.Add('Sage') | Out-Null
         $characterbackgroundselect.Items.Add('Lone Wanderer') | Out-Null
 
+    #Player backgrounds have been migrated to backstory text forms later down the script
     #To add custom player backgrounds you can either type in the box provided
     #If you wish to set only pre-generated backgrounds use this:
     #$characterbackgroundgenerated.Items.Add('custom')
     #you may also comment out the "$characterbackgroundtextbox = $form.ShowDialog()"
-
-    $form.Controls.Add($characterbackgroundselect)
-    $form.Controls.AddRange($characterbackgroundselect)
-    $form.Topmost = $true
-    $Form.Add_Shown({$Form.Activate()})
-    if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::OK)
-    {
-        $chosenbackground = $characterbackgroundselect.SelectedItem
-        $chosenbackground
-    }
-    if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::Ignore)
-    {
-        $characterbackgroundselect = "Unknown"
-    }
-    $characterbackgroundtextbox = $form.ShowDialog()
-    if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::Retry)
-    {
-        return
-    }
-    if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::Cancel)
-    {
-        Exit
-    }
-#end of Background
-
-#Basic user information gathering - Race
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-
-    $form = New-Object System.Windows.Forms.Form
-    $form.Text = 'Sparks D&D Character Creator'
-    $form.Size = New-Object System.Drawing.Size(500,350)
-    $form.StartPosition = 'CenterScreen'
-    $objIcon = New-Object system.drawing.icon (".\Assets\installer.ico")
-    $form.Icon = $objIcon
- 
-    $objImage = [system.drawing.image]::FromFile(".\Assets\form_background.png")
-    $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = "Center"
- 
-    $form.Width = $objImage.Width
-    $form.Height = $objImage.Height
- 
-    $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Location = New-Object System.Drawing.Point(75,270)
-    $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'OK'
-    $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-    $form.AcceptButton = $okButton
-    $form.Controls.Add($okButton)
-
-    $skipButton = New-Object System.Windows.Forms.Button
-    $skipButton.Location = New-Object System.Drawing.Point(150,270)
-    $skipButton.Size = New-Object System.Drawing.Size(75,23)
-    $skipButton.Text = 'Skip'
-    $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
-    $form.AcceptButton = $skipButton
-    $form.Controls.Add($skipButton)
-
-    $backButton = New-Object System.Windows.Forms.Button
-    $backButton.Location = New-Object System.Drawing.Point(225,270)
-    $backButton.Size = New-Object System.Drawing.Size(75,23)
-    $backButton.Text = 'Back'
-    $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
-    $form.CancelButton = $backButton
-    $form.Controls.Add($backButton)
-
-    $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Location = New-Object System.Drawing.Point(300,270)
-    $cancelButton.Size = New-Object System.Drawing.Size(75,23)
-    $cancelButton.Text = 'Cancel'
-    $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-    $form.CancelButton = $cancelButton
-    $form.Controls.Add($cancelButton)
-
-    $label = New-Object System.Windows.Forms.Label
-    $label.Location = New-Object System.Drawing.Point(10,20)
-    $label.Size = New-Object System.Drawing.Size(118,18)
-    $label.Text = 'Please select a Race:'
-    $form.Controls.Add($label)
-
-    $ChosenRace = New-Object System.Windows.Forms.ListBox
-    $ChosenRace.Location = New-Object System.Drawing.Point(10,40)
-    $ChosenRace.Size = New-Object System.Drawing.Size(200,20)
-    $ChosenRace.Height = 200
-
-    $pictureBox = new-object Windows.Forms.PictureBox
-    $pictureBox.Location = New-Object System.Drawing.Point(300,40)
-    $pictureBox.Size = New-Object System.Drawing.Size(200,20)
-    #$pictureBox.Width = $img.Size.Width
-    #$pictureBox.Height = $img.Size.Height
-    $pictureBox.Image = $img
-    $form.controls.add($pictureBox)
 
     #Race List
         $ChosenRace.Items.Add('Dragonborn') | Out-Null
@@ -496,51 +406,50 @@ Add-Type -AssemblyName System.Drawing
         $ChosenRace.Items.Add('Gnoll') | Out-Null
         $ChosenRace.Items.Add('Wolf') | Out-Null
 
-        #To add a custom race use this line with a name given and then follow
-        #down the script to add it to the rest of the script
-        #$ChosenRace.Items.Add('Custom')
-        #You need to also add a race description if you wish other players to use it
-        #Along with a race picture, this is all in the "Assets" folder
+    #To add a custom race use this line with a name given and then follow
+    #down the script to add it to the rest of the script
+    #$ChosenRace.Items.Add('Custom')
+    #You need to also add a race description if you wish other players to use it
+    #Along with a race picture, this is all in the "Assets" folder
 
-        #TO DO! Add hover text for each race
-        #Test hover
-
-        #IF statements ONLY for after selecting
-
+    $form.Controls.Add($characterbackgroundselect)
+    $form.Controls.AddRange($characterbackgroundselect)
     $form.Controls.Add($ChosenRace)
     $form.Topmost = $true
+    $Form.Add_Shown({$Form.Activate()})
+    if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::OK)
+    {
+        $chosenbackground = $characterbackgroundselect.SelectedItem
+        $chosenbackground
+
+        $selectedrace = $ChosenRace.SelectedItem
+        $selectedrace
+    }
+    if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::Ignore)
+    {
+        $characterbackgroundselect = "Unknown"
+        $selectedrace = "N/A"
+    }
+    $characterbackgroundtextbox = $form.ShowDialog()
+    if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::Retry)
+    {
+        return
+    }
+    if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::Cancel)
+    {
+        Exit
+    }
+#end of Character race and background
     
-    #if ($ -match 'Dragonborn')
+    #if ($ -match '**')
     #{
-    #    $img = [System.Drawing.Image]::Fromfile('.\Assets\Race_Pictures\Dragonborn.png')
-    #    Add-Content -path ".\Assets\Race_Descriptions\Dragonborn.txt"
+    #    $img = [System.Drawing.Image]::Fromfile('.\Assets\Race_Pictures\**.png')
+    #    Add-Content -path ".\Assets\Race_Descriptions\**.txt"
     #}
 
     #Add this feature above, where you select from the list and an image + text loads
     #The race index can be fitted with selection data such as gold or speed
     #Please add all speed bonuses to match either class and race
-    
-    if ($racetype -eq [System.Windows.Forms.DialogResult]::OK)
-    {
-        $selectedrace = $ChosenRace.SelectedItem
-        $selectedrace
-    }
-    if ($racetype -eq [System.Windows.Forms.DialogResult]::Ignore)
-    {
-        $selectedrace = "N/A"
-        $selectedrace
-    }
-    $racetype = $form.ShowDialog()
-    if ($racetype -eq [System.Windows.Forms.DialogResult]::Retry)
-    {
-        return
-    }
-    if ($racetype -eq [System.Windows.Forms.DialogResult]::Cancel)
-    {
-        Exit
-    }
-
-#End of race selection
 
 #Make sure to fill out ALL required subrace data as there is a lot of subraces per primary
 #race, this allows a waaay bigger pool of characters
@@ -548,9 +457,6 @@ Add-Type -AssemblyName System.Drawing
 #Small race choices like skin and hair
 #Reference: https://www.dandwiki.com/wiki/Random_Hair_and_Eye_Color_(DnD_Other)
 #Start of race features
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(500,350)
@@ -651,6 +557,7 @@ Add-Type -AssemblyName System.Drawing
         $characterfeaturesselecteyes.Items.Add('Spring Green') | Out-Null
         $characterfeaturesselecteyes.Items.Add('Sea Green') | Out-Null
         $characterfeaturesselecteyes.Items.Add('Emerald Green') | Out-Null
+        $characterfeaturesselecteyes.Items.Add('Pink') | Out-Null
 
     #Feature Hair List
         $characterfeaturesselecthair.Items.Add('Blue') | Out-Null
@@ -706,6 +613,7 @@ Add-Type -AssemblyName System.Drawing
         $characterfeaturesselectskin.Items.Add('Green') | Out-Null
         $characterfeaturesselectskin.Items.Add('Blue') | Out-Null
         $characterfeaturesselectskin.Items.Add('Purple') | Out-Null
+        $characterfeaturesselectskin.Items.Add('Dark Purple') | Out-Null
         $characterfeaturesselectskin.Items.Add('Pale Yellow') | Out-Null
         $characterfeaturesselectskin.Items.Add('Dark Red') | Out-Null
         $characterfeaturesselectskin.Items.Add('Red-Orange') | Out-Null
@@ -757,9 +665,6 @@ Add-Type -AssemblyName System.Drawing
     }
 #End of race additions
 #Basic user information gathering - SubRace
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(500,350)
@@ -874,6 +779,11 @@ Add-Type -AssemblyName System.Drawing
     if ($ChosenRace.SelectedItem -match 'Orc')
     {
         $ChosenSubRace.Items.Add('Orc') | Out-Null
+        $ChosenSubRace.Items.Add('Gruumsh One-Eye') | Out-Null
+        $ChosenSubRace.Items.Add('Tribes like Plagues') | Out-Null
+        $ChosenSubRace.Items.Add('Ranging Scavengers') | Out-Null
+        $ChosenSubRace.Items.Add('Leadershiip and Might') | Out-Null
+        $ChosenSubRace.Items.Add('Orc Crossbreeds') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Leonin')
     {
@@ -882,6 +792,7 @@ Add-Type -AssemblyName System.Drawing
     if ($ChosenRace.SelectedItem -match 'Satyr')
     {
         $ChosenSubRace.Items.Add('Satyr') | Out-Null
+        $ChosenSubRace.Items.Add('Hedonistic Revelers') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Fairy')
     {
@@ -894,6 +805,8 @@ Add-Type -AssemblyName System.Drawing
     if ($ChosenRace.SelectedItem -match 'Aarakocra')
     {
         $ChosenSubRace.Items.Add('Aarakocra') | Out-Null
+        $ChosenSubRace.Items.Add('Enemies of Elemental Evil') | Out-Null
+        $ChosenSubRace.Items.Add('Search for the seven shards') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Genasi')
     {
@@ -915,6 +828,8 @@ Add-Type -AssemblyName System.Drawing
     {
         $ChosenSubRace.Items.Add('Bugbear') | Out-Null
         $ChosenSubRace.Items.Add('Bugbear Chief') | Out-Null
+        $ChosenSubRace.Items.Add('Followers of Hruggek') | Out-Null
+        $ChosenSubrace.Items.Add('Venal Ambushers') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Firbolg')
     {
@@ -923,6 +838,12 @@ Add-Type -AssemblyName System.Drawing
     if ($ChosenRace.SelectedItem -match 'Goblin')
     {
         $ChosenSubRace.Items.Add('Goblin') | Out-Null
+        $ChosenSubRace.Items.Add('Goblinoids') | Out-Null
+        $ChosenSubRace.Items.Add('Malicious Glee') | Out-Null
+        $ChosenSubRace.Items.Add('Leaders and Followers') | Out-Null
+        $ChosenSubRace.Items.Add('Challenging Liers') | Out-Null
+        $ChosenSubRace.Items.Add('Rat Keepers and Wolf Riders') | Out-Null
+        $ChosenSubRace.Items.Add('Worshipers of Maglubiyet') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Hobgoblin')
     {
@@ -932,6 +853,9 @@ Add-Type -AssemblyName System.Drawing
     if ($ChosenRace.SelectedItem -match 'Kenku')
     {
         $ChosenSubRace.Items.Add('Kenku') | Out-Null
+        $ChosenSubRace.Items.Add('Fallen Flocks') | Out-Null
+        $ChosenSubRace.Items.Add('Speech in Pantomime') | Out-Null
+        $ChosenSubRace.Items.Add('The Whistful Wingless') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Kobold')
     {
@@ -942,6 +866,11 @@ Add-Type -AssemblyName System.Drawing
     {
         $ChosenSubRace.Items.Add('Lizardfolk') | Out-Null
         $ChosenSubRace.Items.Add('Lizardfolk Shamen') | Out-Null
+        $ChosenSubRace.Items.Add('Territorial Xenophobes') | Out-Null
+        $ChosenSubRace.Items.Add('Great Feasts and Sacrifices') | Out-Null
+        $ChosenSubRace.Items.Add('Canny Crafters') | Out-Null
+        $ChosenSubRace.Items.Add('Lizardfolk Leaders') | Out-Null
+        $ChosenSubRace.Items.Add('Dragon Worshipers') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Tabaxi')
     {
@@ -982,10 +911,23 @@ Add-Type -AssemblyName System.Drawing
     if ($ChosenRace.SelectedItem -match 'Gith')
     {
         $ChosenSubRace.Items.Add('Gith') | Out-Null
+        $ChosenSubRace.Items.Add('Githyanki') | Out-Null
+        $ChosenSubRace.Items.Add('Astral Raiders') | Out-Null
+        $ChosenSubRace.Items.Add('Followers of Gith') | Out-Null
+        $ChosenSubRace.Items.Add('Silver Swords') | Out-Null
+        $ChosenSubRace.Items.Add('Red Dragon Riders') | Out-Null
+        $ChosenSubRace.Items.Add('Outposts in the Mortal Realm') | Out-Null
+        $ChosenSubRace.Items.Add('Githzerai') | Out-Null
+        $ChosenSubRace.Items.Add('Psionic Adepts') | Out-Null
+        $ChosenSubRace.Items.Add('Order amid Chaos') | Out-Null
+        $ChosenSubRace.Items.Add('Disciples of Zerthimon') | Out-Null
+        $ChosenSubRace.Items.Add('Beyond Limbo') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Centaur')
     {
         $ChosenSubRace.Items.Add('Centaur') | Out-Null
+        $ChosenSubRace.Items.Add('Wilderness Nomads') | Out-Null
+        $ChosenSubRace.Items.Add('Reluctant Settlers') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Loxodon')
     {
@@ -994,6 +936,8 @@ Add-Type -AssemblyName System.Drawing
     if ($ChosenRace.SelectedItem -match 'Minotaur')
     {
         $ChosenSubRace.Items.Add('Minotaur') | Out-Null
+        $ChosenSubRace.Items.Add('The Beast Within') | Out-Null
+        $ChosenSubRace.Items.Add('Cults of the Horned King') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Simic Hybrid')
     {
@@ -1018,14 +962,26 @@ Add-Type -AssemblyName System.Drawing
     if ($ChosenRace.SelectedItem -match 'Lycanth')
     {
         $ChosenSubRace.Items.Add('Lycanth') | Out-Null
+        $ChosenSubRace.Items.Add('Curse of Lycanthropy') | Out-Null
+        $ChosenSubRace.Items.Add('Werebear') | Out-Null
+        $ChosenSubRace.Items.Add('Wereboar') | Out-Null
+        $ChosenSubRace.Items.Add('Wererat') | Out-Null
+        $ChosenSubRace.Items.Add('Weretiger') | Out-Null
+        $ChosenSubRace.Items.Add('Werewolf') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Troll')
     {
         $ChosenSubRace.Items.Add('Troll') | Out-Null
+        $ChosenSubRace.Items.Add('Troll Freaks') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Ogre')
     {
         $ChosenSubRace.Items.Add('Ogre') | Out-Null
+        $ChosenSubRace.Items.Add('Furious Tempers') | Out-Null
+        $ChosenSubRace.Items.Add('Gruesome Gluttons') | Out-Null
+        $ChosenSubRace.Items.Add('Greedy Collectors') | Out-Null
+        $ChosenSubRace.Items.Add('Legendary Stupidity') | Out-Null
+        $ChosenSubRace.Items.Add('Primitive Wanderers') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Wolf')
     {
@@ -1064,10 +1020,7 @@ Add-Type -AssemblyName System.Drawing
 #
 #}
 
-#Basic user information gathering - Primary Class
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-
+#Basic user information gathering - Primary Class + Alignment
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(500,350)
@@ -1116,15 +1069,45 @@ Add-Type -AssemblyName System.Drawing
 
     $label = New-Object System.Windows.Forms.Label
     $label.Location = New-Object System.Drawing.Point(10,20)
-    $label.Size = New-Object System.Drawing.Size(170,18)
+    $label.Size = New-Object System.Drawing.Size(160,18)
     $label.Text = 'Please select a Primary Class:'
     $form.Controls.Add($label)
 
     $ChosenClass = New-Object System.Windows.Forms.ListBox
     $ChosenClass.Location = New-Object System.Drawing.Point(10,40)
-    $ChosenClass.Size = New-Object System.Drawing.Size(200,20)
+    $ChosenClass.Size = New-Object System.Drawing.Size(160,20)
     $ChosenClass.Height = 200
 
+    $label = New-Object System.Windows.Forms.Label
+    $label.Location = New-Object System.Drawing.Point(200,20)
+    $label.Size = New-Object System.Drawing.Size(160,18)
+    $label.Text = 'Please select an Alignment:'
+    $form.Controls.Add($label)
+
+    $ChosenAlignment = New-Object System.Windows.Forms.ListBox
+    $ChosenAlignment.Location = New-Object System.Drawing.Point(200,40)
+    $ChosenAlignment.Size = New-Object System.Drawing.Size(160,20)
+    $ChosenAlignment.Height = 200
+
+    #Alignment List
+        $ChosenAlignment.Items.Add('Chaotic Evil') | Out-Null
+        $ChosenAlignment.Items.Add('Chaotic Neutral') | Out-Null
+        $ChosenAlignment.Items.Add('Chaotic Good') | Out-Null
+        $ChosenAlignment.Items.Add('Neutral Evil') | Out-Null
+        $ChosenAlignment.Items.Add('Neutral') | Out-Null
+        $ChosenAlignment.Items.Add('Neutral Good') | Out-Null
+        $ChosenAlignment.Items.Add('Lawful Evil') | Out-Null
+        $ChosenAlignment.Items.Add('Lawful Neutral') | Out-Null
+        $ChosenAlignment.Items.Add('Lawful Good') | Out-Null
+
+        #To add a custom alignment use this line with a name given and then follow
+        #down the script to add it to the rest of the script
+        #$ChosenAlignment.Items.Add('Custom')
+        #You need to also add a race description if you wish other players to use it
+        #Along with a race picture, this is all in the "Assets" folder
+        #Alignment can also be just a race trait, potentially pulling out choice?
+        #TO DO! Add hover text for each race
+ 
     #Class List
         $ChosenClass.Items.Add('Artificer') | Out-Null
         $ChosenClass.Items.Add('Barbarian') | Out-Null
@@ -1195,16 +1178,21 @@ Add-Type -AssemblyName System.Drawing
         $ChosenClassWizard = $ChosenClassWizard.SelectedItem 
     }
     $form.Controls.Add($ChosenClass)
+    $form.Controls.Add($ChosenAlignment)
     $form.Topmost = $true
 
     if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::OK)
     {
         $SelectedClass = $ChosenClass.SelectedItem
         $SelectedClass
+        
+        $selectedalignment = $ChosenAlignment.SelectedItem
+        $selectedalignment
     }
     if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::Ignore)
     {
         $ChosenClass = "None Selected"
+        $ChosenAlignment = "None Selected"
     }
     $chosencharacter = $form.ShowDialog()
     if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::Retry)
@@ -1222,15 +1210,12 @@ Add-Type -AssemblyName System.Drawing
     #    $ChosenClassCustom
     #}
 
-#end of class selection
+#end of class + alignment selection
 #For future reference, setup the chosen class then tells the rest of the document what you can and cant select with IF statements
 #This will mean that this powershell script is going to get BIG, but worth it!
 #Make sure whaterver you set needs to be followed to the characterarray
 
 #Basic user information gathering - SubClass
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(500,350)
@@ -1768,114 +1753,7 @@ Add-Type -AssemblyName System.Drawing
 
 #End of subclass selection
 
-#Alignment Choice
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-
-    $form = New-Object System.Windows.Forms.Form
-    $form.Text = 'Sparks D&D Character Creator'
-    $form.Size = New-Object System.Drawing.Size(500,350)
-    $form.StartPosition = 'CenterScreen'
-    $objIcon = New-Object system.drawing.icon (".\Assets\installer.ico")
-    $form.Icon = $objIcon
- 
-    $objImage = [system.drawing.image]::FromFile(".\Assets\form_background.png")
-    $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = "Center"
- 
-    $form.Width = $objImage.Width
-    $form.Height = $objImage.Height
- 
-    $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Location = New-Object System.Drawing.Point(75,270)
-    $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'OK'
-    $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-    $form.AcceptButton = $okButton
-    $form.Controls.Add($okButton)
-
-    $skipButton = New-Object System.Windows.Forms.Button
-    $skipButton.Location = New-Object System.Drawing.Point(150,270)
-    $skipButton.Size = New-Object System.Drawing.Size(75,23)
-    $skipButton.Text = 'Skip'
-    $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
-    $form.AcceptButton = $skipButton
-    $form.Controls.Add($skipButton)
-
-    $backButton = New-Object System.Windows.Forms.Button
-    $backButton.Location = New-Object System.Drawing.Point(225,270)
-    $backButton.Size = New-Object System.Drawing.Size(75,23)
-    $backButton.Text = 'Back'
-    $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
-    $form.CancelButton = $backButton
-    $form.Controls.Add($backButton)
-
-    $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Location = New-Object System.Drawing.Point(300,270)
-    $cancelButton.Size = New-Object System.Drawing.Size(75,23)
-    $cancelButton.Text = 'Cancel'
-    $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-    $form.CancelButton = $cancelButton
-    $form.Controls.Add($cancelButton)
-
-    $label = New-Object System.Windows.Forms.Label
-    $label.Location = New-Object System.Drawing.Point(10,20)
-    $label.Size = New-Object System.Drawing.Size(160,18)
-    $label.Text = 'Please select an Alignment:'
-    $form.Controls.Add($label)
-
-    $ChosenAlignment = New-Object System.Windows.Forms.ListBox
-    $ChosenAlignment.Location = New-Object System.Drawing.Point(10,40)
-    $ChosenAlignment.Size = New-Object System.Drawing.Size(200,20)
-    $ChosenAlignment.Height = 200
-
-    #Alignment List
-        $ChosenAlignment.Items.Add('Chaotic Evil') | Out-Null
-        $ChosenAlignment.Items.Add('Chaotic Neutral') | Out-Null
-        $ChosenAlignment.Items.Add('Chaotic Good') | Out-Null
-        $ChosenAlignment.Items.Add('Neutral Evil') | Out-Null
-        $ChosenAlignment.Items.Add('Neutral') | Out-Null
-        $ChosenAlignment.Items.Add('Neutral Good') | Out-Null
-        $ChosenAlignment.Items.Add('Lawful Evil') | Out-Null
-        $ChosenAlignment.Items.Add('Lawful Neutral') | Out-Null
-        $ChosenAlignment.Items.Add('Lawful Good') | Out-Null
-
-        #To add a custom alignment use this line with a name given and then follow
-        #down the script to add it to the rest of the script
-        #$ChosenAlignment.Items.Add('Custom')
-        #You need to also add a race description if you wish other players to use it
-        #Along with a race picture, this is all in the "Assets" folder
-        #Alignment can also be just a race trait, potentially pulling out choice?
-        #TO DO! Add hover text for each race
-
-    $form.Controls.Add($ChosenAlignment)
-    $form.Topmost = $true
-    
-    if ($alignmenttype -eq [System.Windows.Forms.DialogResult]::OK)
-    {
-        $selectedalignment = $ChosenAlignment.SelectedItem
-        $selectedalignment
-    }
-    if ($alignmenttype -eq [System.Windows.Forms.DialogResult]::Ignore)
-    {
-        $ChosenAlignment = "None Selected"
-    }
-    $alignmenttype = $form.ShowDialog()
-    if ($alignmenttype -eq [System.Windows.Forms.DialogResult]::Retry)
-    {
-        return
-    }
-    if ($alignmenttype -eq [System.Windows.Forms.DialogResult]::Cancel)
-    {
-        Exit
-    }
-    
-#End of Alignment Choice
-
 #Armour + Shield Selection
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(500,350)
@@ -2003,10 +1881,9 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         #Race Stats
         $ChosenRaceDragonborn = $ChosenRaceDragonborn.SelectedItem 
-        $ChosenRace = "Dragonborn"
+        $ExportRace = "Dragonborn"
         $HP = "20"
         $SpeedTotal = "30"
-        $RaceLifeTime = "80 Years"
         $PlayerSize = "250 Pounds, Medium"
         $Playerheight = "6 Feet"
 
@@ -2048,7 +1925,7 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $Condition_Immunities = "Unknown"
         $Racesavingrolls = "0"
 
-        $RaceDescription = Get-Content .\Assets\Races\Dragonborn.json | ConvertFrom-Json
+        $RaceDescription = Get-Content '.\Assets\Races\Dragonborn.json' | ConvertFrom-Json
         $RaceDescription | Select-Object -Property 'description'
 
         $SpokenLanguages = "You can speak, read, and write Common and Draconic. Draconic is thought to be one of the oldest languages and is often used in the study of magic. The language sounds harsh to most other creatures and includes numerous hard consonants and sibilants."
@@ -2056,32 +1933,16 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $RacialSpecialAbility = "Breath Weapon, You can use your action to exhale destructive energy. Your draconic ancestry determines the size, shape, and damage type of the exhalation. When you use your breath weapon, each creature in the area of the exhalation must make a saving throw, the type of which is determined by your draconic ancestry. The DC for this saving throw equals 8 and your Constitution modifier and your proficiency bonus. A creature takes 2d6 damage on a failed save, and half as much damage on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th level, and 5d6 at 16th level. After you use your breath weapon, you cant use it again until you complete a short or long rest."
         $CharacterImage = '.\Assets\Race_Pictures\Dragonborn.png'
 
-        #Personality
-        $PersonalityTraits = "Test_Personality"
-        $Ideals = "Not Ideal"
-        $Bonds = "Unknown"
-        $Flaws = "Unknown"
-
     }
     if ($ChosenRace.SelectedItem -match 'Dwarf')
     {
         $ChosenRaceDwarf = $ChosenRaceDwarf.SelectedItem 
         $ChosenRaceDwarf
-
+        $ExportRace = "Dwarf"
         $HP = "0"
-        $HP
-
         $SpeedTotal = "25"
-        $SpeedTotal
-
-        $RaceLifeTime = "400 Years"
-        $RaceLifeTime
-
         $PlayerSize = "150 Pounds, Medium"
-        $PlayerSize
-
         $Playerheight = "5 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -2092,60 +1953,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak."
-
         $RaceDescription = "Kingdoms rich in ancient grandeur, halls carved into the roots of mountains, the echoing of picks and hammers in deep mines and blazing forges, a commitment to clan and tradition, and a burning hatred of goblins and orcs, these common threads unite all dwarves."
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Elf')
     {
         $ChosenRaceElf = $ChosenRaceElf.SelectedItem 
         $ChosenRaceElf
-
+        $ExportRace = "Elf"
         $HP = "0"
-        $HP
-
         $SpeedTotal = "30"
-        $SpeedTotal
-
-        $RaceLifeTime = "750 Years"
-        $RaceLifeTime
-
         $PlayerSize = "Slender Builds, Medium"
-        $PlayerSize
-
         $Playerheight = "6 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -2156,60 +1980,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "You can speak, read, and write Common and Elvish. Elvish is fluid, with subtle intonations and intricate grammar. Elven literature is rich and varied, and their songs and poems are famous among other races. Many bards learn their language so they can add Elvish ballads to their repertoires."
-
         $RaceDescription = "Elves are a magical people of otherworldly grace, living in the world but not entirely part of it. They live in places of ethereal beauty, in the midst of ancient forests or in silvery spires glittering with faerie light, where soft music drifts through the air and gentle fragrances waft on the breeze. Elves love nature and magic, art and artistry, music and poetry, and the good things of the world."
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Gnome')
     {
         $ChosenRaceGnome = $ChosenRaceGnome.SelectedItem 
         $ChosenRaceGnome
-
+        $ExportRace = "Gnome"
         $HP = "0"
-        $HP
-
         $SpeedTotal = "25"
-        $SpeedTotal
-
-        $RaceLifeTime = "500 Years"
-        $RaceLifeTime
-
         $PlayerSize = "40 Pounds, Small"
-        $PlayerSize
-
         $Playerheight = "4 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -2220,61 +2007,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
-
         $SpokenLanguages = "You can speak, read, and write Common and Gnomish. The Gnomish language, which uses the Dwarvish script, is renowned for its technical treatises and its catalogs of knowledge about the natural world."
-
         $RaceDescription = "A constant hum of busy activity pervades the warrens and neighborhoods where gnomes form their close knit communities. Louder sounds punctuate the hum: a crunch of grinding gears here, a minor explosion there, a yelp of surprise or triumph, and especially bursts of laughter. Gnomes take delight in life, enjoying every moment of invention, exploration, investigation, creation, and play."
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Half-Elf')
     {
         $ChosenRaceHalf_Elf = $ChosenRaceHalf_Elf.SelectedItem 
         $ChosenRaceHalf_Elf
-
+        $ExportRace = "Half-Elf"
         $HP = "0"
-        $HP
-
         $SpeedTotal = "30"
-        $SpeedTotal
-
-        $RaceLifeTime = "180"
-        $RaceLifeTime
-
         $PlayerSize = "Varies On Build, Medium"
-        $PlayerSize
-
         $Playerheight = "6 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -2285,60 +2034,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "You can speak, read, and write Common, Elvish, and one extra language of your choice."
-
         $RaceDescription = "Walking in two worlds but truly belonging to neither, half elves combine what some say are the best qualities of their elf and human parents: human curiosity, inventiveness, and ambition tempered by the refined senses, love of nature, and artistic tastes of the elves. Some half elves live among humans, set apart by their emotional and physical differences, watching friends and loved ones age while time barely touches them. Others live with the elves, growing restless as they reach adulthood in the timeless elven realms, while their peers continue to live as children. Many half elves, unable to fit into either society, choose lives of solitary wandering or join with other misfits and outcasts in the adventuring life."
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Halfling')
     {
         $ChosenRaceHalfling = $ChosenRaceHalfling.SelectedItem 
         $ChosenRaceHalfling
-
+        $ExportRace = "Halfling"
         $HP = "0"
-        $HP
-
         $SpeedTotal = "25"
-        $SpeedTotal
-
-        $RaceLifeTime = "200"
-        $RaceLifeTime
-
         $PlayerSize = "40 Pounds, Small"
-        $PlayerSize
-
         $Playerheight = "3 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -2349,60 +2061,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "You can speak, read, and write Common and Halfling. The Halfling language isnt secret, but halflings are loath to share it with others. They write very little, so they dont have a rich body of literature. Their oral tradition, however, is very strong. Almost all halflings speak Common to converse with the people in whose lands they dwell or through which they are traveling."
-
         $RaceDescription = "The comforts of home are the goals of most halflings lives: a place to settle in peace and quiet, far from marauding monsters and clashing armies; a blazing fire and a generous meal; fine drink and fine conversation. Though some halflings live out their days in remote agricultural communities, others form nomadic bands that travel constantly, lured by the open road and the wide horizon to discover the wonders of new lands and peoples. But even these wanderers love peace, food, hearth, and home, though home might be a wagon jostling along a dirt road or a raft floating downriver."
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Half-Orc')
     {
         $ChosenRaceHalf_Orc = $ChosenRaceHalf_Orc.SelectedItem 
         $ChosenRaceHalf_Orc
-
+        $ExportRace = "Half-Orc"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "30"
-        $SpeedTotal
-
-        $RaceLifeTime = "75"
-        $RaceLifeTime
-
         $PlayerSize = "Larger Than Humans, Medium"
-        $PlayerSize
-
         $Playerheight = "6 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -2413,60 +2088,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "You can speak, read, and write Common and Orc. Orc is a harsh, grating language with hard consonants. It has no script of its own but is written in the Dwarvish script."
-
         $RaceDescription = "Whether united under the leadership of a mighty warlock or having fought to a standstill after years of conflict, orc and human tribes sometimes form alliances, joining forces into a larger horde to the terror of civilized lands nearby. When these alliances are sealed by marriages, half orcs are born. Some half orcs rise to become proud chiefs of orc tribes, their human blood giving them an edge over their full blooded orc rivals. Some venture into the world to prove their worth among humans and other more civilized races. Many of these become adventurers, achieving greatness for their mighty deeds and notoriety for their barbaric customs and savage fury."
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Human')
     {
         $ChosenRaceHuman = $ChosenRaceHuman.SelectedItem 
         $ChosenRaceHuman
-
+        $ExportRace = "Human"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "30"
-        $SpeedTotal
-
-        $RaceLifeTime = "100"
-        $RaceLifeTime
-
         $PlayerSize = "Varies On Build, Medium"
-        $PlayerSize
-
         $Playerheight = "6 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -2477,60 +2115,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "You can speak, read, and write Common and one extra language of your choice. Humans typically learn the languages of other peoples they deal with, including obscure dialects. They are fond of sprinkling their speech with words borrowed from other tongues: Orc curses, Elvish musical expressions, Dwarvish military phrases, and so on."
-
         $RaceDescription = "In the reckonings of most worlds, humans are the youngest of the common races, late to arrive on the world scene and short, lived in comparison to dwarves, elves, and dragons. Perhaps it is because of their shorter lives that they strive to achieve as much as they can in the years they are given. Or maybe they feel they have something to prove to the elder races, and thats why they build their mighty empires on the foundation of conquest and trade. Whatever drives them, humans are the innovators, the achievers, and the pioneers of the worlds."
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Tiefling')
     {
         $ChosenRaceTiefling = $ChosenRaceTiefling.SelectedItem 
         $ChosenRaceTiefling
-
+        $ExportRace = "Tiefling"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "30"
-        $SpeedTotal
-
-        $RaceLifeTime = "150"
-        $RaceLifeTime
-
         $PlayerSize = "Varies On Build, Medium"
-        $PlayerSize
-
         $Playerheight = "6 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -2541,127 +2142,50 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "You can speak, read, and write Common and Infernal."
-
         $RaceDescription = "To be greeted with stares and whispers, to suffer violence and insult on the street, to see mistrust and fear in every eye: this is the lot of the tiefling. And to twist the knife, tieflings know that this is because a pact struck generations ago infused the essence of Asmodeus overlord of the Nine Hells, into their bloodline. Their appearance and their nature are not their fault but the result of an ancient sin, for which they and their children and their childrens children will always be held accountable."
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Orc')
     {
         $ChosenRaceOrc = $ChosenRaceOrc.SelectedItem 
         $ChosenRaceOrc
-
-        $HP = "0"
-        $HP
-        
+        $ExportRace = "Orc"
+        $HP = "15"      
         $SpeedTotal = "30"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "+3"
+        $DEX = "+1"
+        $CON = "+3"
+        $INT = "-2"
+        $WIS = "+0"
+        $CHA = "+0"
 
-        $Skills = "Unknown"
-        $Skills
-
-        $Senses = "Unknown"
-        $Senses
-
+        $Skills = "Intimidation +2"
+        $Senses = "darkvision 60ft, passive perception 10"
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Common, Orc"
-
-        $RaceDescription = ""
-        $RaceDescription
-
-        $RacialTraits = "Aggressive. As a bonus action, the orc can move up to its speed toward a hostile creature that it can see."
-        $RacialTraits
-
-        $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
+        $RaceDescription = "Orcs are savage raiders and pillagers with stooped postures, low foreheads and piggish faces with prominent lower canines that resemble tusks."
+        $RacialSpecialAbility = "Aggressive. As a bonus action, the orc can move up to its speed toward a hostile creature that it can see."
     }
     if ($ChosenRace.SelectedItem -match 'Leonin')
     {
         $ChosenRaceLeonin = $ChosenRaceLeonin.SelectedItem 
         $ChosenRaceLeonin
-
-        $HP = "0"
-        $HP
-        
+        $ExportRace = "Leonin"
+        $HP = "0"      
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -2672,60 +2196,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = ""
-
         $RaceDescription = ""
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Satyr')
     {
         $ChosenRaceSatyr = $ChosenRaceSatyr.SelectedItem 
         $ChosenRaceSatyr
-        
-        $HP = "31"
-        $HP
-        
+        $ExportRace = "Satyr"
+        $HP = "31"      
         $SpeedTotal = "40"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "+1"
@@ -2736,60 +2223,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "+2"
 
         $Skills = "Perception +2, Performance +6, Stealth +5"
-        $Skills
-
         $Senses = "Passive Perception 12"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Common, Elvish, Sylvan"
-
-        $RaceDescription = "Unknown"
-        $RaceDescription
-
-        $RacialSpecialAbility = "Magic Resistance"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
+        $RaceDescription = "Satyrs are raucous fey that frolic in the wild forests, driven by curosity and hedonism in equal measure. Satyrs resemble stout male humans with the furry lower bodies and cloven hooves of goats. Horns sprout from their heads, ranging in shape from pair of small nubs to large, curling rams' horns. They typically sport facial hair."
+        $RacialSpecialAbility = "Magic Resistance. The satyr had advantage on saving throws against spells and other magical effects."
     }
     if ($ChosenRace.SelectedItem -match 'Fairy')
     {
         $ChosenRaceFairy = $ChosenRaceFairy.SelectedItem 
         $ChosenRaceFairy
-        
+        $ExportRace = "Fairy"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -2800,60 +2250,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Harengon')
     {
         $ChosenRaceHarengon = $ChosenRaceHarengon.SelectedItem 
         $ChosenRaceHarengon
-        
+        $ExportRace = "Harengon"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -2864,60 +2277,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Aarakocra')
     {
         $ChosenRaceAarakocra = $ChosenRaceAarakocra.SelectedItem 
         $ChosenRaceAarakocra
-
+        $ExportRace = "Aarakocra"
         $HP = "13"
-        $HP
-        
         $SpeedTotal = "25, 50 if flying"
-        $SpeedTotal
-
-        $RaceLifeTime = "30"
-        $RaceLifeTime
-
         $PlayerSize = "100 Pounds, Medium"
-        $PlayerSize
-
         $Playerheight = "5 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "+0"
@@ -2928,62 +2304,25 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "+0"
 
         $Skills = "Perception +5"
-        $Skills
-
         $Senses = "Passive perception 15"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "You can speak, read, and write Common, Aarakocra, and Auran."
-
         $RaceDescription = "From below, aarakocra look much like large birds. Only when they descend to roost on a branch or walk across the ground does their humanoid appearance reveal itself. Standing upright, aarakocra might reach 5 feet tall, and they have long, narrow legs that taper to sharp talons.
-
+        
         Feathers cover their bodies. Their plumage typically denotes membership in a tribe. Males are brightly colored, with feathers of red, orange, or yellow. Females have more subdued colors, usually brown or gray. Their heads complete the avian appearance, being something like a parrot or eagle with distinct tribal variations."
-        $RaceDescription
-
         $RacialSpecialAbility = "Dive Attack"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Genasi')
     {
         $ChosenRaceGenasi = $ChosenRaceGenasi.SelectedItem 
         $ChosenRaceGenasi
-
+        $ExportRace = "Genasi"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "30"
-        $SpeedTotal
-
-        $RaceLifeTime = "120"
-        $RaceLifeTime
-
         $PlayerSize = "Varies On Build, Medium"
-        $PlayerSize
-
         $Playerheight = "6 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -2994,22 +2333,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "You can speak, read, and write Common and Primordial. Primordial is a guttural language, filled with harsh syllables and hard consonants."
-
         $RaceDescription = "Those who think of other planes at all consider them remote, distant realms, but planar influence can be felt throughout the world. It sometimes manifests in beings who, through an accident of birth, carry the power of the planes in their blood. The genasi are one such people, the offspring of genies and mortals.
 
         The Elemental Planes are often inhospitable to natives of the Material Plane: crushing earth, searing flames, boundless skies, and endless seas make visiting these places dangerous for even a short time. The powerful genies, however, dont face such troubles when venturing into the mortal world. They adapt well to the mingled elements of the Material Plane, and they sometimes visit, whether of their own volition or compelled by magic. Some genies can adopt mortal guise and travel incognito.
@@ -3020,40 +2348,16 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $RaceDescription
 
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Goliath')
     {
         $ChosenRaceGoliath = $ChosenRaceGoliath.SelectedItem 
         $ChosenRaceGoliath
-
+        $ExportRace = "Goliath"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "30"
-        $SpeedTotal
-
-        $RaceLifeTime = "100"
-        $RaceLifeTime
-
         $PlayerSize = "280-340 Pounds"
-        $PlayerSize
-
         $Playerheight = "8 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -3064,60 +2368,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "You can speak, read, and write Common and Giant."
-
         $RaceDescription = "At the highest mountain peaks, far above the slopes where trees grow and where the air is thin and the frigid winds howl dwell the reclusive goliaths. Few folk can claim to have seen a goliath, and fewer still can claim friendship with them. Goliaths wander a bleak realm of rock, wind, and cold. Their bodies look as if they are carved from mountain stone and give them great physical power. Their spirits take after the wandering wind, making them nomads who wander from peak to peak. Their hearts are infused with the cold regard of their frigid realm, leaving each goliath with the responsibility to earn a place in the tribe or die trying."
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Aasimar')
     {
         $ChosenRaceAasimar = $ChosenRaceAasimar.SelectedItem 
         $ChosenRaceAasimar
-        
-        $HP = "0"
-        $HP
-        
+        $ExportRace = "Aasimar"
+        $HP = "0"      
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -3128,60 +2395,24 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Bugbear')
     {
         $ChosenRaceBugbear = $ChosenRaceBugbear.SelectedItem 
         $ChosenRaceBugbear
+        $ExportRace = "Bugbear"
         
         $HP = "27"
-        $HP
-        
         $SpeedTotal = "30"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "+2"
@@ -3192,60 +2423,24 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "-1"
 
         $Skills = "Stealth +6, Survival +2"
-        $Skills
-
         $Senses = "Darkvision 60ft, passive perception 10"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Common, Goblin"
-
-        $RaceDescription = "Unknown"
-        $RaceDescription
-
-        $RacialSpecialAbility = "Brute, Surprise Attack"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
+        $RaceDescription = "Bugbears are born for battle and mayhem, Surviving by raiding and hunting, they bully the weak and despise being bossed around, but their love for carnage means they fight for powerful masters if bloodshed and treasure are assured."
+        $RacialSpecialAbility = "Brute. A Melee weapon deals one extra die of damage when the bugbear hits with it (included in the attack)
+        Surprise Attack. If the bugbear surprises a creature and hits with an attack during the first round of combat, the target takes an extra 7 (2d6) damage from the attack."
     }
     if ($ChosenRace.SelectedItem -match 'Firbolg')
     {
         $ChosenRaceFirbolg = $ChosenRaceFirbolg.SelectedItem 
         $ChosenRaceFirbolg
-
+        $ExportRace = "Firbolg"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "30"
-        $SpeedTotal
-
-        $RaceLifeTime = "500"
-        $RaceLifeTime
-
         $PlayerSize = "240-300 Pounds"
-        $PlayerSize
-
         $Playerheight = "6 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -3256,126 +2451,51 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "You can speak, read and write Common, Elvish and giant"
-
         $RaceDescription = "Firbolgs are the fores-dwelling race native to the Greying Wildlands, particularly the mysterious Savlirwood. Their bodie are covered with thick fur ranging from tones of earthen brown and ruddy red to cool grays and blues , and even to wild hues of pink and green. Their bodies are bovine or camelid in appearance with floppy, pointed ears and broad, pink noses, but they are bipdal and have hands that manipulate weapons and objects
         Most Firbolgs live in extended family units, and it is unusual to find one living alone. However, they are introverted to the point where they seldom engage with other firbolgs outside the family unit, and firbolgs rarely form their own cities, villages or even large tribes. Despite this, many firbolgs enjoy visiting other nations and settlements for a short time for trade, signseeing, and to visit friends."
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Goblin')
     {
         $ChosenRaceGoblin = $ChosenRaceGoblin.SelectedItem 
         $ChosenRaceGoblin
-
-        $HP = "0"
-        $HP
-        
-        $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
+        $ExportRace = "Goblin"
+        $HP = "7"
+        $SpeedTotal = "30"
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "-1"
+        $DEX = "+2"
+        $CON = "+0"
+        $INT = "+0"
+        $WIS = "-1"
+        $CHA = "-1"
 
-        $Skills = "Unknown"
-        $Skills
-
-        $Senses = "Unknown"
-        $Senses
-
+        $Skills = "Stealth +6"
+        $Senses = "Darkvision 60ft, passive perception 9"
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
-
-        $SpokenLanguages = ""
-
-        $RaceDescription = ""
-        $RaceDescription
-
-        $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
+        $SpokenLanguages = "Common, Goblin"
+        $RaceDescription = "Goblins are small, black-hearted, selfish humanoids that lair in caves, abandoned mines, depsoiled dungeons and other dismal settings. Individually weak, goblins gather in large - sometimes overwhelming - numbers. They crave power and regularly abuse whatever authority they obtain."
+        $RacialSpecialAbility = "Nimble Escape. The goblin can take the disengage or hide action as a bonus action on each of it's turns."
     }
     if ($ChosenRace.SelectedItem -match 'Hobgoblin')
     {
         $ChosenRaceHobGoblin = $ChosenRaceHobGoblin.SelectedItem 
         $ChosenRaceHobGoblin
-        
+        $ExportRace = "Hobgoblin"
         $HP = "11"
-        $HP
-        
         $SpeedTotal = "30"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "+1"
@@ -3386,60 +2506,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "-1"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Darkvision 60ft, Passive perception 10"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Common, Goblin"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Martial Advantage"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Kenku')
     {
         $ChosenRaceKenku = $ChosenRaceKenku.SelectedItem 
         $ChosenRaceKenku
-        
+        $ExportRace = "Kenku"
         $HP = "13"
-        $HP
-        
         $SpeedTotal = "30"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "+0"
@@ -3450,61 +2533,25 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "+0"
 
         $Skills = "Deception +4, Perception +2, Stealth +5"
-        $Skills
-
         $Senses = "Passive Perception 12"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
-        $SpokenLanguages = "Common, Auran (only using mimicry)"
-
-        $RaceDescription = "Unknown"
-        $RaceDescription
-
-        $RacialSpecialAbility = "Ambusher, Mimicry"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
+        $SpokenLanguages = "Common, Auran (only using mimicry trait)"
+        $RaceDescription = "Kenku are feathered humanoids that wander the world as vagabonds, driven by greed. They can perfectly imitate any sounds they hear."
+        $RacialSpecialAbility = "Ambusher. In the first round of combat, the kenku has advantage on attack rolls against any creature it surpsied.
+        Mimicry. The kenku can mimic any sounds it has heard, including voices. A creature that hears the sounds can tell they are imitations with a successful DC 14 Wisdom (insight) check."
     }
     if ($ChosenRace.SelectedItem -match 'Kobold')
     {
         #Race Stats
         $ChosenRaceKobold = $ChosenRaceKobold.SelectedItem 
         $ChosenRaceKobold
-
+        $ExportRace = "Kobold"
         $HP = "5"
-        $HP
-        
         $SpeedTotal = "30"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "-2"
@@ -3515,59 +2562,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "-1"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Darkvision 60ft, Passive perception 8"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Sunlight Sensitivity"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
     }
     if ($ChosenRace.SelectedItem -match 'Lizardfolk')
     {
         $ChosenRaceLizardfolk = $ChosenRaceLizardfolk.SelectedItem 
         $ChosenRaceLizardfolk
-        
+        $ExportRace = "Lizardfolk"
         $HP = "22"
-        $HP
-        
         $SpeedTotal = "30"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "+2"
@@ -3578,60 +2589,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "-2"
 
         $Skills = "Perception +3, Stealth +4, Survival +5"
-        $Skills
-
         $Senses = "Passive perception 13"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
-        $SpokenLanguages = "Common, Draconic"
-
-        $RaceDescription = "Unknown"
-        $RaceDescription
-
+        $SpokenLanguages = "Draconic"
+        $RaceDescription = "Lizardfolk are primitive reptilian humanoids that lurk in the swamps and jungles of the world. Their hut villages thrive in forbidding grottos, half-sunken ruins and watery caverns."
         $RacialSpecialAbility = "Hold Breath"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Tabaxi')
     {
         $ChosenRaceTabaxi = $ChosenRaceTabaxi.SelectedItem 
         $ChosenRaceTabaxi
-        
+        $ExportRace = "Tabaxi"  
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -3642,60 +2616,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Triton')
     {
         $ChosenRaceTriton = $ChosenRaceTriton.SelectedItem 
         $ChosenRaceTriton
-        
+        $ExportRace = "Triton"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -3706,60 +2643,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Yuan-ti Pureblood')
     {
         $ChosenRaceYuan_Ti_Pureblood = $ChosenRaceYuan_Ti_Pureblood.SelectedItem 
         $ChosenRaceYuan_Ti_Pureblood
-        
+        $ExportRace = "Yuan-ti Pureblood"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -3770,60 +2670,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Feral Tiefling')
     {
         $ChosenRaceFeral_Tiefling = $ChosenRaceFeral_Tiefling.SelectedItem 
         $ChosenRaceFeral_Tiefling
-        
+        $ExportRace = "Feral Tiefling"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -3834,60 +2697,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Tortle')
     {
         $ChosenRaceTortle = $ChosenRaceTortle.SelectedItem 
         $ChosenRaceTortle
-        
+        $ExportRace = "Tortle"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -3898,60 +2724,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Changling')
     {
         $ChosenRaceChangling = $ChosenRaceChangling.SelectedItem 
         $ChosenRaceChangling
-        
+        $ExportRace = "Changling"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -3962,60 +2751,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Kalashtar')
     {
         $ChosenRaceKalashtar = $ChosenRaceKalashtar.SelectedItem 
         $ChosenRaceKalashtar
-        
+        $ExportRace = "Kalashtar"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -4026,59 +2778,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
     }
     if ($ChosenRace.SelectedItem -match 'Shifter')
     {
         $ChosenRaceShifter = $ChosenRaceShifter.SelectedItem 
         $ChosenRaceShifter
-        
+        $ExportRace = "Shifter"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -4089,60 +2805,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Warforged')
     {
         $ChosenRaceWarforged = $ChosenRaceWarforged.SelectedItem 
         $ChosenRaceWarforged
-        
+        $ExportRace = "Warforged"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -4153,188 +2832,80 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-        $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Gith')
     {
         $ChosenRaceGith = $ChosenRaceGith.SelectedItem 
         $ChosenRaceGith
+        $ExportRace = "Gith"
         
-        $HP = "0"
-        $HP
-        
+        $HP = "49"
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "+2"
+        $DEX = "+2"
+        $CON = "+1"
+        $INT = "+1"
+        $WIS = "1"
+        $CHA = "+0"
 
-        $Skills = "Unknown"
-        $Skills
-
-        $Senses = "Unknown"
-        $Senses
-
+        $Skills = "None"
+        $Senses = "Passive perception 11"
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
-        $SpokenLanguages = "Unknown"
-
-        $RaceDescription = "Unknown"
-        $RaceDescription
-
-        $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-                $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
+        $SpokenLanguages = "Gith"
+        $RaceDescription = "The warlike githyanki and the contemplative githzerai are sundered people - two cultures that utterly despide one another. Before there were githyanki or githzerai, these creatures were a single race enslaved by the mind flayers. Although they attempted to overthrow their masters many times, their rebellions were repeatedly crushed until a great leader named Gith arose. After much bloodshed, Gith and her followers threw off the yoke of their illithid masters, but another leader named Zerthimon emerged in the aftermath of battle. Zerthimon challenged Gith's motives, claiming that her strict martial leadership and desire for vengeance amounted a little more than another form of slavery for her people. A rift erupted between followers of each leader and they eventually became two races whose enmity endures to this day. Whether these tall, gaunt creatures were peaceful of savage, cultured or primitive before the mind flayers enslaved and changed them, none can say. Not even the original name of their race remails from that distant time."
+        $RacialSpecialAbility = "innate Spellcasting (Psionics). The githyanki's innate spellcasting ability is intelligence. It can innately cast the following spells, requiring no component: 
+        At will: mage hand (the hand is invisible)
+        3/day each: jump, misty step, nondetection (self only)."
     }
     if ($ChosenRace.SelectedItem -match 'Centaur')
     {
         $ChosenRaceCentaur = $ChosenRaceCentaur.SelectedItem 
         $ChosenRaceCentaur
-        
-        $HP = "0"
-        $HP
-        
-        $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
+        $ExportRace = "Centaur"
+        $HP = "45"
+        $SpeedTotal = "50"
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "+4"
+        $DEX = "+2"
+        $CON = "+2"
+        $INT = "-1"
+        $WIS = "+1"
+        $CHA = "+0"
 
-        $Skills = "Unknown"
-        $Skills
-
-        $Senses = "Unknown"
-        $Senses
-
+        $Skills = "Athletics +6, Perception +3, Survival +3"
+        $Senses = "Passive perception 13"
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
-        $SpokenLanguages = "Unknown"
-
-        $RaceDescription = "Unknown"
-        $RaceDescription
-
-        $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-                $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
+        $SpokenLanguages = "Elvish, Sylvan"
+        $RaceDescription = "Reclusive wanderers and omen-readers of the wild, centaurs avoid conflict but fight fiercely when pressed. They roam the vast wilderness, keeping far from borders, law and the company of other creatures."
+        $RacialSpecialAbility = "Charge. If the cenntaur moves at least 30 feet straight toward a target and then hits with a pike attack on the same turn, the target takes an extra 10 (3d6) piercing damage."
     }
     if ($ChosenRace.SelectedItem -match 'Loxodon')
     {
         $ChosenRaceLoxodon = $ChosenRaceLoxodon.SelectedItem 
         $ChosenRaceLoxodon
-        
+        $ExportRace = "Loxodon"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -4345,124 +2916,52 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-                $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Minotaur')
     {
         $ChosenRaceMinotaur = $ChosenRaceMinotaur.SelectedItem 
         $ChosenRaceMinotaur
-        
-        $HP = "0"
-        $HP
-        
-        $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
+        $ExportRace = "Minotaur"
+        $HP = "76"
+        $SpeedTotal = "40"
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "+4"
+        $DEX = "+0"
+        $CON = "+3"
+        $INT = "-2"
+        $WIS = "+3"
+        $CHA = "-1"
 
-        $Skills = "Unknown"
-        $Skills
-
-        $Senses = "Unknown"
-        $Senses
-
+        $Skills = "Perception +7"
+        $Senses = "Darkvision 60ft, passive perception 17"
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
-        $SpokenLanguages = "Unknown"
-
-        $RaceDescription = "Unknown"
-        $RaceDescription
-
-        $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-                $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
+        $SpokenLanguages = "Abyssal"
+        $RaceDescription = "A minotaur's roar is a savage battle cry that most civilized creatures fear. Born into the mortal realm by the demonic rites, minotaurs are savage conquerors and carnivores that live for the hunt. Their brown and black fur is stained with the blood of fallen foes and they carry the stench of death."
+        $RacialSpecialAbility = "Charge. If the minotaur moves at least 10 feet straight toward a target and then hits it with a gore attack on the same turn, the target takes an extra 9 (2d8) piercing damage. If the target is a creature, it must succeed on a DC 14 strength saving throw or be pushed up to 10 feet away and knocked prone.
+        Labyrinthine Recall. The minotaur can perfectly recall any path it has travelled.
+        Reckless. At the start of it's turn, the minotaur can gain advantage on all melee weapon attack rolls it makes during that turn, but attack rolls against it have advantage until the start of it's next turn."
     }
     if ($ChosenRace.SelectedItem -match 'Simic Hybrid')
     {
         $ChosenRaceSimic_Hybrid = $ChosenRaceSimic_Hybridr.SelectedItem 
         $ChosenRaceSimic_Hybrid
-        
+        $ExportRace = "Simic Hybrid"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -4473,60 +2972,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-                $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Vedalken')
     {
         $ChosenRaceSimic_Hybrid = $ChosenRaceSimic_Hybrid.SelectedItem 
         $ChosenRaceSimic_Hybrid
-        
+        $ExportRace = "Vedalken"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -4537,60 +2999,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-                $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Verdan')
     {
         $ChosenRaceVerdan = $ChosenRaceVerdan.SelectedItem 
         $ChosenRaceVerdan
-        
+        $ExportRace = "Verdan"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -4601,60 +3026,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-                $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Locathah')
     {
         $ChosenRaceLocathah = $ChosenRaceLocathah.SelectedItem 
         $ChosenRaceLocathah
-        
+        $ExportRace = "Locathah"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -4665,60 +3053,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-                $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Grung')
     {
         $ChosenRaceGrung = $ChosenRaceGrung.SelectedItem 
         $ChosenRaceGrung
-        
+        $ExportRace = "Grung"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -4729,124 +3080,51 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-                $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Lycanth')
     {
         $ChosenRaceLycanth = $ChosenRaceLycanth.SelectedItem 
         $ChosenRaceLycanth
-        
-        $HP = "0"
-        $HP
-        
-        $SpeedTotal = "0"
+        $ExportRace = "Lycanth"
+        $HP = "70"
+        $SpeedTotal = "30"
         $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
+        $STR = "+2"
+        $DEX = "+1"
+        $CON = "+2"
+        $INT = "+0"
+        $WIS = "+1"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Skills
-
-        $Senses = "Unknown"
-        $Senses
-
+        $Skills = "Perception +3, Stealth +2"
+        $Senses = "Perception 14"
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
-        $SpokenLanguages = "Unknown"
-
-        $RaceDescription = "Unknown"
-        $RaceDescription
-
-        $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-                $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
+        $SpokenLanguages = "Common (can't speak in form)"
+        $RaceDescription = "One of the most ancient and feared of all curses, lycanthropy can transform the most civilised humanoid into a ravening beast. In it's natural humanoid form, a creature cursed by lycanthropy appears as it's normal self. Over time, however, many lycanthropes acquire features suggestive of their animal form. In that animal form, a lycanthrope resembles a powerful version of a normal animal. On close inspection, it's eyes show a faint spark of unnatural intelligence and might glow red in the dark. Evil lycanthropes hide among normal folk, emerging in animal form at night to spread terror and bloodshed, especially under a full moon. Good lycanthropes are reclusive and uncomfortable around other civilised creatures, often living alone in wilderness areas far from villages and towns."
+        $RacialSpecialAbility = "Shapechanger. The lycanth can use it's polymorph to change into it's were form, any equipment it is wearing or carrying is not transformed."
     }
     if ($ChosenRace.SelectedItem -match 'Troll')
     {
         $ChosenRaceTroll = $ChosenRaceTroll.SelectedItem 
         $ChosenRaceTroll
-        
+        $ExportRace = "Troll"
         $HP = "84"
-        $HP
-        
         $SpeedTotal = "30"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "+4"
@@ -4857,124 +3135,51 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "-2"
 
         $Skills = "Perception +2"
-        $Skills
-
         $Senses = "Darkvision 60ft, passive perception 12"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Giant"
-
-        $RaceDescription = "Unknown"
-        $RaceDescription
-
-        $RacialSpecialAbility = "Keen smell, Regeneration"
-        $RacialSpecialAbility
-
-                $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
+        $RaceDescription = "Born with horrific appetites, trolls eat anything they can catch and devour. They have no society to speak of, but they do serve as mercenaries to orcs, ogres, ettins, hags and giants. As payment, trolls demand food and treasure. Trolls are difficult to control, however, doing as they please even when working with more powerful creatures."
+        $RacialSpecialAbility = "Keen Smell. The troll has advantage on wisdom (perception) checks that rely on smell.
+        Regeneration. The troll regains 10 hit points at the start of it's turn. If the troll takes acid or fire damage, this trait doesn't function at the start of the troll's next turn. The troll dies only if it sarts it's turn with 0 hit point and doesn't regenerate."
     }
     if ($ChosenRace.SelectedItem -match 'Ogre')
     {
         $ChosenRaceOrge = $ChosenRaceOrge.SelectedItem 
         $ChosenRaceOrge
-        
+        $ExportRace = "Ogre"
         $HP = "59"
-        $HP
-        
-        $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
-        $PlayerSize = "0 Pounds"
-        $PlayerSize
-
-        $Playerheight = "0 Feet"
-        $Playerheight
+        $SpeedTotal = "40"
+        $PlayerSize = "900 Pounds"
+        $Playerheight = "10 Feet"
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "+4"
+        $DEX = "-1"
+        $CON = "+3"
+        $INT = "-3"
+        $WIS = "-2"
+        $CHA = "-2"
 
         $Skills = "Unknown"
-        $Skills
-
-        $Senses = "Unknown"
-        $Senses
-
+        $Senses = "Darkvision 60ft, passive perception 8"
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
-        $SpokenLanguages = "Unknown"
-
-        $RaceDescription = "Unknown"
-        $RaceDescription
-
+        $SpokenLanguages = "Common, Giant"
+        $RaceDescription = "Ogres are as lazy of the mind as they are strong of the body. They live by raiding, scavenging and killing for food and pleasure. The average adult specimen stands between 9 and 10 feet tall and weighs close to a thousand pounds."
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-                $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Feral Wolf')
     {
         $ChosenRaceFera_Wolf = $ChosenRaceFera_Wolf.SelectedItem 
         $ChosenRaceFera_Wolf
-        
+        $ExportRace = "Feral Wolf"
         $HP = "0"
-        $HP
-        
         $SpeedTotal = "0"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "0"
@@ -4985,60 +3190,23 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "0"
 
         $Skills = "Unknown"
-        $Skills
-
         $Senses = "Unknown"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
-        $RacialSpecialAbility
-
-                $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
     if ($ChosenRace.SelectedItem -match 'Wolf')
     {
         $ChosenRaceWolf = $ChosenRaceWolf.SelectedItem 
         $ChosenRaceWolf
-        
+        $ExportRace = "Wolf"
         $HP = "15"
-        $HP
-        
         $SpeedTotal = "40"
-        $SpeedTotal
-
-        $RaceLifeTime = "0"
-        $RaceLifeTime
-
         $PlayerSize = "0 Pounds"
-        $PlayerSize
-
         $Playerheight = "0 Feet"
-        $Playerheight
 
         #Attributes
         $STR = "+1"
@@ -5049,66 +3217,35 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "-2"
 
         $Skills = "Perception +3, Stealth +4"
-        $Skills
-
         $Senses = "Passive Perception 13"
-        $Senses
-
         $Damage_Immunities = "Unknown"
-        $Damage_Immunities
-
         $Condition_Immunities = "Unknown"
-        $Condition_Immunities
-
         $Racesavingrolls = "0"
-        $Racesavingrolls
-
         $SpokenLanguages = "Unknown"
-
         $RaceDescription = "Unknown"
-        $RaceDescription
-
         $RacialSpecialAbility = "Keen Hearing and Smell"
-        $RacialSpecialAbility
-
-                $PersonalityTraits = "Unknown"
-        $PersonalityTraits
-
-        $Ideals = "Unknown"
-        $Ideals
-
-        $Bonds = "Unknown"
-        $Bonds
-
-        $Flaws = "Unknown"
-        $Flaws
-
     }
-#End of details
+#End of race details
 
-Write-Output $RaceDescription
+#Chosen Subrace override for name of race, this is for anyone who chose a subrace
+
+    if ($ChosenSubRace.SelectedItem -match 'Draconic Ancestory')
+    {
+        $ExportRace = "Draconic Ancestory"
+    }
 
 #If adding a new race, please use the code below as an example:
-    #if ($ChosenRace.SelectedItem -match 'Dragonborn')
+    #if ($ChosenRace.SelectedItem -match '**')
     #{
         #Race Stats
-    #   $ChosenRaceDragonborn = $ChosenRaceDragonborn.SelectedItem 
-    #   $ChosenRaceDragonborn
-
+        #$ChosenRace** = $ChosenRace**.SelectedItem 
+        #$ChosenRace**
+        #$ExportRace = **
         #$HP = "0"
-        #$HP
-        
         #$SpeedTotal = "0"
-        #$SpeedTotal
-
         #$RaceLifeTime = "0"
-        #$RaceLifeTime
-
         #$PlayerSize = "0 Pounds"
-        #$PlayerSize
-
         #$Playerheight = "0 Feet"
-        #$Playerheight
 
         #Attributes
         #$STR = "0"
@@ -5119,28 +3256,13 @@ Write-Output $RaceDescription
         #$CHA = "0"
 
         #$Skills = "Unknown"
-        #$Skills
-
         #$Senses = "Unknown"
-        #$Senses
-
         #$Damage_Immunities = "Unknown"
-        #$Damage_Immunities
-
         #$Condition_Immunities = "Unknown"
-        #$Condition_Immunities
-
         #$Racesavingrolls = "0"
-        #$Racesavingrolls
-
         #$SpokenLanguages = "Unknown"
-
         #$RaceDescription = "Unknown"
-        #$RaceDescription
-
         #$RacialSpecialAbility = "Unknown"
-        #$RacialSpecialAbility
-        
     #}
 
     #Please finish adding - IF you select a race a picture appears to the rightside
@@ -5150,9 +3272,6 @@ Write-Output $RaceDescription
     #New weapon selection compared to the old one, 3 weapon scroll panels
     #All 3 must be a duplicate of the previous, but weapon stats need to be carried.
 #New Weapon selection
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(400,300)
@@ -7024,13 +5143,13 @@ $ArmourClass = 0
 #Damage per weapon is added to the index above
 #This also should include weight and properties
 
-#Custom Backstory
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
+#Attacks and Spellcasting fill box
+#To do 
 
+#Custom Backstory
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Sparks D&D Character Creator'
-    $form.Size = New-Object System.Drawing.Size(500,350)
+    $form.Size = New-Object System.Drawing.Size(800,605)
     $form.StartPosition = 'CenterScreen'
     $objIcon = New-Object system.drawing.icon (".\Assets\installer.ico")
     $form.Icon = $objIcon
@@ -7039,11 +5158,8 @@ Add-Type -AssemblyName System.Drawing
     $form.BackgroundImage = $objImage
     $form.BackgroundImageLayout = "Center"
  
-    $form.Width = $objImage.Width
-    $form.Height = $objImage.Height
-
     $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Location = New-Object System.Drawing.Point(75,270)
+    $okButton.Location = New-Object System.Drawing.Point(420,535)
     $okButton.Size = New-Object System.Drawing.Size(75,23)
     $okButton.Text = 'OK'
     $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
@@ -7051,7 +5167,7 @@ Add-Type -AssemblyName System.Drawing
     $form.Controls.Add($okButton)
 
     $skipButton = New-Object System.Windows.Forms.Button
-    $skipButton.Location = New-Object System.Drawing.Point(150,270)
+    $skipButton.Location = New-Object System.Drawing.Point(495,535)
     $skipButton.Size = New-Object System.Drawing.Size(75,23)
     $skipButton.Text = 'Skip'
     $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
@@ -7059,7 +5175,7 @@ Add-Type -AssemblyName System.Drawing
     $form.Controls.Add($skipButton)
 
     $backButton = New-Object System.Windows.Forms.Button
-    $backButton.Location = New-Object System.Drawing.Point(225,270)
+    $backButton.Location = New-Object System.Drawing.Point(570,535)
     $backButton.Size = New-Object System.Drawing.Size(75,23)
     $backButton.Text = 'Back'
     $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
@@ -7067,7 +5183,7 @@ Add-Type -AssemblyName System.Drawing
     $form.Controls.Add($backButton)
 
     $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Location = New-Object System.Drawing.Point(300,270)
+    $cancelButton.Location = New-Object System.Drawing.Point(645,535)
     $cancelButton.Size = New-Object System.Drawing.Size(75,23)
     $cancelButton.Text = 'Cancel'
     $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
@@ -7082,22 +5198,94 @@ Add-Type -AssemblyName System.Drawing
     
     $characterbackstory = New-Object System.Windows.Forms.TextBox
     $characterbackstory.Location = New-Object System.Drawing.Point(10,40)
-    $characterbackstory.Size = New-Object System.Drawing.Size(400,200)
+    $characterbackstory.Size = New-Object System.Drawing.Size(400,500)
     $characterbackstory.Multiline = 1
     $characterbackstory.ScrollBars = 2
     $characterbackstory.AcceptsReturn = 1
     $form.Controls.Add($characterbackstory)
-    
+
+    $personalitylabel = New-Object System.Windows.Forms.Label
+    $personalitylabel.Location = New-Object System.Drawing.Point(420,20)
+    $personalitylabel.Size = New-Object System.Drawing.Size(160,18)
+    $personalitylabel.Text = 'Write your Personality Traits:'
+    $form.Controls.Add($personalitylabel)
+
+    $PersonalityTraits = New-Object System.Windows.Forms.TextBox
+    $PersonalityTraits.Location = New-Object System.Drawing.Point(420,40)
+    $PersonalityTraits.Size = New-Object System.Drawing.Size(300,100)
+    $PersonalityTraits.Multiline = 1
+    $PersonalityTraits.ScrollBars = 2
+    $PersonalityTraits.AcceptsReturn = 1
+    $form.Controls.Add($PersonalityTraits)
+
+    $Idealslabel = New-Object System.Windows.Forms.Label
+    $Idealslabel.Location = New-Object System.Drawing.Point(420,150)
+    $Idealslabel.Size = New-Object System.Drawing.Size(160,18)
+    $Idealslabel.Text = 'Write your Ideals:'
+    $form.Controls.Add($Idealslabel)
+
+    $Ideals = New-Object System.Windows.Forms.TextBox
+    $Ideals.Location = New-Object System.Drawing.Point(420,170)
+    $Ideals.Size = New-Object System.Drawing.Size(300,100)
+    $Ideals.Multiline = 1
+    $Ideals.ScrollBars = 2
+    $Ideals.AcceptsReturn = 1
+    $form.Controls.Add($Ideals)
+
+    $Bondslabel = New-Object System.Windows.Forms.Label
+    $Bondslabel.Location = New-Object System.Drawing.Point(420,280)
+    $Bondslabel.Size = New-Object System.Drawing.Size(160,18)
+    $Bondslabel.Text = 'Write About your Bonds:'
+    $form.Controls.Add($Bondslabel)
+
+    $Bonds = New-Object System.Windows.Forms.TextBox
+    $Bonds.Location = New-Object System.Drawing.Point(420,300)
+    $Bonds.Size = New-Object System.Drawing.Size(300,100)
+    $Bonds.Multiline = 1
+    $Bonds.ScrollBars = 2
+    $Bonds.AcceptsReturn = 1
+    $form.Controls.Add($Bonds)
+
+    $Flawslabel = New-Object System.Windows.Forms.Label
+    $Flawslabel.Location = New-Object System.Drawing.Point(420,410)
+    $Flawslabel.Size = New-Object System.Drawing.Size(160,18)
+    $Flawslabel.Text = 'Write your Flaws:'
+    $form.Controls.Add($Flawslabel)
+
+    $Flaws = New-Object System.Windows.Forms.TextBox
+    $Flaws.Location = New-Object System.Drawing.Point(420,430)
+    $Flaws.Size = New-Object System.Drawing.Size(300,100)
+    $Flaws.Multiline = 1
+    $Flaws.ScrollBars = 2
+    $Flaws.AcceptsReturn = 1
+    $form.Controls.Add($Flaws)
+
     $form.Topmost = $true
     if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::OK)
     {
         $characterbackstory = $characterbackstory.Text
         $characterbackstory
 
+        $PersonalityTraits = $PersonalityTraits.Text
+        $PersonalityTraits
+
+        $Ideals = $Ideals.Text
+        $Ideals
+
+        $Bonds = $Bonds.Text
+        $Bonds
+
+        $Flaws = $Flaws.Text
+        $Flaws
+
     }
     if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::Ignore)
     {
         $characterbackstory = "N/A"
+        $PersonalityTraits = "Unknown"
+        $Ideals = "Unknown"
+        $Bonds = "Unknown"
+        $Flaws = "Unknown"
     }
     $characterbackstoryformdialog = $form.ShowDialog()
     if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::Retry)
@@ -7130,7 +5318,7 @@ $characterparameters = @{
         'PlayerName' = $playername.Text;
         'CharacterName' = $charactername.Text;
         'Background' = $characterbackgroundselect.SelectedItem;
-        'Race' = $ChosenRace.SelectedItem;
+        'Race' = $ExportRace;
         'Alignment' = $ChosenAlignment.SelectedItem;
         'XP' = $XP;
         'Inspiration' = $Inspiration;
@@ -7139,13 +5327,13 @@ $characterparameters = @{
         'AC' = $ArmourClass;
         'Initiative' = $InitiativeTotal;
         'Speed' = $SpeedTotal;
-        'PersonalityTraits ' = $PersonalityTraits;
+        'PersonalityTraits ' = $PersonalityTraits.Text;
         'STRmod' = $STRmod;
         'ST Strength' = $ST_STR;
         'DEX' = $DEX;
-        'Ideals' = $Ideals;
+        'Ideals' = $Ideals.Text;
         'DEXmod ' = $DEXmod;
-        'Bonds' = $Bonds;
+        'Bonds' = $Bonds.Text;
         'CON' = $CON;
         'HDTotal' = $HitDiceTotal;
         'Check Box 12' = $Check12; #first success button (from left)
@@ -7156,7 +5344,7 @@ $characterparameters = @{
         'Check Box 16' = $Check16; #second failure button
         'Check Box 17' = $Check17; #last failure button
         #'HD' =  ;
-        'Flaws' = $Flaws;
+        'Flaws' = $Flaws.Text;
         'INT' = $INT;
         'ST Dexterity' = $ST_DEX;
         'ST Constitution' = $ST_CON;
@@ -7231,7 +5419,7 @@ $characterparameters = @{
         #'GP' = ;
         #'PP' = ;
         #'Equipment' =  ;
-        #'Features and Traits' =  ;
+        #'Features and Traits' = ;
         'CharacterName 2' = $charactername.Text;
         'Age' = $age.Text;
         'Height' = $Playerheight;
@@ -7470,7 +5658,6 @@ Save-PdfField @characterparameters
 #'.\Exported_Characters\D&D Avatar - ChangeMe.pdf'
 
 #End of character Creation Dialog box
-Add-Type -AssemblyName PresentationCore,PresentationFramework
     $ButtonType = [System.Windows.MessageBoxButton]::Ok
     $MessageIcon = [System.Windows.MessageBoxImage]::Information
     $MessageBody = "Dungeons And Dragons Character Successfully Created!"

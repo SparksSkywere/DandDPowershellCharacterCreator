@@ -27,7 +27,7 @@ function Show-Console
 }
 #end of powershell console hiding
 #To show the console change "-hide" to "-show"
-show-console -hide
+show-console -show
 
 #Sparks's D&D Character Creator powershell script, this is intended for fun and feel free to edit fields for future use but please keep me credited
 #This is a powershell produced program, it is written in C# and powershell functions
@@ -72,11 +72,13 @@ $ChosenRace = "None Selected"
 $ExportRace = "None Selected"
 $ChosenSubRace = "None Selected"
 $RaceDescription = "Unknown"
-$RacialSpecialAbility = "Unknown"
+#$RacialSpecialAbility = "Unknown"
 $PersonalityTraits = "Unknown"
 $ProficencyBonus = "+0"
-$ClassLevel = "N/A"
+$ClassLevel = "0"
 $HP = "0"
+$HD = "0"
+#$HPCurrent = "0"
 $SpeedTotal = "0"
 $PlayerSize = "Unknown"
 $Playerheight = "Unknown"
@@ -87,49 +89,53 @@ $INT = "0"
 $WIS = "0"
 $CHA = "0"
 $SpokenLanguages = "Unknown"
-$Skills = "Unknown"
-$Senses = "Unknown"
+#$Skills = "Unknown"
+#$Senses = "Unknown"
 $ChosenClass = "None Selected"
 $ChosenSubClass = "None Selected"
 $ChosenAlignment = "None Selected"
 $InitiativeTotal = "0"
-$Damage_Immunities = "Unknown"
-$Condition_Immunities = "Unknown"
-$Racesavingrolls = "0"
+#$Damage_Immunities = "Unknown"
+#$Condition_Immunities = "Unknown"
+#Extra Character Information
+$characterbackstory = "Unknown"
+$factionname = "Unknown"
+$alliesandorganisations = "Unknown"
+$AddionalfeatTraits = "Unknown"
+$Ideals = "Unknown"
+$Bonds = "Unknown"
+$Flaws = "Unknown"
 #-Weapon Stats-
-$ATK_Bonus = "0"
-$selectedweapon1 = "Unknown"
-$selectedweapon2 = "Unknown"
-$selectedweapon3 = "Unknown"
+$selectweapon1panel = "Unknown"
+$selectweapon2panel = "Unknown"
+$selectweapon3panel = "Unknown"
+$Weapon1DamageSimpleMelee = "Unknown"
+$Weapon2DamageSimpleMelee = "Unknown"
+$Weapon3DamageSimpleMelee = "Unknown"
+$WPN1ATK_Bonus = "N/A"
+$WPN2ATK_Bonus = "N/A"
+$WPN3ATK_Bonus = "N/A"
+$Weapon1Weight = "0"
+$Weapon2Weight = "0"
+$Weapon3Weight = "0"
 $CombinedWeaponStats = "Null"
 $ChosenArmour = "Unknown"
 $ArmourClass = "0"
 $checkboxshield = "Unknown"
 $ArmourClassWithShield = "Unknown"
-$Totalweaponweight = "0"
+$Weapon1Weight = "0"
 #-Extra-
 $HitDiceTotal = "0"
-$Gold = "10"
 $XP = "1"
 $Inspiration = "1"
+#Treasure
+$CopperCP = ""
+$SilverSP = ""
+$ElectrumEP = ""
+$GoldGP = "10"
+$PlatinumPP = ""
 
-#Checkbox Death saves test
-$Check12 = 'Yes'
-$Check13 = 'Yes'
-$Check14 = 'Yes'
-$Check15 = 'Yes'
-$Check16 = 'Yes'
-$Check17 = 'Yes'
-
-#Checkbox Saving throws
-$Check11 = 'Yes'
-$Check18 = 'Yes'
-$Check19 = 'Yes'
-$Check20 = 'Yes'
-$Check21 = 'Yes'
-$Check22 = 'Yes'
-
-#Checkbox Skills
+#Checkbox# Skills
 $Check23 = 'Yes' 
 $Check24 = 'Yes'
 $Check25 = 'Yes'
@@ -779,11 +785,9 @@ $Check40 = 'Yes'
     if ($ChosenRace.SelectedItem -match 'Orc')
     {
         $ChosenSubRace.Items.Add('Orc') | Out-Null
-        $ChosenSubRace.Items.Add('Gruumsh One-Eye') | Out-Null
-        $ChosenSubRace.Items.Add('Tribes like Plagues') | Out-Null
+        $ChosenSubRace.Items.Add('Eye of Gruumsh') | Out-Null
         $ChosenSubRace.Items.Add('Ranging Scavengers') | Out-Null
-        $ChosenSubRace.Items.Add('Leadershiip and Might') | Out-Null
-        $ChosenSubRace.Items.Add('Orc Crossbreeds') | Out-Null
+        $ChosenSubRace.Items.Add('Orc Crossbreed') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Leonin')
     {
@@ -806,7 +810,6 @@ $Check40 = 'Yes'
     {
         $ChosenSubRace.Items.Add('Aarakocra') | Out-Null
         $ChosenSubRace.Items.Add('Enemies of Elemental Evil') | Out-Null
-        $ChosenSubRace.Items.Add('Search for the seven shards') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Genasi')
     {
@@ -840,7 +843,6 @@ $Check40 = 'Yes'
         $ChosenSubRace.Items.Add('Goblin') | Out-Null
         $ChosenSubRace.Items.Add('Goblinoids') | Out-Null
         $ChosenSubRace.Items.Add('Malicious Glee') | Out-Null
-        $ChosenSubRace.Items.Add('Leaders and Followers') | Out-Null
         $ChosenSubRace.Items.Add('Challenging Liers') | Out-Null
         $ChosenSubRace.Items.Add('Rat Keepers and Wolf Riders') | Out-Null
         $ChosenSubRace.Items.Add('Worshipers of Maglubiyet') | Out-Null
@@ -849,12 +851,12 @@ $Check40 = 'Yes'
     {
         $ChosenSubRace.Items.Add('Hobgoblin') | Out-Null
         $ChosenSubRace.Items.Add('Hobgoblin Captain') | Out-Null
+        $ChosenSubRace.Items.Add('Legion of Maglubiyet') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Kenku')
     {
         $ChosenSubRace.Items.Add('Kenku') | Out-Null
         $ChosenSubRace.Items.Add('Fallen Flocks') | Out-Null
-        $ChosenSubRace.Items.Add('Speech in Pantomime') | Out-Null
         $ChosenSubRace.Items.Add('The Whistful Wingless') | Out-Null
     }
     if ($ChosenRace.SelectedItem -match 'Kobold')
@@ -912,12 +914,15 @@ $Check40 = 'Yes'
     {
         $ChosenSubRace.Items.Add('Gith') | Out-Null
         $ChosenSubRace.Items.Add('Githyanki') | Out-Null
+        $ChosenSubRace.Items.Add('Githyanki Warrior') | Out-Null
+        $ChosenSubRace.Items.Add('Githyanki Knight') | Out-Null
         $ChosenSubRace.Items.Add('Astral Raiders') | Out-Null
         $ChosenSubRace.Items.Add('Followers of Gith') | Out-Null
         $ChosenSubRace.Items.Add('Silver Swords') | Out-Null
         $ChosenSubRace.Items.Add('Red Dragon Riders') | Out-Null
-        $ChosenSubRace.Items.Add('Outposts in the Mortal Realm') | Out-Null
         $ChosenSubRace.Items.Add('Githzerai') | Out-Null
+        $ChosenSubRace.Items.Add('Githzerai Monk') | Out-Null
+        $ChosenSubRace.Items.Add('Githzerai Zerth') | Out-Null
         $ChosenSubRace.Items.Add('Psionic Adepts') | Out-Null
         $ChosenSubRace.Items.Add('Order amid Chaos') | Out-Null
         $ChosenSubRace.Items.Add('Disciples of Zerthimon') | Out-Null
@@ -988,6 +993,7 @@ $Check40 = 'Yes'
         $ChosenSubRace.Items.Add('Wolf') | Out-Null
         $ChosenSubRace.Items.Add('Winter Wolf') | Out-Null
         $ChosenSubRace.Items.Add('Timber Wolf') | Out-Null
+        $ChosenSubRace.Items.Add('Dire Wolf') | Out-Null
     }
     
     if ($subracetype -eq [System.Windows.Forms.DialogResult]::OK)
@@ -1318,9 +1324,11 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Zealot') | Out-Null
             $Chosensubclass.Items.Add('Beast') | Out-Null
             $Chosensubclass.Items.Add('Wild Magic') | Out-Null
-            $HitDiceTotal = "d12"
+            $HitDiceTotal = "1d12"
             $ClassLevel = "Barbarian 1"
-            
+            $Check11 = 'Yes'
+            $Check19 = 'Yes'
+
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
                 $SelectedSubClass = $ChosenSubClass.SelectedItem
@@ -1350,8 +1358,10 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('College of Whispers') | Out-Null
             $Chosensubclass.Items.Add('College of Eloquence') | Out-Null
             $Chosensubclass.Items.Add('College of Creation') | Out-Null
-            $HitDiceTotal = "d8"
+            $HitDiceTotal = "1d8"
             $ClassLevel = "Bard 1"
+            $Check18 = 'Yes'
+            $Check22 = 'Yes'
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1395,8 +1405,10 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Order Domain') | Out-Null
             $Chosensubclass.Items.Add('Peace Domain') | Out-Null
             $Chosensubclass.Items.Add('Twilight Domain') | Out-Null
-            $HitDiceTotal = "d8"
+            $HitDiceTotal = "1d8"
             $ClassLevel = "Cleric 1"
+            $Check21 = 'Yes'
+            $Check22 = 'Yes'
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1429,8 +1441,10 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Circle of Spores') | Out-Null
             $Chosensubclass.Items.Add('Circle of Stars') | Out-Null
             $Chosensubclass.Items.Add('Circle of Wildlife') | Out-Null
-            $HitDiceTotal = "d8"
+            $HitDiceTotal = "1d8"
             $ClassLevel = "Druid 1"
+            $Check20 = 'Yes'
+            $Check21 = 'Yes'
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1466,8 +1480,10 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Echo Knight') | Out-Null
             $Chosensubclass.Items.Add('Psi Worrior') | Out-Null
             $Chosensubclass.Items.Add('Rune Knight') | Out-Null
-            $HitDiceTotal = "d10"
+            $HitDiceTotal = "1d10"
             $ClassLevel = "Fighter 1"
+            $Check11 = 'Yes'
+            $Check19 = 'Yes'
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1502,8 +1518,10 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Way of Kensei') | Out-Null
             $Chosensubclass.Items.Add('Way of Mercy') | Out-Null
             $Chosensubclass.Items.Add('Way of Astral Self') | Out-Null
-            $HitDiceTotal = "d8"
+            $HitDiceTotal = "1d8"
             $ClassLevel = "Monk 1"
+            $Check11 = 'Yes'
+            $Check18 = 'Yes'
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1538,8 +1556,10 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Oath Of Redemption') | Out-Null
             $Chosensubclass.Items.Add('Oath Of Glory') | Out-Null
             $Chosensubclass.Items.Add('Oath Of The Watchers') | Out-Null
-            $HitDiceTotal = "d10"
+            $HitDiceTotal = "1d10"
             $ClassLevel = "Paladin 1"
+            $Check21 = 'Yes'
+            $Check22 = 'Yes'
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1572,8 +1592,10 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Monster Slayer') | Out-Null
             $Chosensubclass.Items.Add('Fey Wanderer') | Out-Null
             $Chosensubclass.Items.Add('Swarmkeeper') | Out-Null
-            $HitDiceTotal = "d10"
+            $HitDiceTotal = "1d10"
             $ClassLevel = "Ranger 1"
+            $Check11 = 'Yes'
+            $Check18 = 'Yes'
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1608,8 +1630,10 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Scout') | Out-Null
             $Chosensubclass.Items.Add('Phantom') | Out-Null
             $Chosensubclass.Items.Add('Soulknife') | Out-Null
-            $HitDiceTotal = "d8"
+            $HitDiceTotal = "1d8"
             $ClassLevel = "Rogue 1"
+            $Check18 = 'Yes'
+            $Check20 = 'Yes'
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1643,8 +1667,10 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Shadow Magic') | Out-Null
             $Chosensubclass.Items.Add('Aberrant Mind') | Out-Null
             $Chosensubclass.Items.Add('Clockwork Soul') | Out-Null
-            $HitDiceTotal = "d6"
+            $HitDiceTotal = "1d6"
             $ClassLevel = "Sorcerer 1"
+            $Check19 = 'Yes'
+            $Check22 = 'Yes'
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1678,8 +1704,10 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('The Hexblade') | Out-Null
             $Chosensubclass.Items.Add('The Fathomless') | Out-Null
             $Chosensubclass.Items.Add('The Genie') | Out-Null
-            $HitDiceTotal = "d8"
+            $HitDiceTotal = "1d8"
             $ClassLevel = "Warlock 1"
+            $Check21 = 'Yes'
+            $Check22 = 'Yes'
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1718,8 +1746,10 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Chronurgy Magic') | Out-Null
             $Chosensubclass.Items.Add('Gravitygy Magic') | Out-Null
             $Chosensubclass.Items.Add('Order Of Scribes') | Out-Null
-            $HitDiceTotal = "d6"
+            $HitDiceTotal = "1d6"
             $ClassLevel = "Wizard 1"
+            $Check20 = 'Yes'
+            $Check21 = 'Yes'
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1752,129 +1782,6 @@ $Check40 = 'Yes'
         #}    
 
 #End of subclass selection
-
-#Armour + Shield Selection
-    $form = New-Object System.Windows.Forms.Form
-    $form.Text = 'Sparks D&D Character Creator'
-    $form.Size = New-Object System.Drawing.Size(500,350)
-    $form.StartPosition = 'CenterScreen'
-    $objIcon = New-Object system.drawing.icon (".\Assets\installer.ico")
-    $form.Icon = $objIcon
-    
-    $objImage = [system.drawing.image]::FromFile(".\Assets\form_background.png")
-    $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = "Center"
-    
-    $form.Width = $objImage.Width
-    $form.Height = $objImage.Height
-
-    $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Location = New-Object System.Drawing.Point(75,270)
-    $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'OK'
-    $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-    $form.AcceptButton = $okButton
-    $form.Controls.Add($okButton)
-
-    $skipButton = New-Object System.Windows.Forms.Button
-    $skipButton.Location = New-Object System.Drawing.Point(150,270)
-    $skipButton.Size = New-Object System.Drawing.Size(75,23)
-    $skipButton.Text = 'Skip'
-    $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
-    $form.AcceptButton = $skipButton
-    $form.Controls.Add($skipButton)
-
-    $backButton = New-Object System.Windows.Forms.Button
-    $backButton.Location = New-Object System.Drawing.Point(225,270)
-    $backButton.Size = New-Object System.Drawing.Size(75,23)
-    $backButton.Text = 'Back'
-    $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
-    $form.CancelButton = $backButton
-    $form.Controls.Add($backButton)
-
-    $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Location = New-Object System.Drawing.Point(300,270)
-    $cancelButton.Size = New-Object System.Drawing.Size(75,23)
-    $cancelButton.Text = 'Cancel'
-    $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-    $form.CancelButton = $cancelButton
-    $form.Controls.Add($cancelButton)
-
-    $label = New-Object System.Windows.Forms.Label
-    $label.Location = New-Object System.Drawing.Point(10,20)
-    $label.Size = New-Object System.Drawing.Size(220,18)
-    $label.Text = 'Please select Armour you wish to wear:'
-    $form.Controls.Add($label)
-
-    $ChosenArmour = New-Object System.Windows.Forms.ListBox
-    $ChosenArmour.Location = New-Object System.Drawing.Point(10,40)
-    $ChosenArmour.Size = New-Object System.Drawing.Size(220,20)
-    $ChosenArmour.Height = 200
-
-    $checkboxshield = new-object System.Windows.Forms.checkbox
-    $checkboxshield.Location = new-object System.Drawing.Size(25,245)
-    $checkboxshield.Size = new-object System.Drawing.Size(120,32)
-    $checkboxshield.Text = "Do you want a shield?"
-    $checkboxshield.Checked = $false
-    
-    #Armour List
-    #Each class needs to be limited to armour types to stop OP characters
-    #Make this a later thing to do as classes are still being worked on
-
-        $ChosenArmour.Items.Add('Light Armour - Naked') | Out-Null
-        $ChosenArmour.Items.Add('Light Armour - Padded') | Out-Null
-        $ChosenArmour.Items.Add('Light Armour - Leather') | Out-Null
-        $ChosenArmour.Items.Add('Light Armour - Studded Leather') | Out-Null
-        $ChosenArmour.Items.Add('Medium Armour - Hide') | Out-Null
-        $ChosenArmour.Items.Add('Medium Armour - Chain Shirt') | Out-Null
-        $ChosenArmour.Items.Add('Medium Armour - Scale Mail') | Out-Null
-        $ChosenArmour.Items.Add('Medium Armour - Breastplate') | Out-Null
-        $ChosenArmour.Items.Add('Medium Armour - Half Plate') | Out-Null
-        $ChosenArmour.Items.Add('Heavy Armour - Ring Mail') | Out-Null
-        $ChosenArmour.Items.Add('Heavy Armour - Chain Mail') | Out-Null
-        $ChosenArmour.Items.Add('Heavy Armour - Splint') | Out-Null
-        $ChosenArmour.Items.Add('Heavy Armour - Plate') | Out-Null
-
-    #make these armours assigned to a specific class
-    #this can be altered using abilities too
-
-    $form.Controls.Add($ChosenArmour)
-    $Form.controls.AddRange(@($checkboxshield))
-    $form.Topmost = $true
-    $Form.Add_Shown({$Form.Activate()})
-    
-    #Shield as an option with tickbox, completely optional to a player
-    $checkboxshield.Add_CheckStateChanged({
-        $checkboxshield.Enabled = $checkboxshield.Checked 
-    })
-    $Armourtype = $form.ShowDialog()
-    if ($Armourtype -eq [System.Windows.Forms.DialogResult]::OK)
-    {
-        $SelectedArmour = $ChosenArmour.SelectedItem
-        $SelectedArmour
-    }
-    if ($Armourtype -eq [System.Windows.Forms.DialogResult]::Ignore)
-    {
-        $ChosenArmour = "None Selected"
-    }
-    if ($Armourtype -eq [System.Windows.Forms.DialogResult]::Retry)
-    {
-        return
-    }
-    if ($Armourtype -eq [System.Windows.Forms.DialogResult]::Cancel)
-    {
-        Exit
-    }
-#End of armour and shields
-#remember these types of armour are affected with cost, armour class, strength, stealth and weight
-#There is one type of shield with a base code of 10gp, armour class of +2 and weight of 453g
-#Getting out of armour has times for "DON" and "DOFF" DON = Put on, DOff = Take off
-#Light armour has a don of 1 min and doff of 1 min
-#Medium armour has a don of 5 mins and doff of 1 min
-#Heavy armour has a don of 10 mins and a doff off 5mins
-#shield has a don of 1 action and doff of 1 action
-
-#end of armour type selection
 
 #Filling out final details from selected above
 if ($ChosenRace.SelectedItem -match 'Dragonborn')
@@ -1914,25 +1821,24 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WISmod = "25"
         $CHAmod = "71"
 
-        #Skills Values
+        ##Skills Values
 
 
-        #Skills Tickbox's
+        ##Skills Tickbox's
 
         #RaceExtra's
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
 
-        $RaceDescription = Get-Content '.\Assets\Races\Dragonborn.json' | ConvertFrom-Json
-        $RaceDescription | Select-Object -Property 'description'
+        $RaceDescription = "Dragonborn look very much like dragons standing erect in humanoid form, though they lack wings or a tail. The first dragonborn had scales of vibrant hues matching the colors of their dragon kin, but generations of interbreeding have created a more uniform appearance. Their small, fine scales are usually brass or bronze in color, sometimes ranging to scarlet, rust, gold, or copper-green. They are tall and strongly built, often standing close to 6½ feet tall and weighing 300 pounds or more. Their hands and feet are strong, talonlike claws with three fingers and a thumb on each hand.
+
+        The blood of a particular type of dragon runs very strong through some dragonborn clans. These dragonborn often boast scales that more closely match those of their dragon ancestor bright red, green, blue, or white, lustrous black, or gleaming metallic gold, silver, brass, copper, or bronze."
+        $RaceDescription
 
         $SpokenLanguages = "You can speak, read, and write Common and Draconic. Draconic is thought to be one of the oldest languages and is often used in the study of magic. The language sounds harsh to most other creatures and includes numerous hard consonants and sibilants."
-
         $RacialSpecialAbility = "Breath Weapon, You can use your action to exhale destructive energy. Your draconic ancestry determines the size, shape, and damage type of the exhalation. When you use your breath weapon, each creature in the area of the exhalation must make a saving throw, the type of which is determined by your draconic ancestry. The DC for this saving throw equals 8 and your Constitution modifier and your proficiency bonus. A creature takes 2d6 damage on a failed save, and half as much damage on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th level, and 5d6 at 16th level. After you use your breath weapon, you cant use it again until you complete a short or long rest."
-        $CharacterImage = '.\Assets\Race_Pictures\Dragonborn.png'
-
+        $CharacterImage = Get-Item -path '.\Assets\Race_Pictures\Dragonborn.png'
     }
     if ($ChosenRace.SelectedItem -match 'Dwarf')
     {
@@ -1952,11 +1858,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak."
         $RaceDescription = "Kingdoms rich in ancient grandeur, halls carved into the roots of mountains, the echoing of picks and hammers in deep mines and blazing forges, a commitment to clan and tradition, and a burning hatred of goblins and orcs, these common threads unite all dwarves."
         $RacialSpecialAbility = "Unknown"
@@ -1979,11 +1900,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+4"
+        $CONmod = "+3"
+        $INTmod = "+0"
+        $WISmod = "+1"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "You can speak, read, and write Common and Elvish. Elvish is fluid, with subtle intonations and intricate grammar. Elven literature is rich and varied, and their songs and poems are famous among other races. Many bards learn their language so they can add Elvish ballads to their repertoires."
         $RaceDescription = "Elves are a magical people of otherworldly grace, living in the world but not entirely part of it. They live in places of ethereal beauty, in the midst of ancient forests or in silvery spires glittering with faerie light, where soft music drifts through the air and gentle fragrances waft on the breeze. Elves love nature and magic, art and artistry, music and poetry, and the good things of the world."
         $RacialSpecialAbility = "Unknown"
@@ -2006,11 +1942,25 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "You can speak, read, and write Common and Gnomish. The Gnomish language, which uses the Dwarvish script, is renowned for its technical treatises and its catalogs of knowledge about the natural world."
         $RaceDescription = "A constant hum of busy activity pervades the warrens and neighborhoods where gnomes form their close knit communities. Louder sounds punctuate the hum: a crunch of grinding gears here, a minor explosion there, a yelp of surprise or triumph, and especially bursts of laughter. Gnomes take delight in life, enjoying every moment of invention, exploration, investigation, creation, and play."
         $RacialSpecialAbility = "Unknown"
@@ -2033,11 +1983,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "You can speak, read, and write Common, Elvish, and one extra language of your choice."
         $RaceDescription = "Walking in two worlds but truly belonging to neither, half elves combine what some say are the best qualities of their elf and human parents: human curiosity, inventiveness, and ambition tempered by the refined senses, love of nature, and artistic tastes of the elves. Some half elves live among humans, set apart by their emotional and physical differences, watching friends and loved ones age while time barely touches them. Others live with the elves, growing restless as they reach adulthood in the timeless elven realms, while their peers continue to live as children. Many half elves, unable to fit into either society, choose lives of solitary wandering or join with other misfits and outcasts in the adventuring life."
         $RacialSpecialAbility = "Unknown"
@@ -2060,11 +2025,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "You can speak, read, and write Common and Halfling. The Halfling language isnt secret, but halflings are loath to share it with others. They write very little, so they dont have a rich body of literature. Their oral tradition, however, is very strong. Almost all halflings speak Common to converse with the people in whose lands they dwell or through which they are traveling."
         $RaceDescription = "The comforts of home are the goals of most halflings lives: a place to settle in peace and quiet, far from marauding monsters and clashing armies; a blazing fire and a generous meal; fine drink and fine conversation. Though some halflings live out their days in remote agricultural communities, others form nomadic bands that travel constantly, lured by the open road and the wide horizon to discover the wonders of new lands and peoples. But even these wanderers love peace, food, hearth, and home, though home might be a wagon jostling along a dirt road or a raft floating downriver."
         $RacialSpecialAbility = "Unknown"
@@ -2087,11 +2067,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "You can speak, read, and write Common and Orc. Orc is a harsh, grating language with hard consonants. It has no script of its own but is written in the Dwarvish script."
         $RaceDescription = "Whether united under the leadership of a mighty warlock or having fought to a standstill after years of conflict, orc and human tribes sometimes form alliances, joining forces into a larger horde to the terror of civilized lands nearby. When these alliances are sealed by marriages, half orcs are born. Some half orcs rise to become proud chiefs of orc tribes, their human blood giving them an edge over their full blooded orc rivals. Some venture into the world to prove their worth among humans and other more civilized races. Many of these become adventurers, achieving greatness for their mighty deeds and notoriety for their barbaric customs and savage fury."
         $RacialSpecialAbility = "Unknown"
@@ -2114,11 +2109,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "You can speak, read, and write Common and one extra language of your choice. Humans typically learn the languages of other peoples they deal with, including obscure dialects. They are fond of sprinkling their speech with words borrowed from other tongues: Orc curses, Elvish musical expressions, Dwarvish military phrases, and so on."
         $RaceDescription = "In the reckonings of most worlds, humans are the youngest of the common races, late to arrive on the world scene and short, lived in comparison to dwarves, elves, and dragons. Perhaps it is because of their shorter lives that they strive to achieve as much as they can in the years they are given. Or maybe they feel they have something to prove to the elder races, and thats why they build their mighty empires on the foundation of conquest and trade. Whatever drives them, humans are the innovators, the achievers, and the pioneers of the worlds."
         $RacialSpecialAbility = "Unknown"
@@ -2141,11 +2151,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "You can speak, read, and write Common and Infernal."
         $RaceDescription = "To be greeted with stares and whispers, to suffer violence and insult on the street, to see mistrust and fear in every eye: this is the lot of the tiefling. And to twist the knife, tieflings know that this is because a pact struck generations ago infused the essence of Asmodeus overlord of the Nine Hells, into their bloodline. Their appearance and their nature are not their fault but the result of an ancient sin, for which they and their children and their childrens children will always be held accountable."
         $RacialSpecialAbility = "Unknown"
@@ -2161,18 +2186,33 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $Playerheight = "0 Feet"
 
         #Attributes
-        $STR = "+3"
-        $DEX = "+1"
-        $CON = "+3"
-        $INT = "-2"
-        $WIS = "+0"
-        $CHA = "+0"
+        $STR = "16"
+        $DEX = "12"
+        $CON = "16"
+        $INT = "7"
+        $WIS = "11"
+        $CHA = "10"
 
-        $Skills = "Intimidation +2"
-        $Senses = "darkvision 60ft, passive perception 10"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Intimidation +2"
+        #$Senses = "darkvision 60ft, passive perception 10"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Common, Orc"
         $RaceDescription = "Orcs are savage raiders and pillagers with stooped postures, low foreheads and piggish faces with prominent lower canines that resemble tusks."
         $RacialSpecialAbility = "Aggressive. As a bonus action, the orc can move up to its speed toward a hostile creature that it can see."
@@ -2195,11 +2235,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = ""
         $RaceDescription = ""
         $RacialSpecialAbility = "Unknown"
@@ -2215,18 +2270,33 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $Playerheight = "0 Feet"
 
         #Attributes
-        $STR = "+1"
-        $DEX = "+3"
-        $CON = "+0"
-        $INT = "+1"
-        $WIS = "+0"
-        $CHA = "+2"
+        $STR = "12"
+        $DEX = "16"
+        $CON = "11"
+        $INT = "12"
+        $WIS = "10"
+        $CHA = "14"
 
-        $Skills = "Perception +2, Performance +6, Stealth +5"
-        $Senses = "Passive Perception 12"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Perception +2, Performance +6, Stealth +5"
+        #$Senses = "Passive Perception 12"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Common, Elvish, Sylvan"
         $RaceDescription = "Satyrs are raucous fey that frolic in the wild forests, driven by curosity and hedonism in equal measure. Satyrs resemble stout male humans with the furry lower bodies and cloven hooves of goats. Horns sprout from their heads, ranging in shape from pair of small nubs to large, curling rams' horns. They typically sport facial hair."
         $RacialSpecialAbility = "Magic Resistance. The satyr had advantage on saving throws against spells and other magical effects."
@@ -2249,11 +2319,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -2276,11 +2361,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -2296,18 +2396,33 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $Playerheight = "5 Feet"
 
         #Attributes
-        $STR = "+0"
-        $DEX = "+2"
-        $CON = "+0"
-        $INT = "+0"
-        $WIS = "+1"
-        $CHA = "+0"
+        $STR = "10"
+        $DEX = "14"
+        $CON = "10"
+        $INT = "11"
+        $WIS = "12"
+        $CHA = "11"
 
-        $Skills = "Perception +5"
-        $Senses = "Passive perception 15"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+2"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+1"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Perception +5"
+        #$Senses = "Passive perception 15"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "You can speak, read, and write Common, Aarakocra, and Auran."
         $RaceDescription = "From below, aarakocra look much like large birds. Only when they descend to roost on a branch or walk across the ground does their humanoid appearance reveal itself. Standing upright, aarakocra might reach 5 feet tall, and they have long, narrow legs that taper to sharp talons.
         
@@ -2332,11 +2447,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "You can speak, read, and write Common and Primordial. Primordial is a guttural language, filled with harsh syllables and hard consonants."
         $RaceDescription = "Those who think of other planes at all consider them remote, distant realms, but planar influence can be felt throughout the world. It sometimes manifests in beings who, through an accident of birth, carry the power of the planes in their blood. The genasi are one such people, the offspring of genies and mortals.
 
@@ -2345,8 +2475,6 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         During these visits, a mortal might catch a genies eye. Friendship forms, romance blooms, and sometimes children result. These children are genasi, individuals with ties to two worlds, yet belonging to neither. Some genasi are born of mortal genie unions, others have two genasi as parents, and a rare few have a genie further up their family tree, manifesting an elemental heritage thats lain dormant for generations.
         
         Occasionally, genasi result from exposure to a surge of elemental power, through phenomena such as an eruption from the Inner Planes or a planar convergence. Elemental energy saturates any creatures in the area and might alter their nature enough that their offspring with other mortals are born as genasi."
-        $RaceDescription
-
         $RacialSpecialAbility = "Unknown"
     }
     if ($ChosenRace.SelectedItem -match 'Goliath')
@@ -2367,11 +2495,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "You can speak, read, and write Common and Giant."
         $RaceDescription = "At the highest mountain peaks, far above the slopes where trees grow and where the air is thin and the frigid winds howl dwell the reclusive goliaths. Few folk can claim to have seen a goliath, and fewer still can claim friendship with them. Goliaths wander a bleak realm of rock, wind, and cold. Their bodies look as if they are carved from mountain stone and give them great physical power. Their spirits take after the wandering wind, making them nomads who wander from peak to peak. Their hearts are infused with the cold regard of their frigid realm, leaving each goliath with the responsibility to earn a place in the tribe or die trying."
         $RacialSpecialAbility = "Unknown"
@@ -2394,11 +2537,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -2415,18 +2573,33 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $Playerheight = "0 Feet"
 
         #Attributes
-        $STR = "+2"
-        $DEX = "+2"
-        $CON = "-1"
-        $INT = "-1"
-        $WIS = "+0"
-        $CHA = "-1"
+        $STR = "15"
+        $DEX = "14"
+        $CON = "13"
+        $INT = "8"
+        $WIS = "11"
+        $CHA = "9"
 
-        $Skills = "Stealth +6, Survival +2"
-        $Senses = "Darkvision 60ft, passive perception 10"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Stealth +6, Survival +2"
+        #$Senses = "Darkvision 60ft, passive perception 10"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Common, Goblin"
         $RaceDescription = "Bugbears are born for battle and mayhem, Surviving by raiding and hunting, they bully the weak and despise being bossed around, but their love for carnage means they fight for powerful masters if bloodshed and treasure are assured."
         $RacialSpecialAbility = "Brute. A Melee weapon deals one extra die of damage when the bugbear hits with it (included in the attack)
@@ -2450,11 +2623,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "You can speak, read and write Common, Elvish and giant"
         $RaceDescription = "Firbolgs are the fores-dwelling race native to the Greying Wildlands, particularly the mysterious Savlirwood. Their bodie are covered with thick fur ranging from tones of earthen brown and ruddy red to cool grays and blues , and even to wild hues of pink and green. Their bodies are bovine or camelid in appearance with floppy, pointed ears and broad, pink noses, but they are bipdal and have hands that manipulate weapons and objects
         Most Firbolgs live in extended family units, and it is unusual to find one living alone. However, they are introverted to the point where they seldom engage with other firbolgs outside the family unit, and firbolgs rarely form their own cities, villages or even large tribes. Despite this, many firbolgs enjoy visiting other nations and settlements for a short time for trade, signseeing, and to visit friends."
@@ -2471,18 +2659,33 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $Playerheight = "0 Feet"
 
         #Attributes
-        $STR = "-1"
-        $DEX = "+2"
-        $CON = "+0"
-        $INT = "+0"
-        $WIS = "-1"
-        $CHA = "-1"
+        $STR = "8"
+        $DEX = "14"
+        $CON = "10"
+        $INT = "10"
+        $WIS = "8"
+        $CHA = "8"
 
-        $Skills = "Stealth +6"
-        $Senses = "Darkvision 60ft, passive perception 9"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Stealth +6"
+        #$Senses = "Darkvision 60ft, passive perception 9"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Common, Goblin"
         $RaceDescription = "Goblins are small, black-hearted, selfish humanoids that lair in caves, abandoned mines, depsoiled dungeons and other dismal settings. Individually weak, goblins gather in large - sometimes overwhelming - numbers. They crave power and regularly abuse whatever authority they obtain."
         $RacialSpecialAbility = "Nimble Escape. The goblin can take the disengage or hide action as a bonus action on each of it's turns."
@@ -2498,21 +2701,36 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $Playerheight = "0 Feet"
 
         #Attributes
-        $STR = "+1"
-        $DEX = "+1"
-        $CON = "+1"
-        $INT = "+0"
-        $WIS = "+0"
-        $CHA = "-1"
+        $STR = "13"
+        $DEX = "12"
+        $CON = "12"
+        $INT = "10"
+        $WIS = "10"
+        $CHA = "9"
 
-        $Skills = "Unknown"
-        $Senses = "Darkvision 60ft, Passive perception 10"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Darkvision 60ft, Passive perception 10"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Common, Goblin"
-        $RaceDescription = "Unknown"
-        $RacialSpecialAbility = "Martial Advantage"
+        $RaceDescription = "War horns sound, stones fly from catapults adnt the thunder of thousand booted feet echoes across the land as hobgoblins march to battle. Across the borderlands of civilization, settlements and settlers must contend with these aggressive humanoids, whos thirst for conquest is never satisfied. Hobgoblins have dark orange or red-orange skin and hair ranging from dark red-brown to dark gray. Yellow or dark brown eyes peer out beneath their beetling brows and their wide mouths sport sharp and yellowed teeth. A male hobgoblin might have a large blue or red nose, which symbolizes verility and power among goblinkin. Hobgoblins can live as long as humans, though their love of warfare and battle means that few do."
+        $RacialSpecialAbility = "Martial Advantage. Once per turn, the hobgoblin can deal an extra 7 (2d6) damage to a creature it hits with a weapon attack if they creature is within 5 feet of an ally of the hobgoblin that isn't incapacitated."
     }
     if ($ChosenRace.SelectedItem -match 'Kenku')
     {
@@ -2525,18 +2743,33 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $Playerheight = "0 Feet"
 
         #Attributes
-        $STR = "+0"
-        $DEX = "+3"
-        $CON = "+0"
-        $INT = "+0"
-        $WIS = "+0"
-        $CHA = "+0"
+        $STR = "10"
+        $DEX = "16"
+        $CON = "10"
+        $INT = "11"
+        $WIS = "10"
+        $CHA = "10"
 
-        $Skills = "Deception +4, Perception +2, Stealth +5"
-        $Senses = "Passive Perception 12"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Deception +4, Perception +2, Stealth +5"
+        #$Senses = "Passive Perception 12"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Common, Auran (only using mimicry trait)"
         $RaceDescription = "Kenku are feathered humanoids that wander the world as vagabonds, driven by greed. They can perfectly imitate any sounds they hear."
         $RacialSpecialAbility = "Ambusher. In the first round of combat, the kenku has advantage on attack rolls against any creature it surpsied.
@@ -2554,18 +2787,33 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $Playerheight = "0 Feet"
 
         #Attributes
-        $STR = "-2"
-        $DEX = "+2"
-        $CON = "-1"
-        $INT = "-1"
-        $WIS = "-2"
-        $CHA = "-1"
+        $STR = "7"
+        $DEX = "15"
+        $CON = "9"
+        $INT = "8"
+        $WIS = "7"
+        $CHA = "8"
 
-        $Skills = "Unknown"
-        $Senses = "Darkvision 60ft, Passive perception 8"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Darkvision 60ft, Passive perception 8"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Sunlight Sensitivity"
@@ -2581,18 +2829,33 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $Playerheight = "0 Feet"
 
         #Attributes
-        $STR = "+2"
-        $DEX = "+0"
-        $CON = "+1"
-        $INT = "-2"
-        $WIS = "+1"
-        $CHA = "-2"
+        $STR = "15"
+        $DEX = "10"
+        $CON = "13"
+        $INT = "7"
+        $WIS = "12"
+        $CHA = "7"
 
-        $Skills = "Perception +3, Stealth +4, Survival +5"
-        $Senses = "Passive perception 13"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Perception +3, Stealth +4, Survival +5"
+        #$Senses = "Passive perception 13"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Draconic"
         $RaceDescription = "Lizardfolk are primitive reptilian humanoids that lurk in the swamps and jungles of the world. Their hut villages thrive in forbidding grottos, half-sunken ruins and watery caverns."
         $RacialSpecialAbility = "Hold Breath"
@@ -2615,11 +2878,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -2642,11 +2920,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -2669,11 +2962,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -2696,11 +3004,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -2723,11 +3046,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -2750,11 +3088,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -2777,11 +3130,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -2804,11 +3172,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -2831,11 +3214,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -2859,11 +3257,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "1"
         $CHA = "+0"
 
-        $Skills = "None"
-        $Senses = "Passive perception 11"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "None"
+        #$Senses = "Passive perception 11"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Gith"
         $RaceDescription = "The warlike githyanki and the contemplative githzerai are sundered people - two cultures that utterly despide one another. Before there were githyanki or githzerai, these creatures were a single race enslaved by the mind flayers. Although they attempted to overthrow their masters many times, their rebellions were repeatedly crushed until a great leader named Gith arose. After much bloodshed, Gith and her followers threw off the yoke of their illithid masters, but another leader named Zerthimon emerged in the aftermath of battle. Zerthimon challenged Gith's motives, claiming that her strict martial leadership and desire for vengeance amounted a little more than another form of slavery for her people. A rift erupted between followers of each leader and they eventually became two races whose enmity endures to this day. Whether these tall, gaunt creatures were peaceful of savage, cultured or primitive before the mind flayers enslaved and changed them, none can say. Not even the original name of their race remails from that distant time."
         $RacialSpecialAbility = "innate Spellcasting (Psionics). The githyanki's innate spellcasting ability is intelligence. It can innately cast the following spells, requiring no component: 
@@ -2881,18 +3294,33 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $Playerheight = "0 Feet"
 
         #Attributes
-        $STR = "+4"
-        $DEX = "+2"
-        $CON = "+2"
-        $INT = "-1"
-        $WIS = "+1"
-        $CHA = "+0"
+        $STR = "18"
+        $DEX = "14"
+        $CON = "14"
+        $INT = "9"
+        $WIS = "13"
+        $CHA = "11"
 
-        $Skills = "Athletics +6, Perception +3, Survival +3"
-        $Senses = "Passive perception 13"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Athletics +6, Perception +3, Survival +3"
+        #$Senses = "Passive perception 13"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Elvish, Sylvan"
         $RaceDescription = "Reclusive wanderers and omen-readers of the wild, centaurs avoid conflict but fight fiercely when pressed. They roam the vast wilderness, keeping far from borders, law and the company of other creatures."
         $RacialSpecialAbility = "Charge. If the cenntaur moves at least 30 feet straight toward a target and then hits with a pike attack on the same turn, the target takes an extra 10 (3d6) piercing damage."
@@ -2915,11 +3343,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -2935,18 +3378,33 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $Playerheight = "0 Feet"
 
         #Attributes
-        $STR = "+4"
-        $DEX = "+0"
-        $CON = "+3"
-        $INT = "-2"
-        $WIS = "+3"
-        $CHA = "-1"
+        $STR = "18"
+        $DEX = "11"
+        $CON = "16"
+        $INT = "6"
+        $WIS = "16"
+        $CHA = "9"
 
-        $Skills = "Perception +7"
-        $Senses = "Darkvision 60ft, passive perception 17"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Perception +7"
+        #$Senses = "Darkvision 60ft, passive perception 17"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Abyssal"
         $RaceDescription = "A minotaur's roar is a savage battle cry that most civilized creatures fear. Born into the mortal realm by the demonic rites, minotaurs are savage conquerors and carnivores that live for the hunt. Their brown and black fur is stained with the blood of fallen foes and they carry the stench of death."
         $RacialSpecialAbility = "Charge. If the minotaur moves at least 10 feet straight toward a target and then hits it with a gore attack on the same turn, the target takes an extra 9 (2d8) piercing damage. If the target is a creature, it must succeed on a DC 14 strength saving throw or be pushed up to 10 feet away and knocked prone.
@@ -2971,11 +3429,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -2998,11 +3471,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -3025,11 +3513,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -3052,11 +3555,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -3079,11 +3597,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -3107,11 +3640,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "+1"
         $CHA = "0"
 
-        $Skills = "Perception +3, Stealth +2"
-        $Senses = "Perception 14"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Perception +3, Stealth +2"
+        #$Senses = "Perception 14"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Common (can't speak in form)"
         $RaceDescription = "One of the most ancient and feared of all curses, lycanthropy can transform the most civilised humanoid into a ravening beast. In it's natural humanoid form, a creature cursed by lycanthropy appears as it's normal self. Over time, however, many lycanthropes acquire features suggestive of their animal form. In that animal form, a lycanthrope resembles a powerful version of a normal animal. On close inspection, it's eyes show a faint spark of unnatural intelligence and might glow red in the dark. Evil lycanthropes hide among normal folk, emerging in animal form at night to spread terror and bloodshed, especially under a full moon. Good lycanthropes are reclusive and uncomfortable around other civilised creatures, often living alone in wilderness areas far from villages and towns."
         $RacialSpecialAbility = "Shapechanger. The lycanth can use it's polymorph to change into it's were form, any equipment it is wearing or carrying is not transformed."
@@ -3127,18 +3675,33 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $Playerheight = "0 Feet"
 
         #Attributes
-        $STR = "+4"
-        $DEX = "+1"
-        $CON = "+5"
-        $INT = "-2"
-        $WIS = "-1"
-        $CHA = "-2"
+        $STR = "18"
+        $DEX = "13"
+        $CON = "20"
+        $INT = "7"
+        $WIS = "9"
+        $CHA = "7"
 
-        $Skills = "Perception +2"
-        $Senses = "Darkvision 60ft, passive perception 12"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Perception +2"
+        #$Senses = "Darkvision 60ft, passive perception 12"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Giant"
         $RaceDescription = "Born with horrific appetites, trolls eat anything they can catch and devour. They have no society to speak of, but they do serve as mercenaries to orcs, ogres, ettins, hags and giants. As payment, trolls demand food and treasure. Trolls are difficult to control, however, doing as they please even when working with more powerful creatures."
         $RacialSpecialAbility = "Keen Smell. The troll has advantage on wisdom (perception) checks that rely on smell.
@@ -3155,18 +3718,33 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $Playerheight = "10 Feet"
 
         #Attributes
-        $STR = "+4"
-        $DEX = "-1"
-        $CON = "+3"
-        $INT = "-3"
-        $WIS = "-2"
-        $CHA = "-2"
+        $STR = "19"
+        $DEX = "8"
+        $CON = "16"
+        $INT = "5"
+        $WIS = "7"
+        $CHA = "7"
 
-        $Skills = "Unknown"
-        $Senses = "Darkvision 60ft, passive perception 8"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Darkvision 60ft, passive perception 8"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Common, Giant"
         $RaceDescription = "Ogres are as lazy of the mind as they are strong of the body. They live by raiding, scavenging and killing for food and pleasure. The average adult specimen stands between 9 and 10 feet tall and weighs close to a thousand pounds."
         $RacialSpecialAbility = "Unknown"
@@ -3189,11 +3767,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $WIS = "0"
         $CHA = "0"
 
-        $Skills = "Unknown"
-        $Senses = "Unknown"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Unknown"
@@ -3204,35 +3797,43 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenRaceWolf
         $ExportRace = "Wolf"
         $HP = "15"
-        $SpeedTotal = "40"
+        $SpeedTotal = "35"
         $PlayerSize = "0 Pounds"
         $Playerheight = "0 Feet"
 
         #Attributes
-        $STR = "+1"
-        $DEX = "+2"
-        $CON = "+1"
-        $INT = "-4"
-        $WIS = "+1"
-        $CHA = "-2"
+        $STR = "12"
+        $DEX = "15"
+        $CON = "12"
+        $INT = "3"
+        $WIS = "12"
+        $CHA = "6"
 
-        $Skills = "Perception +3, Stealth +4"
-        $Senses = "Passive Perception 13"
-        $Damage_Immunities = "Unknown"
-        $Condition_Immunities = "Unknown"
-        $Racesavingrolls = "0"
+        #Attribute Modifiers
+        $STRmod = "+1"
+        $DEXmod = "+2"
+        $CONmod = "+1"
+        $INTmod = "-4"
+        $WISmod = "+1"
+        $CHAmod = "-2"
+
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+
+        #$Skills = "Perception +3, Stealth +4"
+        #$Senses = "Passive Perception 13"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Unknown"
         $RaceDescription = "Unknown"
         $RacialSpecialAbility = "Keen Hearing and Smell"
     }
 #End of race details
-
-#Chosen Subrace override for name of race, this is for anyone who chose a subrace
-
-    if ($ChosenSubRace.SelectedItem -match 'Draconic Ancestory')
-    {
-        $ExportRace = "Draconic Ancestory"
-    }
 
 #If adding a new race, please use the code below as an example:
     #if ($ChosenRace.SelectedItem -match '**')
@@ -3255,14 +3856,710 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         #$WIS = "0"
         #$CHA = "0"
 
-        #$Skills = "Unknown"
-        #$Senses = "Unknown"
-        #$Damage_Immunities = "Unknown"
-        #$Condition_Immunities = "Unknown"
-        #$Racesavingrolls = "0"
+        #Attribute Modifiers
+        #$STRmod = "+0"
+        #$DEXmod = "+0"
+        #$CONmod = "+0"
+        #$INTmod = "+0"
+        #$WISmod = "+0"
+        #$CHAmod = "+0"
+
+        #Saving Throws
+        #$ST_STR = "0"
+        #$ST_DEX = "0"
+        #$ST_CON = "0"
+        #$ST_INT = "0"
+        #$ST_WIS = "0"
+        #$ST_CHA = "0"
+
+        ##$Skills = "Unknown"
+        ##$Senses = "Unknown"
+        ##$Damage_Immunities = "Unknown"
+        ##$Condition_Immunities = "Unknown"
+
         #$SpokenLanguages = "Unknown"
         #$RaceDescription = "Unknown"
         #$RacialSpecialAbility = "Unknown"
+    #}
+
+#Sizes and squares
+
+#Size 	        Space	            Number of 5×5 foot squares
+#Tiny	    2 ½ ft x 2 ½ ft.	        ½ of a square
+#Small	    5 x 5 ft.	                   1 square
+#Medium	    5 x 5 ft.	                   1 square
+#Large	    10 x 10 ft.	                   4 squares 
+#Huge	    15 x 15 ft.	                   9 squares
+#Gargantuan	20 x 20 ft.                    16 squares
+
+#Default sizes of main races
+
+#Race               Base Height	 Base Weight    Height Modifier	Weight Modifier	Average Height and Weight
+#Aarakocra	            4’4″	    90	        1d6	                1d6	            4’8″ 106 lbs.
+#Bugbear	            6’0″	    110	        2d10	            2d4	            7’1″ 291 lbs.
+#Centaur	            6′	        600	        1d10	            2d12	        8’7″ 678 lbs.
+#Dragonborn	            5′ 6″	    175	        2d8	                2d6	            6′ 3″ 238 lbs.
+#Dwarf, Hill	        3′ 8″	    115	        2d4	                2d6	            4′ 1″ 150 lbs.
+#Dwarf, Mountain	    4′ 0″	    130	        2d4	                2d6	            4′ 5″ 165 lbs.
+#Elf	                54	        90	        2d10	            1d4	            5’4″ 119 lbs.
+#Elf, Drow	            4’5″	    75	        2d6	                1d6	            5’0″ 103 lbs.
+#Elf, High	            4′ 6″	    90	        2d10	            1d4	            5′ 5″ 123 lbs.
+#Elf, Shadar-kai	    4’8″	    90	        2d8	                1d4	            5’5″ 133 lbs.
+#Elf, Wood	            4’6″	    100	        2d10	            1d4	            5’5″ 133 lbs.
+#Firbolg	            6′ 2″	    175	        2d12	            2d6	            7′ 3″ 266 lbs.
+#Giff	                6′ 6″	    400	        2d8	                2d8	            7′ 3″, 517 lbs.
+#Githyanki	            5’0″	    100	        2d12	            2d4	            6’1″ 165 lbs.
+#Githzerai	            4’11”	    90	        2d12	            1d4	            6’0″ 129 lbs.
+#Gnoll	                6’11”	    276	        1d6	                2d4	            7’3″, 296 lbs.
+#Gnome	                2′ 11″	    35	        2d4	                1	            3′ 4″ 40 lbs.
+#Goliath	            6′ 2″	    200	        2d10	            2d6	            7′ 1″ 277 lbs.
+#Grung	                24	        23	        1d12	            1	            2’7″ 30 lbs.
+#Half-Elf	            4′ 9″	    110	        2d8	                2d4	            5′ 6″ 155 lbs.
+#Half-Orc	            4′ 10″	    140	        2d10	            2d6	            5′ 9″ 217 lbs.
+#Halfling	            2’7″	    35	        2d4	                1	            3’0″ 40 lbs.
+#Longshanks	            4′ 2″ (50″)	80	        2d8	                1d6	            4′ 11″ 116 lbs.
+#Human	                4’8″	    110	        2d10	            2d4	            5’7″ 165 lbs.
+#Kenku	                4′ 4″	    50	        2d8	                1d6	            5′ 1″ 86 lbs.
+#Kuo-toa	            4′ 7″	    110	        3d6	                2d4	            5′ 6″ 165 lbs.
+#Leonin	                6′ 6″	    180	        2d10	            2d6	            8’5″ 257 lbs.
+#Lizardfolk	            4′ 9″	    120	        2d10	            2d6	            5′ 8″ 197 lbs.
+#Loxodon	            6′ 5″	    295	        2d10	            2d4	            5′ 8″ 197 lbs.
+#Minotaur	            5′ 4″	    175	        2d8	                2d6	            6′ 1″ 238 lbs.
+#Orc	                5′ 4″	    175	        2d8	                2d6	            6′ 1″ 238 lbs.
+#Satyr	                4′ 8″	    100	        2d8	                2d4	            5’5″ 145 lbs.
+#Tabaxi	                4′ 8″	    90	        2d10	            2d4	            5′ 0″ 120 lbs.
+#Tiefling	            4′ 9″	    110	        2d8	                2d4	            5′ 6″ 155 lbs.
+#Tortle	                4′ 11″	    415	        1d12	            2d4	            5′ 6″ 350 lbs.
+#Vedalken	            5′ 4″	    110	        2d10	            2d4d	        5′ 10″ 140 lbs.
+#Warforged	            5’10”	    270	        2d6	                4	            6’5″ 298 lbs.
+#Yuan-ti	            4′ 8″	    110	        2d10	            2d4	            5′ 7″ 165 lbs.
+
+#Sourced: https://blackcitadelrpg.com/height-age-weight-5e/
+
+#Chosen Subrace override for name of race, this is for anyone who chose a subrace
+$ExportRace
+    if ($ChosenSubRace.SelectedItem -match 'Draconic Ancestory')
+    {
+        $ExportRace = "Draconic Ancestory"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'DraconBlood Dragonborn')
+    {
+        $ExportRace = "DraconBlood Dragonborn"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Chromatic Dragonborn')
+    {
+        $ExportRace = "Chromatic Dragonborn"
+    }
+    if ($ChosenSUbRace.SelectedItem -match 'Gem Dragonborn')
+    {
+        $ExportRace = "Gem Dragonborn"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Revenite Dragonborn')
+    {
+        $ExportRace = "Revenite Dragonborn"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Metallic Dragonborn')
+    {
+        $ExportRace = "Metallic Dragonborn"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Hill Dwarves')
+    {
+        $ExportRace = "Hill Dwarves"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Mountain Dwarves')
+    {
+        $ExportRace = "Mountain Dwarves"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Eladrin')
+    {
+        $ExportRace = "Eladrin"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'High Elf')
+    {
+        $ExportRace = "High Elf"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Wood Elf')
+    {
+        $ExportRace = "Wood Elf"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Deep Gnome')
+    {
+        $ExportRace = "Deep Gnome"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Rock Gnome')
+    {
+        $ExportRace = "Rock Gnome"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Lightfoot Halfling')
+    {
+        $ExportRace = "Lightfoot Halfling"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Stout Halfling')
+    {
+        $ExportRace = "Stout Halfling"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Eye of Gruumsh')
+    {
+        $ExportRace = "Orc Eye of Gruumsh"
+        #Attributes Basic
+        $STR = "16"
+        $DEX = "12"
+        $CON = "16"
+        $INT = "9"
+        $WIS = "13"
+        $CHA = "12"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Ranging Scavengers')
+    {
+        $ExportRace = "Orc Ranging Scavengers"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Orc Crossbreed')
+    {
+        $ExportRace = "Orc Crossbreed"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Hedonistic Revelers')
+    {
+        $ExportRace = "Satyr Hedonistic Revelers"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Enemies of Elemental Evil')
+    {
+        $ExportRace = "Aarakocra Enemies of Elemental Evil"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Air Genasi')
+    {
+        $ExportRace = "Air Genasi"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Earch Genasi')
+    {
+        $ExportRace = "Air Genasi"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Fire Genasi')
+    {
+        $ExportRace = "Fire Genasi"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Water Genasi')
+    {
+        $ExportRace = "Water Genasi"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Bugbear Chief')
+    {
+        $ExportRace = "Bugbear Chief"
+        #Attributes Basic
+        $STR = "17"
+        $DEX = "14"
+        $CON = "14"
+        $INT = "11"
+        $WIS = "12"
+        $CHA = "11"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Followers of Hruggek')
+    {
+        $ExportRace = "Bugbear Followers of Hruggek"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Venal Ambushers')
+    {
+        $ExportRace = "Bugbear Venal Ambushers"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Goblinoids')
+    {
+        $ExportRace = "Goblinoids"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Malicious Glee')
+    {
+        $ExportRace = "Goblin Malicious Glee"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Challenging Liers')
+    {
+        $ExportRace = "Goblin Challenging Liers"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Rat Keepers and Wolf Riders')
+    {
+        $ExportRace = "Goblin Rat Keepers and Wolf Riders"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Worshipers of Maglubiyet')
+    {
+        $ExportRace = "Goblin Worshipers of Maglubiyet"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Hobgoblin Captain')
+    {
+        $ExportRace = "Hobgoblin Captain"
+        #Attributes Basic
+        $STR = "15"
+        $DEX = "14"
+        $CON = "14"
+        $INT = "12"
+        $WIS = "10"
+        $CHA = "13"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Legion of Maglubiyet')
+    {
+        $ExportRace = "Hobgoblin Legion of Maglubiyet"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Fallen Flocks')
+    {
+        $ExportRace = "Kenku Fallen Flocks"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'The Whistful Wingless')
+    {
+        $ExportRace = "Kenku The Whistful Wingless"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Winged Kobold')
+    {
+        $ExportRace = "Winged Kobold"
+        #Attributes Basic
+        $STR = "7"
+        $DEX = "16"
+        $CON = "9"
+        $INT = "8"
+        $WIS = "7"
+        $CHA = "8"
+        #Attribute Modifiers
+        $STRmod = "-2"
+        $DEXmod = "+3"
+        $CONmod = "-1"
+        $INTmod = "-1"
+        $WISmod = "-2"
+        $CHAmod = "-1"
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Lizardfolk Shamen')
+    {
+        $ExportRace = "Lizardfolk Shamen"
+        #Attributes Basic
+        $STR = "15"
+        $DEX = "10"
+        $CON = "13"
+        $INT = "10"
+        $WIS = "15"
+        $CHA = "8"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Territorial Xenophobes')
+    {
+        $ExportRace = "Lizardfolk Territorial Xenophobes"
+    }
+    if ($ChosenSubrace.SelectedItem -match 'Great Feasts and Sacrifices')
+    {
+        $ExportRace = "Lizardfolk Great Feasts and Sacrifices"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Canny Crafters')
+    {
+        $ExportRace = "Lizardfolk Canny Crafters"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Lizardfolk Leaders')
+    {
+        $ExportRace = "Lizardfolk Leaders"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Dragon Worshipers')
+    {
+        $ExportRace = "Lizardfolk Dragon Worshipers"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Githyanki')
+    {
+        $ExportRace = "Githyanki"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Githyanki Warrior')
+    {
+        $ExportRace = "Githyanki Warrior"
+        #Atttributes Basic
+        $STR = "15"
+        $DEX = "14"
+        $CON = "12"
+        $INT = "13"
+        $WIS = "13"
+        $CHA = "10"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Githyanki Knight')
+    {
+        $ExportRace = "Githyanki Knight"
+        #Attributes Basic
+        $STR = "16"
+        $DEX = "14"
+        $CON = "15"
+        $INT = "14"
+        $WIS = "14"
+        $CHA = "15"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Astral Raiders')
+    {
+        $ExportRace = "Gith Astral Raiders"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Followers of Gith')
+    {
+        $ExportRace = "Followers of Gith"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Silver Swords')
+    {
+        $ExportRace = "Gith Silver Swords"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Red Dragon Riders')
+    {
+        $ExportRace = "Gith Red Dragon Riders"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Githzerai')
+    {
+        $ExportRace = "Githzerai"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Githzerai Monk')
+    {
+        $ExportRace = "Githzerai Monk"
+        #Attributes Basic
+        $STR = "12"
+        $DEX = "15"
+        $CON = "12"
+        $INT = "13"
+        $WIS = "14"
+        $CHA = "10"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Githzerai Zerth')
+    {
+        $ExportRace = "Githzerai Zerth"
+        #Attributes Basic
+        $STR = "13"
+        $DEX = "18"
+        $CON = "15"
+        $INT = "16"
+        $WIS = "17"
+        $CHA = "12"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Psionic Adepts')
+    {
+        $ExportRace = "Gith Psionic Adepts"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Disciples of Zerthimon')
+    {
+        $ExportRace = "Gith Disciples of Zerthimon"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Beyond Limbo')
+    {
+        $ExportRace = "Gith Beyond Limbo"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Wilderness Nomads')
+    {
+        $ExportRace = "Centaur Wilderness Nomads"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Reluctant Settlers')
+    {
+        $ExportRace = "Centaur Reluctant Settlers"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'The Beast Within')
+    {
+        $ExportRace = "Minotaur The Beast Within"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Cults of the Horned King')
+    {
+        $ExportRace = "Minotaur Cults of the Horned King"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Curse of Lycanthropy')
+    {
+        $ExportRace = "Cursed Human Lycanth"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Werebear')
+    {
+        $ExportRace = "Werebear"
+        #Attributes Basic
+        $STR = "19"
+        $DEX = "10"
+        $CON = "17"
+        $INT = "11"
+        $WIS = "12"
+        $CHA = "12"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Wereboar')
+    {
+        $ExportRace = "Wereboar"
+        #Attributes Basic
+        $STR = "17"
+        $DEX = "10"
+        $CON = "15"
+        $INT = "10"
+        $WIS = "11"
+        $CHA = "8"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Wererat')
+    {
+        $ExportRace = "Wererat"
+        #Attributes Basic
+        $STR = "10"
+        $DEX = "15"
+        $CON = "12"
+        $INT = "11"
+        $WIS = "10"
+        $CHA = "8"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Weretiger')
+    {
+        $ExportRace = "Weretiger"
+        #Attributes Basic
+        $STR = "17"
+        $DEX = "15"
+        $CON = "16"
+        $INT = "10"
+        $WIS = "13"
+        $CHA = "11"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Werewolf')
+    {
+        $ExportRace = "Werewolf"
+        #Attributes Basic
+        $STR = "15"
+        $DEX = "13"
+        $CON = "14"
+        $INT = "10"
+        $WIS = "11"
+        $CHA = "10"
+        #Attribute Modifiers
+        $STRmod = "+0"
+        $DEXmod = "+0"
+        $CONmod = "+0"
+        $INTmod = "+0"
+        $WISmod = "+0"
+        $CHAmod = "+0"
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Troll Freaks')
+    {
+        $ExportRace = "Troll Freaks"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Furious Tempers')
+    {
+        $ExportRace = "Ogre Furious Tempers"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Gruesome Gluttons')
+    {
+        $ExportRace = "Ogre Gruesome Gluttons"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Greedy Collectors')
+    {
+        $ExportRace = "Ogre Greedy Collectors"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Legendary Stupidity')
+    {
+        $ExportRace = "Ogre Legendary Stupidity"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Primaitive Wanderers')
+    {
+        $ExportRace = "Primitive Wanderers"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Winter Wolf')
+    {
+        $ExportRace = "Primitive Wanderers"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Timber Wolf')
+    {
+        $ExportRace = "Timber Wolf"
+    }
+    if ($ChosenSubRace.SelectedItem -match 'Dire Wolf')
+    {
+        $ExportRace = "Dire Wolf"
+        #Attributes Basic
+        $STR = "17"
+        $DEX = "15"
+        $CON = "15"
+        $INT = "3"
+        $WIS = "12"
+        $CHA = "7"
+        #Attribute Modifiers
+        $STRmod = "+3"
+        $DEXmod = "+2"
+        $CONmod = "+2"
+        $INTmod = "-4"
+        $WISmod = "+1"
+        $CHAmod = "-2"
+        #Saving Throws
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+        #$Skills = "Perception +3, stealth +4"
+        #$Senses = "passive perception 13"
+    }
+
+    #If adding a custom SubRace, you can add the override using:    
+    #    if ($ChosenSubRace.SelectedItem -match '**')
+    #{
+    #    $ExportRace = "**"
     #}
 
     #Please finish adding - IF you select a race a picture appears to the rightside
@@ -3274,7 +4571,7 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
 #New Weapon selection
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Sparks D&D Character Creator'
-    $form.Size = New-Object System.Drawing.Size(400,300)
+    $form.Size = New-Object System.Drawing.Size(500,600)
     $form.StartPosition = 'CenterScreen'
     $objIcon = New-Object system.drawing.icon (".\Assets\installer.ico")
     $form.Icon = $objIcon
@@ -3283,11 +4580,8 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     $form.BackgroundImage = $objImage
     $form.BackgroundImageLayout = "Center"
     
-    $form.Width = $objImage.Width
-    $form.Height = $objImage.Height
-
     $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Location = New-Object System.Drawing.Point(75,270)
+    $okButton.Location = New-Object System.Drawing.Point(75,530)
     $okButton.Size = New-Object System.Drawing.Size(75,23)
     $okButton.Text = 'OK'
     $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
@@ -3295,7 +4589,7 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     $form.Controls.Add($okButton)
 
     $skipButton = New-Object System.Windows.Forms.Button
-    $skipButton.Location = New-Object System.Drawing.Point(150,270)
+    $skipButton.Location = New-Object System.Drawing.Point(150,530)
     $skipButton.Size = New-Object System.Drawing.Size(75,23)
     $skipButton.Text = 'Skip'
     $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
@@ -3303,7 +4597,7 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     $form.Controls.Add($skipButton)
 
     $backButton = New-Object System.Windows.Forms.Button
-    $backButton.Location = New-Object System.Drawing.Point(225,270)
+    $backButton.Location = New-Object System.Drawing.Point(225,530)
     $backButton.Size = New-Object System.Drawing.Size(75,23)
     $backButton.Text = 'Back'
     $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
@@ -3311,7 +4605,7 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     $form.Controls.Add($backButton)
 
     $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Location = New-Object System.Drawing.Point(300,270)
+    $cancelButton.Location = New-Object System.Drawing.Point(300,530)
     $cancelButton.Size = New-Object System.Drawing.Size(75,23)
     $cancelButton.Text = 'Cancel'
     $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
@@ -3319,37 +4613,65 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     $form.Controls.Add($cancelButton)
 
     $selectweapon1label = New-Object System.Windows.Forms.Label
-    $selectweapon1label.Location = New-Object System.Drawing.Point(10,20)
+    $selectweapon1label.Location = New-Object System.Drawing.Point(15,20)
     $selectweapon1label.Size = New-Object System.Drawing.Size(140,18)
     $selectweapon1label.Text = 'Select Weapon 1:'
     $form.Controls.Add($selectweapon1label)
 
     $selectweapon2label = New-Object System.Windows.Forms.Label
-    $selectweapon2label.Location = New-Object System.Drawing.Point(160,20)
+    $selectweapon2label.Location = New-Object System.Drawing.Point(165,20)
     $selectweapon2label.Size = New-Object System.Drawing.Size(140,18)
     $selectweapon2label.Text = 'Select Weapon 2:'
     $form.Controls.Add($selectweapon2label)
 
     $selectweapon3label = New-Object System.Windows.Forms.Label
-    $selectweapon3label.Location = New-Object System.Drawing.Point(310,20)
+    $selectweapon3label.Location = New-Object System.Drawing.Point(315,20)
     $selectweapon3label.Size = New-Object System.Drawing.Size(140,18)
     $selectweapon3label.Text = 'Select Weapon 3:'
     $form.Controls.Add($selectweapon3label)
 
     $selectweapon1panel = New-Object System.Windows.Forms.ListBox
-    $selectweapon1panel.Location = New-Object System.Drawing.Point(10,40)
+    $selectweapon1panel.Location = New-Object System.Drawing.Point(15,40)
     $selectweapon1panel.Size = New-Object System.Drawing.Size(140,18)
     $selectweapon1panel.Height = 230
 
     $selectweapon2panel = New-Object System.Windows.Forms.ListBox
-    $selectweapon2panel.Location = New-Object System.Drawing.Point(160,40)
+    $selectweapon2panel.Location = New-Object System.Drawing.Point(165,40)
     $selectweapon2panel.Size = New-Object System.Drawing.Size(140,18)
     $selectweapon2panel.Height = 230
 
     $selectweapon3panel = New-Object System.Windows.Forms.ListBox
-    $selectweapon3panel.Location = New-Object System.Drawing.Point(310,40)
+    $selectweapon3panel.Location = New-Object System.Drawing.Point(315,40)
     $selectweapon3panel.Size = New-Object System.Drawing.Size(140,18)
     $selectweapon3panel.Height = 230
+
+    $selectadventuregearlabel = New-Object System.Windows.Forms.Label
+    $selectadventuregearlabel.Location = New-Object System.Drawing.Point(240,270)
+    $selectadventuregearlabel.Size = New-Object System.Drawing.Size(170,18)
+    $selectadventuregearlabel.Text = 'Select 1 extra Adventuring Gear:'
+    $form.Controls.Add($selectadventuregearlabel)
+
+    $selectadventuinggearpanel = New-Object System.Windows.Forms.ListBox
+    $selectadventuinggearpanel.Location = New-Object System.Drawing.Point(240,290)
+    $selectadventuinggearpanel.Size = New-Object System.Drawing.Size(220,20)
+    $selectadventuinggearpanel.Height = 230
+
+    $armourlabel = New-Object System.Windows.Forms.Label
+    $armourlabel.Location = New-Object System.Drawing.Point(10,270)
+    $armourlabel.Size = New-Object System.Drawing.Size(220,18)
+    $armourlabel.Text = 'Please select Armour you wish to wear:'
+    $form.Controls.Add($armourlabel)
+
+    $ChosenArmour = New-Object System.Windows.Forms.ListBox
+    $ChosenArmour.Location = New-Object System.Drawing.Point(10,290)
+    $ChosenArmour.Size = New-Object System.Drawing.Size(220,20)
+    $ChosenArmour.Height = 200
+
+    $checkboxshield = new-object System.Windows.Forms.checkbox
+    $checkboxshield.Location = new-object System.Drawing.Size(25,490)
+    $checkboxshield.Size = new-object System.Drawing.Size(120,40)
+    $checkboxshield.Text = "Do you want a shield?"
+    $checkboxshield.Checked = $false
 
     #Weapon Lists, they correspond to the actual GUI, so don't mess up the co-ordinates
     #Weapon 1
@@ -3466,11 +4788,122 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $selectweapon3panel.Items.Add('Crossbow - Heavy') | Out-Null
         $selectweapon3panel.Items.Add('Crossbow - Hand') | Out-Null
         $selectweapon3panel.Items.Add('Longbow') | Out-Null
- 
+
+    #Adventuring Gear List
+        $selectadventuinggearpanel.Items.Add('Abacus') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Acid (vial)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Alchemists fire (flask)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Antitoxin (vial)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Backpack') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Ball Bearings (bag of 1,000)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Barrel') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Nasket') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Bedroll') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Bell') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Blanket') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Block and tackle') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Book') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Bottle, glass') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Bucket') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Caltrops (bag of 20)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Candle') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Case, crossbow bolt') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Case, map or scroll') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Chain (10 feet)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Chalk (1 piece)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Chest') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Climbers kit') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Clothes, common') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Clothes, costume') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Clothes, fine') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Clothes, travelers') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Component pouch') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Crowbar') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Fishing Tackle') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Flask or tankard') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Grappling hook') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Hammer') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Sledgehammer') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Healers kit') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Holy water (flask)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Hourglass') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Hunting trap') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Ink (1 ounce bottle) + Ink pen') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Jug or pitcher') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Ladder (10 foot)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Lamp') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Lantern, bullseye') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Lantern, hooded') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Lock') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Magnifying glass') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Manacles') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Mess kit') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Mirror, steel') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Oil (flask)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Paper (one sheet)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Parchment (one sheet)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Perfume (vial)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Pick, miners') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Piton') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Poison, basic (vial)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Pole (10-foot)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Pot, iron') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Potion of healing') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Pouch') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Quiver') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Ram, portable') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Rations (1 day)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Robes') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Rope, hempen (50 feet)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Rope, silk (50 feet)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Sack') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Scale, merchants') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Sealing wax') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Shovel') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Signal whistle') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Signet ring') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Soap') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Spellbook') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Spikes, iron (10)') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Spyglass') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Tent, two-person') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Tinderbox') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Torch') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Vial') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Waterskin') | Out-Null
+        $selectadventuinggearpanel.Items.Add('Whetstone') | Out-Null
+
+    #List from: https://www.dndbeyond.com/sources/basic-rules/equipment#AdventuringGear
+    #Each class needs to be limited to armour types to stop OP characters
+    #Make this a later thing to do as classes are still being worked on
+
+        $ChosenArmour.Items.Add('Light Armour - Naked') | Out-Null
+        $ChosenArmour.Items.Add('Light Armour - Padded') | Out-Null
+        $ChosenArmour.Items.Add('Light Armour - Leather') | Out-Null
+        $ChosenArmour.Items.Add('Light Armour - Studded Leather') | Out-Null
+        $ChosenArmour.Items.Add('Medium Armour - Hide') | Out-Null
+        $ChosenArmour.Items.Add('Medium Armour - Chain Shirt') | Out-Null
+        $ChosenArmour.Items.Add('Medium Armour - Scale Mail') | Out-Null
+        $ChosenArmour.Items.Add('Medium Armour - Breastplate') | Out-Null
+        $ChosenArmour.Items.Add('Medium Armour - Half Plate') | Out-Null
+        $ChosenArmour.Items.Add('Heavy Armour - Ring Mail') | Out-Null
+        $ChosenArmour.Items.Add('Heavy Armour - Chain Mail') | Out-Null
+        $ChosenArmour.Items.Add('Heavy Armour - Splint') | Out-Null
+        $ChosenArmour.Items.Add('Heavy Armour - Plate') | Out-Null
+
+    #Shield as an option with tickbox, completely optional to a player
+    $checkboxshield.Add_CheckStateChanged({
+        $checkboxshield.Enabled = $checkboxshield.Checked 
+    })
+    $Form.Add_Shown({$Form.Activate()})
+     
     $form.Controls.Add($selectweapon1panel)
     $form.Controls.Add($selectweapon2panel)
     $form.Controls.Add($selectweapon3panel)
-    $form.Topmost = $true
+    $form.Controls.Add($selectadventuinggearpanel)
+    $form.Controls.Add($ChosenArmour)
+    $Form.controls.AddRange(@($checkboxshield))
+    $form.Topmost = $true    
 
     if ($selectedweapons -eq [System.Windows.Forms.DialogResult]::OK)
     {
@@ -3482,12 +4915,19 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
 
         $selectedweapon3 = $selectweapon3panel.SelectedItem
         $selectedweapon3
+
+        $selectedadventuregear = $selectadventuinggearpanel.SelectedItem
+        $selectedadventuregear
+
+        $SelectedArmour = $ChosenArmour.SelectedItem
+        $SelectedArmour
     }
     if ($selectedweapons -eq [System.Windows.Forms.DialogResult]::Ignore)
     {
         $selectedweapon1 = "Non-Selected"
         $selectedweapon2 = "Non-Selected"
         $selectedweapon3 = "Non-Selected"
+        $ChosenArmour = "None Selected"
     }
     $selectedweapons = $form.ShowDialog()
     if ($selectedweapons -eq [System.Windows.Forms.DialogResult]::Retry)
@@ -3514,43 +4954,51 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
 #Make sure to split all sup parts of weapon stats up so when making files
 #it can be done via value's 
 
+#remember these types of armour are affected with cost, armour class, strength, stealth and weight
+#There is one type of shield with a base code of 10gp, armour class of +2 and weight of 453g
+#Getting out of armour has times for "DON" and "DOFF" DON = Put on, DOff = Take off
+#Light armour has a don of 1 min and doff of 1 min
+#Medium armour has a don of 5 mins and doff of 1 min
+#Heavy armour has a don of 10 mins and a doff off 5mins
+#shield has a don of 1 action and doff of 1 action
+
 #Currently adding weapon damage types to each weapon, finish this please
     #Weapon 1 Choice
     if ($selectweapon1panel.SelectedItem -match 'Iron Dagger')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeaponDamageSimpleMelee = "1d4 Piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon1DamageSimpleMelee = "1d4 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "1lb"
-        $Totalweaponweight
+        $Weapon1Weight = "1lb"
+        $Weapon1Weight
 
-        $WeaponPropertiessimplemelee = "Finesse, Light, thrown (range 20/60)"
-        $WeaponPropertiessimplemelee
+        $Weapon1Propertiessimplemelee = "Finesse, Light, thrown (range 20/60)"
+        $Weapon1Propertiessimplemelee
     }
     if ($selectweapon1panel.SelectedItem -match 'Steel Dagger')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeaponDamageSimpleMelee = "1d4 Piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon1DamageSimpleMelee = "1d4 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon1Weight = "2lb"
+        $Weapon1Weight
 
-        $WeaponPropertiessimplemelee = "Finesse, Light, thrown (range 20/60)"
-        $WeaponPropertiessimplemelee
+        $Weapon1Propertiessimplemelee = "Finesse, Light, thrown (range 20/60)"
+        $Weapon1Propertiessimplemelee
     }
     if ($selectweapon1panel.SelectedItem -match 'Club')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeaponDamageSimpleMelee = "1d4 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon1DamageSimpleMelee = "1d4 Bludgeoning"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon1Weight = "2lb"
+        $Weapon1Weight
 
         $WeaponPropertiessimplemelee = "Light"
         $WeaponPropertiessimplemelee
@@ -3559,11 +5007,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeaponDamageSimpleMelee = "1d8 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon1DamageSimpleMelee = "1d8 Bludgeoning"
+        $Weapon1DamageSimpleMelee
         
-        $Totalweaponweight = "10lb"
-        $Totalweaponweight
+        $Weapon1Weight = "10lb"
+        $Weapon1Weight
 
         $WeaponPropertiessimplemelee = "Two-Handed"
         $WeaponPropertiessimplemelee
@@ -3572,11 +5020,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeaponDamageSimpleMelee = "1d6 slashing"
-        $WeaponDamageSimpleMelee
+        $Weapon1DamageSimpleMelee = "1d6 slashing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon1Weight = "2lb"
+        $Weapon1Weight
 
         $WeaponPropertiessimplemelee = "Light, Thrown (range 20/60)"
         $WeaponPropertiessimplemelee
@@ -3585,11 +5033,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeaponDamageSimpleMelee = "1d6 piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon1DamageSimpleMelee = "1d6 piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon1Weight = "2lb"
+        $Weapon1Weight
 
         $WeaponPropertiessimplemelee = "Thrown (range 30/120"
         $WeaponPropertiessimplemelee
@@ -3598,11 +5046,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeaponDamageSimpleMelee = "1d4 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon1DamageSimpleMelee = "1d4 Bludgeoning"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon1Weight = "2lb"
+        $Weapon1Weight
 
         $WeaponPropertiessimplemelee = "Light, Thrown (range 20/60)"
         $WeaponPropertiessimplemelee
@@ -3611,11 +5059,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeaponDamageSimpleMelee = "1d6 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon1DamageSimpleMelee = "1d6 Bludgeoning"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "4lb"
-        $Totalweaponweight
+        $Weapon1Weight = "4lb"
+        $Weapon1Weight
 
         $WeaponPropertiessimplemelee = "One-Handed"
         $WeaponPropertiessimplemelee
@@ -3624,11 +5072,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeaponDamageSimpleMelee = "1d6 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon1DamageSimpleMelee = "1d6 Bludgeoning"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "4lb"
-        $Totalweaponweight
+        $Weapon1Weight = "4lb"
+        $Weapon1Weight
 
         $WeaponPropertiessimplemelee = "Versatile (1d8)"
         $WeaponPropertiessimplemelee
@@ -3637,11 +5085,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeaponDamageSimpleMelee = "1d6 Piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon1DamageSimpleMelee = "1d6 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "3lb"
-        $Totalweaponweight
+        $Weapon1Weight = "3lb"
+        $Weapon1Weight
 
         $WeaponPropertiessimplemelee = "Thrown (range 20/60, versatile (qd8)"
         $WeaponPropertiessimplemelee
@@ -3650,11 +5098,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeaponDamageSimpleMelee = "1d4 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon1DamageSimpleMelee = "1d4 Bludgeoning"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "5lb"
-        $Totalweaponweight
+        $Weapon1Weight = "5lb"
+        $Weapon1Weight
 
         $WeaponPropertiessimplemelee = "Two-Handed, Thrown (range 20/30)"
         $WeaponPropertiessimplemelee
@@ -3663,11 +5111,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeaponDamageSimpleMelee = "1d6 Piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon1DamageSimpleMelee = "1d6 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "6lb"
-        $Totalweaponweight
+        $Weapon1Weight = "6lb"
+        $Weapon1Weight
 
         $WeaponPropertiessimplemelee = "One-Handed"
         $WeaponPropertiessimplemelee
@@ -3676,11 +5124,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeaponDamageSimpleMelee = "1d4 Piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon1DamageSimpleMelee = "1d4 Piercing"
+        $Weapon1DamageSimpleMelee
         
-        $Totalweaponweight = "3lb"
-        $Totalweaponweight
+        $Weapon1Weight = "3lb"
+        $Weapon1Weight
 
         $WeaponPropertiessimplemelee = "One-Handed"
         $WeaponPropertiessimplemelee
@@ -3689,11 +5137,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeapongDamageSimpleRanged = "1d8 Piercing"
-        $WeapongDamageSimpleRanged
+        $Weapon1DamageSimpleMelee = "1d8 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "5lb"
-        $Totalweaponweight
+        $Weapon1Weight = "5lb"
+        $Weapon1Weight
         
         $WeaponPropertiessimpleranged = "Ammunition (range 80/320), Loading, Two-Handed"
         $WeaponPropertiessimpleranged
@@ -3702,11 +5150,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeapongDamageSimpleRanged = "1d6 Piercing"
-        $WeapongDamageSimpleRanged
+        $Weapon1DamageSimpleMelee = "1d6 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon1Weight = "2lb"
+        $Weapon1Weight
 
         $WeaponPropertiessimpleranged = "Ammunition (range 80/320), Two-Handed"
         $WeaponPropertiessimpleranged
@@ -3715,11 +5163,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeapongDamageSimpleRanged = "1d4 Bludgeoning"
-        $WeapongDamageSimpleRanged
+        $Weapon1DamageSimpleMelee = "1d4 Bludgeoning"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "0lb"
-        $Totalweaponweight
+        $Weapon1Weight = "0lb"
+        $Weapon1Weight
 
         $WeaponPropertiessimpleranged = "Ammunition (range 30/120)"
         $WeaponPropertiessimpleranged
@@ -3728,11 +5176,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeapongDamageSimpleRanged = "1d4 Piercing"
-        $WeapongDamageSimpleRanged
+        $Weapon1DamageSimpleMelee = "1d4 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "1/4lb"
-        $Totalweaponweight
+        $Weapon1Weight = "1/4lb"
+        $Weapon1Weight
 
         $WeaponPropertiessimpleranged = "Finesse, thrown (range 20/60)"
         $WeaponPropertiessimpleranged
@@ -3741,11 +5189,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeaponDamageMartialMelee = "1d8 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "1d8 Slashing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "4lb"
-        $Totalweaponweight
+        $Weapon1Weight = "4lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "Versatile (1d10)"
         $WeaponPropertiesmartialmelee
@@ -3754,11 +5202,11 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $WPN1ATK_Bonus = "+4"
 
-        $WeaponDamageMartialMelee = "1d8 Bludgeoning"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "1d8 Bludgeoning"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon1Weight = "2lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "One-Handed"
         $WeaponPropertiesmartialmelee
@@ -3766,12 +5214,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'Great Axe')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d12 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "1d12 Slashing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "7lb"
-        $Totalweaponweight
+        $Weapon1Weight = "7lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
         $WeaponPropertiesmartialmelee
@@ -3779,12 +5228,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'Great Sword')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialMelee = "2d6 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "2d6 Slashing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "6lb"
-        $Totalweaponweight
+        $Weapon1Weight = "6lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
         $WeaponPropertiesmartialmelee
@@ -3792,12 +5242,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'Halberd')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d10 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "1d10 Slashing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "6lb"
-        $Totalweaponweight
+        $Weapon1Weight = "6lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Reach, Two-Handed"
         $WeaponPropertiesmartialmelee
@@ -3805,12 +5256,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'Longsword')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "1d8 Slashing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "3lb"
-        $Totalweaponweight
+        $Weapon1Weight = "3lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "Versatile (1d10)"
         $WeaponPropertiesmartialmelee
@@ -3818,12 +5270,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'Maul')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialMelee = "2d6 Bludgeoning"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "2d6 Bludgeoning"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "10lb"
-        $Totalweaponweight
+        $Weapon1Weight = "10lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
         $WeaponPropertiesmartialmelee
@@ -3831,12 +5284,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'MorningStar')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Piercing"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "1d8 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "4lb"
-        $Totalweaponweight
+        $Weapon1Weight = "4lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "Two-Handed"
         $WeaponPropertiesmartialmelee
@@ -3844,12 +5298,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'Rapier')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Piercing"
-        $WeapoWeaponDamageMartialMeleenDamage
+        $Weapon1DamageSimpleMelee = "1d8 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon1Weight = "2lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "Finesse"
         $WeaponPropertiesmartialmelee
@@ -3857,12 +5312,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'Sicimitar')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d6 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "1d6 Slashing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "3lb"
-        $Totalweaponweight
+        $Weapon1Weight = "3lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "Finesse, Light"
         $WeaponPropertiesmartialmelee
@@ -3870,12 +5326,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'ShortSword')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d6 Piercing"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "1d6 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon1Weight = "2lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "Finesse, Light"
         $WeaponPropertiesmartialmelee
@@ -3883,12 +5340,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'Trident')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d6 Piercing"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "1d6 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "4lb"
-        $Totalweaponweight
+        $Weapon1Weight = "4lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "Thrown (range 20/60), Versatile (1d8)"
         $WeaponPropertiesmartialmelee
@@ -3896,12 +5354,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'Warhammer')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Bludgeoning"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "1d8 Bludgeoning"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon1Weight = "2lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "Versatile (1d10)"
         $WeaponPropertiesmartialmelee
@@ -3909,12 +5368,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'DoomHammer')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d12 Bludgeoning"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "1d12 Bludgeoning"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "10lb"
-        $Totalweaponweight
+        $Weapon1Weight = "10lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
         $WeaponPropertiesmartialmelee
@@ -3922,12 +5382,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'Dual-Wield Staff')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Budgeoning"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "1d8 Budgeoning"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "7lb"
-        $Totalweaponweight
+        $Weapon1Weight = "7lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "Two-Handed, Light"
         $WeaponPropertiesmartialmelee
@@ -3935,12 +5396,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'Broadsword')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Piercing"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "1d8 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "8lb"
-        $Totalweaponweight
+        $Weapon1Weight = "8lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
         $WeaponPropertiesmartialmelee
@@ -3948,12 +5410,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'Steel Sword')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Piercing"
-        $WeaponDamageMartialMelee
+        $Weapon1DamageSimpleMelee = "1d8 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "8lb"
-        $Totalweaponweight
+        $Weapon1Weight = "8lb"
+        $Weapon1Weight
 
         $WeaponPropertiesmartialmelee = "One-Handed"
         $WeaponPropertiesmartialmelee
@@ -3961,12 +5424,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'Crossbow - Heavy')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialRanged = "1d10 Piercing"
-        $WeaponDamageMartialRanged
+        $Weapon1DamageSimpleMelee = "1d10 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "18lb"
-        $Totalweaponweight
+        $Weapon1Weight = "18lb"
+        $Weapon1Weight
 
         $WeaponPropertiessmartialranged = "Ammunition (range 30/120), light, loading"
         $WeaponPropertiessmartialranged
@@ -3974,12 +5438,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'Crossbow - Hand')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialRanged = "1d6 Piercing"
-        $WeaponDamageMartialRanged
+        $Weapon1DamageSimpleMelee = "1d6 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "3lb"
-        $Totalweaponweight
+        $Weapon1Weight = "3lb"
+        $Weapon1Weight
 
         $WeaponPropertiessmartialranged = "Ammunition (range 100/400), Heavy, Loading, Two-Handed"
         $WeaponPropertiessmartialranged
@@ -3987,12 +5452,13 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     if ($selectweapon1panel.SelectedItem -match 'Longbow')
     {
         $WPN1ATK_Bonus = "+4"
+        $WPN1ATK_Bonus
 
-        $WeaponDamageMartialRanged = "1d8 Piercing"
-        $WeaponWeaponDamageMartialRangedDamage
+        $Weapon1DamageSimpleMelee = "1d8 Piercing"
+        $Weapon1DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon1Weight = "2lb"
+        $Weapon1Weight
 
         $WeaponPropertiessmartialranged = "Ammunition (range 150/600), Heavy, Two-Handed"
         $WeaponPropertiessmartialranged
@@ -4000,518 +5466,518 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     #Weapon 2 Choice
     if ($selectweapon2panel.SelectedItem -match 'Iron Dagger')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d4 Piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon2DamageSimpleMelee = "1d4 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "1lb"
-        $Totalweaponweight
+        $Weapon2Weight = "1lb"
+        $Weapon2Weight
 
         $WeaponPropertiessimplemelee = "Finesse, Light, thrown (range 20/60)"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Steel Dagger')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d4 Piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon2DamageSimpleMelee = "1d4 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon2Weight = "2lb"
+        $Weapon1Weight
 
         $WeaponPropertiessimplemelee = "Finesse, Light, thrown (range 20/60)"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Club')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d4 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon2DamageSimpleMelee = "1d4 Bludgeoning"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon2Weight = "2lb"
+        $Weapon2Weight
 
         $WeaponPropertiessimplemelee = "Light"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Great Club')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d8 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon2DamageSimpleMelee = "1d8 Bludgeoning"
+        $Weapon2DamageSimpleMelee
         
-        $Totalweaponweight = "10lb"
-        $Totalweaponweight
+        $Weapon2Weight = "10lb"
+        $Weapon2Weight
 
         $WeaponPropertiessimplemelee = "Two-Handed"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon2panel.SelectedItem -match 'HandAxe')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d6 slashing"
-        $WeaponDamageSimpleMelee
+        $Weapon2DamageSimpleMelee = "1d6 slashing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon2Weight = "2lb"
+        $Weapon2Weight
 
         $WeaponPropertiessimplemelee = "Light, Thrown (range 20/60)"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Javelin')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d6 piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon2DamageSimpleMelee = "1d6 piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon2Weight = "2lb"
+        $Weapon2Weight
 
         $WeaponPropertiessimplemelee = "Thrown (range 30/120"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Light Hammer')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d4 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon2DamageSimpleMelee = "1d4 Bludgeoning"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon2Weight = "2lb"
+        $Weapon2Weight
 
         $WeaponPropertiessimplemelee = "Light, Thrown (range 20/60)"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Mace')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d6 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon2DamageSimpleMelee = "1d6 Bludgeoning"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "4lb"
-        $Totalweaponweight
+        $Weapon2Weight = "4lb"
+        $Weapon2Weight
 
         $WeaponPropertiessimplemelee = "One-Handed"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon2panel.SelectedItem -match 'QuarterStaff')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d6 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon2DamageSimpleMelee = "1d6 Bludgeoning"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "4lb"
-        $Totalweaponweight
+        $Weapon2Weight = "4lb"
+        $Weapon2Weight
 
         $WeaponPropertiessimplemelee = "Versatile (1d8)"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Spear')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d6 Piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon2DamageSimpleMelee = "1d6 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "3lb"
-        $Totalweaponweight
+        $Weapon2Weight = "3lb"
+        $Weapon2Weight
 
         $WeaponPropertiessimplemelee = "Thrown (range 20/60, versatile (qd8)"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Nunchucks')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d4 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon2DamageSimpleMelee = "1d4 Bludgeoning"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "5lb"
-        $Totalweaponweight
+        $Weapon2Weight = "5lb"
+        $Weapon2Weight
 
         $WeaponPropertiessimplemelee = "Two-Handed, Thrown (range 20/30)"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Iron Sword')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d6 Piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon2DamageSimpleMelee = "1d6 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "6lb"
-        $Totalweaponweight
+        $Weapon2Weight = "6lb"
+        $Weapon2Weight
 
         $WeaponPropertiessimplemelee = "One-Handed"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Iron Short Sword')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d4 Piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon2DamageSimpleMelee = "1d4 Piercing"
+        $Weapon2DamageSimpleMelee
         
-        $Totalweaponweight = "3lb"
-        $Totalweaponweight
+        $Weapon2Weight = "3lb"
+        $Weapon2Weight
 
         $WeaponPropertiessimplemelee = "One-Handed"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Crossbow - Light')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeapongDamageSimpleRanged = "1d8 Piercing"
-        $WeapongDamageSimpleRanged
+        $Weapon2DamageSimpleMelee = "1d8 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "5lb"
-        $Totalweaponweight
+        $Weapon2Weight = "5lb"
+        $Weapon2Weight
         
         $WeaponPropertiessimpleranged = "Ammunition (range 80/320), Loading, Two-Handed"
         $WeaponPropertiessimpleranged
     }
     if ($selectweapon2panel.SelectedItem -match 'Shortbow')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeapongDamageSimpleRanged = "1d6 Piercing"
-        $WeapongDamageSimpleRanged
+        $Weapon2DamageSimpleMelee = "1d6 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon2Weight = "2lb"
+        $Weapon2Weight
 
         $WeaponPropertiessimpleranged = "Ammunition (range 80/320), Two-Handed"
         $WeaponPropertiessimpleranged
     }
     if ($selectweapon2panel.SelectedItem -match 'Sling')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeapongDamageSimpleRanged = "1d4 Bludgeoning"
-        $WeapongDamageSimpleRanged
+        $Weapon2DamageSimpleMelee = "1d4 Bludgeoning"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "0lb"
-        $Totalweaponweight
+        $Weapon2Weight = "0lb"
+        $Weapon2Weight
 
         $WeaponPropertiessimpleranged = "Ammunition (range 30/120)"
         $WeaponPropertiessimpleranged
     }
     if ($selectweapon2panel.SelectedItem -match 'Dart')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeapongDamageSimpleRanged = "1d4 Piercing"
-        $WeapongDamageSimpleRanged
+        $Weapon2DamageSimpleMelee = "1d4 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "1/4lb"
-        $Totalweaponweight
+        $Weapon2Weight = "1/4lb"
+        $Weapon2Weight
 
         $WeaponPropertiessimpleranged = "Finesse, thrown (range 20/60)"
         $WeaponPropertiessimpleranged
     }
     if ($selectweapon2panel.SelectedItem -match 'BattleAxe')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "1d8 Slashing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "4lb"
-        $Totalweaponweight
+        $Weapon2Weight = "4lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "Versatile (1d10)"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Flail')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Bludgeoning"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "1d8 Bludgeoning"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon2Weight = "2lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "One-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Great Axe')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d12 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "1d12 Slashing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "7lb"
-        $Totalweaponweight
+        $Weapon2Weight = "7lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Great Sword')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "2d6 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "2d6 Slashing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "6lb"
-        $Totalweaponweight
+        $Weapon2Weight = "6lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Halberd')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d10 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "1d10 Slashing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "6lb"
-        $Totalweaponweight
+        $Weapon2Weight = "6lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Reach, Two-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Longsword')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "1d8 Slashing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "3lb"
-        $Totalweaponweight
+        $Weapon2Weight = "3lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "Versatile (1d10)"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Maul')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "2d6 Bludgeoning"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "2d6 Bludgeoning"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "10lb"
-        $Totalweaponweight
+        $Weapon2Weight = "10lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'MorningStar')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Piercing"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "1d8 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "4lb"
-        $Totalweaponweight
+        $Weapon2Weight = "4lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "Two-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Rapier')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Piercing"
-        $WeapoWeaponDamageMartialMeleenDamage
+        $Weapon2DamageSimpleMelee = "1d8 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon2Weight = "2lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "Finesse"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Sicimitar')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d6 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "1d6 Slashing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "3lb"
-        $Totalweaponweight
+        $Weapon2Weight = "3lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "Finesse, Light"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'ShortSword')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d6 Piercing"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "1d6 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon2Weight = "2lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "Finesse, Light"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Trident')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d6 Piercing"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "1d6 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "4lb"
-        $Totalweaponweight
+        $Weapon2Weight = "4lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "Thrown (range 20/60), Versatile (1d8)"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Warhammer')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Bludgeoning"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "1d8 Bludgeoning"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon2Weight = "2lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "Versatile (1d10)"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'DoomHammer')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d12 Bludgeoning"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "1d12 Bludgeoning"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "10lb"
-        $Totalweaponweight
+        $Weapon2Weight = "10lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Dual-Wield Staff')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Budgeoning"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "1d8 Budgeoning"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "7lb"
-        $Totalweaponweight
+        $Weapon2Weight = "7lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "Two-Handed, Light"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Broadsword')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Piercing"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "1d8 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "8lb"
-        $Totalweaponweight
+        $Weapon2Weight = "8lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Steel Sword')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Piercing"
-        $WeaponDamageMartialMelee
+        $Weapon2DamageSimpleMelee = "1d8 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "8lb"
-        $Totalweaponweight
+        $Weapon2Weight = "8lb"
+        $Weapon2Weight
 
         $WeaponPropertiesmartialmelee = "One-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon2panel.SelectedItem -match 'Crossbow - Heavy')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialRanged = "1d10 Piercing"
-        $WeaponDamageMartialRanged
+        $Weapon2DamageSimpleMelee = "1d10 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "18lb"
-        $Totalweaponweight
+        $Weapon2Weight = "18lb"
+        $Weapon2Weight
 
         $WeaponPropertiessmartialranged = "Ammunition (range 30/120), light, loading"
         $WeaponPropertiessmartialranged
     }
     if ($selectweapon2panel.SelectedItem -match 'Crossbow - Hand')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialRanged = "1d6 Piercing"
-        $WeaponDamageMartialRanged
+        $Weapon2DamageSimpleMelee = "1d6 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "3lb"
-        $Totalweaponweight
+        $Weapon2Weight = "3lb"
+        $Weapon2Weight
 
         $WeaponPropertiessmartialranged = "Ammunition (range 100/400), Heavy, Loading, Two-Handed"
         $WeaponPropertiessmartialranged
     }
     if ($selectweapon2panel.SelectedItem -match 'Longbow')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN2ATK_Bonus = "+4"
+        $WPN2ATK_Bonus
 
-        $WeaponDamageMartialRanged = "1d8 Piercing"
-        $WeaponWeaponDamageMartialRangedDamage
+        $Weapon2DamageSimpleMelee = "1d8 Piercing"
+        $Weapon2DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon2Weight = "2lb"
+        $Weapon2Weight
 
         $WeaponPropertiessmartialranged = "Ammunition (range 150/600), Heavy, Two-Handed"
         $WeaponPropertiessmartialranged
@@ -4519,518 +5985,518 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     #Weapon 3 Choice
     if ($selectweapon3panel.SelectedItem -match 'Iron Dagger')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d4 Piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon3DamageSimpleMelee = "1d4 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "1lb"
-        $Totalweaponweight
+        $Weapon3Weight = "1lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimplemelee = "Finesse, Light, thrown (range 20/60)"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Steel Dagger')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d4 Piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon3DamageSimpleMelee = "1d4 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon3Weight = "2lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimplemelee = "Finesse, Light, thrown (range 20/60)"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Club')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d4 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon3DamageSimpleMelee = "1d4 Bludgeoning"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon3Weight = "2lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimplemelee = "Light"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Great Club')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d8 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon3DamageSimpleMelee = "1d8 Bludgeoning"
+        $Weapon3DamageSimpleMelee
         
-        $Totalweaponweight = "10lb"
-        $Totalweaponweight
+        $Weapon3Weight = "10lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimplemelee = "Two-Handed"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon3panel.SelectedItem -match 'HandAxe')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d6 slashing"
-        $WeaponDamageSimpleMelee
+        $Weapon3DamageSimpleMelee = "1d6 slashing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon3Weight = "2lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimplemelee = "Light, Thrown (range 20/60)"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Javelin')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d6 piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon3DamageSimpleMelee = "1d6 piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon3Weight = "2lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimplemelee = "Thrown (range 30/120"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Light Hammer')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d4 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon3DamageSimpleMelee = "1d4 Bludgeoning"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon3Weight = "2lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimplemelee = "Light, Thrown (range 20/60)"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Mace')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d6 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon3DamageSimpleMelee = "1d6 Bludgeoning"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "4lb"
-        $Totalweaponweight
+        $Weapon3Weight = "4lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimplemelee = "One-Handed"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon3panel.SelectedItem -match 'QuarterStaff')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d6 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon3DamageSimpleMelee = "1d6 Bludgeoning"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "4lb"
-        $Totalweaponweight
+        $Weapon3Weight = "4lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimplemelee = "Versatile (1d8)"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Spear')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d6 Piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon3DamageSimpleMelee = "1d6 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "3lb"
-        $Totalweaponweight
+        $Weapon3Weight = "3lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimplemelee = "Thrown (range 20/60, versatile (qd8)"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Nunchucks')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d4 Bludgeoning"
-        $WeaponDamageSimpleMelee
+        $Weapon3DamageSimpleMelee = "1d4 Bludgeoning"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "5lb"
-        $Totalweaponweight
+        $Weapon3Weight = "5lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimplemelee = "Two-Handed, Thrown (range 20/30)"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Iron Sword')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d6 Piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon3DamageSimpleMelee = "1d6 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "6lb"
-        $Totalweaponweight
+        $Weapon3Weight = "6lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimplemelee = "One-Handed"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Iron Short Sword')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageSimpleMelee = "1d4 Piercing"
-        $WeaponDamageSimpleMelee
+        $Weapon3DamageSimpleMelee = "1d4 Piercing"
+        $Weapon3DamageSimpleMelee
         
-        $Totalweaponweight = "3lb"
-        $Totalweaponweight
+        $Weapon3Weight = "3lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimplemelee = "One-Handed"
         $WeaponPropertiessimplemelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Crossbow - Light')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeapongDamageSimpleRanged = "1d8 Piercing"
-        $WeapongDamageSimpleRanged
+        $Weapon3DamageSimpleMelee = "1d8 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "5lb"
-        $Totalweaponweight
+        $Weapon3Weight = "5lb"
+        $Weapon3Weight
         
         $WeaponPropertiessimpleranged = "Ammunition (range 80/320), Loading, Two-Handed"
         $WeaponPropertiessimpleranged
     }
     if ($selectweapon3panel.SelectedItem -match 'Shortbow')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeapongDamageSimpleRanged = "1d6 Piercing"
-        $WeapongDamageSimpleRanged
+        $Weapon3DamageSimpleMelee = "1d6 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon3Weight = "2lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimpleranged = "Ammunition (range 80/320), Two-Handed"
         $WeaponPropertiessimpleranged
     }
     if ($selectweapon3panel.SelectedItem -match 'Sling')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeapongDamageSimpleRanged = "1d4 Bludgeoning"
-        $WeapongDamageSimpleRanged
+        $Weapon3DamageSimpleMelee = "1d4 Bludgeoning"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "0lb"
-        $Totalweaponweight
+        $Weapon3Weight = "0lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimpleranged = "Ammunition (range 30/120)"
         $WeaponPropertiessimpleranged
     }
     if ($selectweapon3panel.SelectedItem -match 'Dart')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeapongDamageSimpleRanged = "1d4 Piercing"
-        $WeapongDamageSimpleRanged
+        $Weapon3DamageSimpleMelee = "1d4 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "1/4lb"
-        $Totalweaponweight
+        $Weapon3Weight = "1/4lb"
+        $Weapon3Weight
 
         $WeaponPropertiessimpleranged = "Finesse, thrown (range 20/60)"
         $WeaponPropertiessimpleranged
     }
     if ($selectweapon3panel.SelectedItem -match 'BattleAxe')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "1d8 Slashing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "4lb"
-        $Totalweaponweight
+        $Weapon3Weight = "4lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "Versatile (1d10)"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Flail')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Bludgeoning"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "1d8 Bludgeoning"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon3Weight = "2lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "One-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Great Axe')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d12 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "1d12 Slashing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "7lb"
-        $Totalweaponweight
+        $Weapon3Weight = "7lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Great Sword')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "2d6 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "2d6 Slashing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "6lb"
-        $Totalweaponweight
+        $Weapon3Weight = "6lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Halberd')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d10 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "1d10 Slashing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "6lb"
-        $Totalweaponweight
+        $Weapon3Weight = "6lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Reach, Two-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Longsword')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "1d8 Slashing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "3lb"
-        $Totalweaponweight
+        $Weapon3Weight = "3lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "Versatile (1d10)"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Maul')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "2d6 Bludgeoning"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "2d6 Bludgeoning"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "10lb"
-        $Totalweaponweight
+        $Weapon3Weight = "10lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'MorningStar')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Piercing"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "1d8 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "4lb"
-        $Totalweaponweight
+        $Weapon3Weight = "4lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "Two-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Rapier')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Piercing"
-        $WeapoWeaponDamageMartialMeleenDamage
+        $Weapon3DamageSimpleMelee = "1d8 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon3Weight = "2lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "Finesse"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Sicimitar')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d6 Slashing"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "1d6 Slashing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "3lb"
-        $Totalweaponweight
+        $Weapon3Weight = "3lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "Finesse, Light"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'ShortSword')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d6 Piercing"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "1d6 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon3Weight = "2lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "Finesse, Light"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Trident')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d6 Piercing"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "1d6 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "4lb"
-        $Totalweaponweight
+        $Weapon3Weight = "4lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "Thrown (range 20/60), Versatile (1d8)"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Warhammer')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Bludgeoning"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "1d8 Bludgeoning"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon3Weight = "2lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "Versatile (1d10)"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'DoomHammer')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d12 Bludgeoning"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "1d12 Bludgeoning"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "10lb"
-        $Totalweaponweight
+        $Weapon3Weight = "10lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Dual-Wield Staff')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Budgeoning"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "1d8 Budgeoning"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "7lb"
-        $Totalweaponweight
+        $Weapon3Weight = "7lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "Two-Handed, Light"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Broadsword')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Piercing"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "1d8 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "8lb"
-        $Totalweaponweight
+        $Weapon3Weight = "8lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Steel Sword')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialMelee = "1d8 Piercing"
-        $WeaponDamageMartialMelee
+        $Weapon3DamageSimpleMelee = "1d8 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "8lb"
-        $Totalweaponweight
+        $Weapon3Weight = "8lb"
+        $Weapon3Weight
 
         $WeaponPropertiesmartialmelee = "One-Handed"
         $WeaponPropertiesmartialmelee
     }
     if ($selectweapon3panel.SelectedItem -match 'Crossbow - Heavy')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialRanged = "1d10 Piercing"
-        $WeaponDamageMartialRanged
+        $Weapon3DamageSimpleMelee = "1d10 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "18lb"
-        $Totalweaponweight
+        $Weapon3Weight = "18lb"
+        $Weapon3Weight
 
         $WeaponPropertiessmartialranged = "Ammunition (range 30/120), light, loading"
         $WeaponPropertiessmartialranged
     }
     if ($selectweapon3panel.SelectedItem -match 'Crossbow - Hand')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialRanged = "1d6 Piercing"
-        $WeaponDamageMartialRanged
+        $Weapon3DamageSimpleMelee = "1d6 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "3lb"
-        $Totalweaponweight
+        $Weapon3Weight = "3lb"
+        $Weapon3Weight
 
         $WeaponPropertiessmartialranged = "Ammunition (range 100/400), Heavy, Loading, Two-Handed"
         $WeaponPropertiessmartialranged
     }
     if ($selectweapon3panel.SelectedItem -match 'Longbow')
     {
-        $ATK_Bonus = "+4"
-        $ATK_Bonus
+        $WPN3ATK_Bonus = "+4"
+        $WPN3ATK_Bonus
 
-        $WeaponDamageMartialRanged = "1d8 Piercing"
-        $WeaponWeaponDamageMartialRangedDamage
+        $Weapon3DamageSimpleMelee = "1d8 Piercing"
+        $Weapon3DamageSimpleMelee
 
-        $Totalweaponweight = "2lb"
-        $Totalweaponweight
+        $Weapon3Weight = "2lb"
+        $Weapon3Weight
 
         $WeaponPropertiessmartialranged = "Ammunition (range 150/600), Heavy, Two-Handed"
         $WeaponPropertiessmartialranged
@@ -5047,8 +6513,8 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
      #$WeapomDamageCHOICE = "0"
      #$WeaponDamageCHOICE
 
-     #$Totalweaponweight ="0"
-     #$Totalweaponweight
+     #$Weapon1Weight ="0"
+     #$Weapon1Weight
 
      #$weaponpropertiesCHOICE = ""
      #$weaponpropertiesCHOICE
@@ -5059,7 +6525,7 @@ $ArmourClass = 0
 
     if ($chosenArmour.SelectedItem -match 'Light Armour - Naked')
     {
-      $ArmourClass = 0
+      $ArmourClass = 1
       $ArmourClass
     }
     if ($chosenArmour.SelectedItem -match 'Light Armour - Padded')
@@ -5144,7 +6610,9 @@ $ArmourClass = 0
 #This also should include weight and properties
 
 #Attacks and Spellcasting fill box
-#To do 
+#Weight calculation
+#$EquiptmentArray = @(ForEach-Object {Measure-Object -Sum} $selectedweapon1, $selectedweapon2, $selectedweapon3)
+#$TotalWeight = ($EquiptmentArray | ForEach-Object {Measure-Object -Sum})
 
 #Custom Backstory
     $form = New-Object System.Windows.Forms.Form
@@ -5281,7 +6749,7 @@ $ArmourClass = 0
     }
     if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::Ignore)
     {
-        $characterbackstory = "N/A"
+        $characterbackstory = "Unknown"
         $PersonalityTraits = "Unknown"
         $Ideals = "Unknown"
         $Bonds = "Unknown"
@@ -5296,6 +6764,118 @@ $ArmourClass = 0
     {
         Exit
     }
+
+#More Background details
+$form = New-Object System.Windows.Forms.Form
+$form.Text = 'Sparks D&D Character Creator'
+$form.Size = New-Object System.Drawing.Size(790,620)
+$form.StartPosition = 'CenterScreen'
+$objIcon = New-Object system.drawing.icon (".\Assets\installer.ico")
+$form.Icon = $objIcon
+
+$objImage = [system.drawing.image]::FromFile(".\Assets\form_background.png")
+$form.BackgroundImage = $objImage
+$form.BackgroundImageLayout = "Center"
+
+$okButton = New-Object System.Windows.Forms.Button
+$okButton.Location = New-Object System.Drawing.Point(420,545)
+$okButton.Size = New-Object System.Drawing.Size(75,23)
+$okButton.Text = 'OK'
+$okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
+$form.AcceptButton = $okButton
+$form.Controls.Add($okButton)
+
+$skipButton = New-Object System.Windows.Forms.Button
+$skipButton.Location = New-Object System.Drawing.Point(495,545)
+$skipButton.Size = New-Object System.Drawing.Size(75,23)
+$skipButton.Text = 'Skip'
+$skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
+$form.AcceptButton = $skipButton
+$form.Controls.Add($skipButton)
+
+$backButton = New-Object System.Windows.Forms.Button
+$backButton.Location = New-Object System.Drawing.Point(570,545)
+$backButton.Size = New-Object System.Drawing.Size(75,23)
+$backButton.Text = 'Back'
+$backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
+$form.CancelButton = $backButton
+$form.Controls.Add($backButton)
+
+$cancelButton = New-Object System.Windows.Forms.Button
+$cancelButton.Location = New-Object System.Drawing.Point(645,545)
+$cancelButton.Size = New-Object System.Drawing.Size(75,23)
+$cancelButton.Text = 'Cancel'
+$cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
+$form.CancelButton = $cancelButton
+$form.Controls.Add($cancelButton)
+
+$alliesandorganisationslabel = New-Object System.Windows.Forms.Label
+$alliesandorganisationslabel.Location = New-Object System.Drawing.Point(10,20)
+$alliesandorganisationslabel.Size = New-Object System.Drawing.Size(220,18)
+$alliesandorganisationslabel.Text = 'Write about your Allies and Organisations:'
+$form.Controls.Add($alliesandorganisationslabel)
+
+$alliesandorganisations = New-Object System.Windows.Forms.TextBox
+$alliesandorganisations.Location = New-Object System.Drawing.Point(10,40)
+$alliesandorganisations.Size = New-Object System.Drawing.Size(360,480)
+$alliesandorganisations.Multiline = 1
+$alliesandorganisations.ScrollBars = 2
+$alliesandorganisations.AcceptsReturn = 1
+$form.Controls.Add($alliesandorganisations)
+
+$addionalfeattraitslabel = New-Object System.Windows.Forms.Label
+$addionalfeattraitslabel.Location = New-Object System.Drawing.Point(420,20)
+$addionalfeattraitslabel.Size = New-Object System.Drawing.Size(220,18)
+$addionalfeattraitslabel.Text = 'Write your Additional features and traits:'
+$form.Controls.Add($addionalfeattraitslabel)
+
+$AddionalfeatTraits = New-Object System.Windows.Forms.TextBox
+$AddionalfeatTraits.Location = New-Object System.Drawing.Point(400,40)
+$AddionalfeatTraits.Size = New-Object System.Drawing.Size(360,480)
+$AddionalfeatTraits.Multiline = 1
+$AddionalfeatTraits.ScrollBars = 2
+$AddionalfeatTraits.AcceptsReturn = 1
+$form.Controls.Add($AddionalfeatTraits)
+
+$factionslabel = New-Object System.Windows.Forms.Label
+$factionslabel.Location = New-Object System.Drawing.Point(10,530)
+$factionslabel.Size = New-Object System.Drawing.Size(220,18)
+$factionslabel.Text = 'Faction Name:'
+$form.Controls.Add($factionslabel)
+
+$factionname = New-Object System.Windows.Forms.TextBox
+$factionname.Location = New-Object System.Drawing.Point(10,550)
+$factionname.Size = New-Object System.Drawing.Size(360,20)
+$factionname.AcceptsReturn = 1
+$form.Controls.Add($factionname)
+
+$form.Topmost = $true
+if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::OK)
+{
+    $alliesandorganisations = $alliesandorganisations.Text
+    $alliesandorganisations
+
+    $AddionalfeatTraits = $AddionalfeatTraits.Text
+    $AddionalfeatTraits
+
+    $factionname = $factionname.Text
+    $factionname
+}
+if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::Ignore)
+{
+    $AddionalfeatTraits = "Unknown"
+    $alliesandorganisations = "Unknown"
+    $factionname = "Unknown"
+}
+$characterextraformdialog = $form.ShowDialog()
+if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::Retry)
+{
+    Return
+}
+if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::Cancel)
+{
+    Exit
+}
 
 #Select Path for export
 $SaveChooser = New-Object -Typename System.Windows.Forms.SaveFileDialog
@@ -5343,7 +6923,7 @@ $characterparameters = @{
         'Check Box 15' = $Check15; #first failure button (from left)
         'Check Box 16' = $Check16; #second failure button
         'Check Box 17' = $Check17; #last failure button
-        #'HD' =  ;
+        'HD' = $HD;
         'Flaws' = $Flaws.Text;
         'INT' = $INT;
         'ST Dexterity' = $ST_DEX;
@@ -5358,7 +6938,7 @@ $characterparameters = @{
         #'History ' =  ;
         'Wpn Name' = $selectweapon1panel.SelectedItem;
         'Wpn1 AtkBonus' = $WPN1ATK_Bonus;
-        'Wpn1 Damage' = $WeaponDamageSimpleMelee.SelectedItem;
+        'Wpn1 Damage' = $Weapon1DamageSimpleMelee;
         #'Insight' =  ;
         #'Intimidation' =  ;
         'Wpn Name 2' = $selectweapon2panel.SelectedItem;
@@ -5372,7 +6952,7 @@ $characterparameters = @{
         'Check Box 21' = $Check21; #Wisdom Button
         'Check Box 22' = $Check22; #Charisma Button
         'INTmod' = $INTmod;
-        'Wpn2 Damage' = $WeaponDamageMartialMelee.SelectedItem;
+        'Wpn2 Damage' = $Weapon2DamageSimpleMelee;
         #'Investigation ' =  ;
         'WIS' = $WIS;
         #'Arcana' =  ;
@@ -5406,20 +6986,20 @@ $characterparameters = @{
         'HPMax' = $HP;
         #'HPCurrent' = NULL;
         #'HPTemp' = NULL;
-        'Wpn3 Damage ' = $WeapongDamageSimpleRanged.SelectedItem;
+        'Wpn3 Damage ' = $Weapon3DamageSimpleMelee;
         #'SleightofHand' =  ;
         'CHamod' = $CHAmod;
         #'Survival' =  ;
         'AttacksSpellcasting' = $CombinedWeaponStats;
         #'Passive' =  ;
-        #'CP' =  ;
+        'CP' = $CopperCP;
         'ProficienciesLang' = $SpokenLanguages;
-        #'SP' = ;
-        #'EP' = ;
-        #'GP' = ;
-        #'PP' = ;
-        #'Equipment' =  ;
-        #'Features and Traits' = ;
+        'SP' = $SilverSP;
+        'EP' = $ElectrumEP;
+        'GP' = $GoldGP;
+        'PP' = $PlatinumPP;
+        'Equipment' = $selectadventuinggearpanel.SelectedItem;
+        'Features and Traits' = $RacialSpecialAbility;
         'CharacterName 2' = $charactername.Text;
         'Age' = $age.Text;
         'Height' = $Playerheight;
@@ -5429,11 +7009,11 @@ $characterparameters = @{
         'Hair' = $characterfeaturesselecthair.SelectedItem;
         'CHARACTER IMAGE' = $CharacterImage;
         #'Faction Symbol Image' =  ;
-        #'Allies' =  ;
-        #'FactionName' =  ;
+        'Allies' = $alliesandorganisations.Text;
+        'FactionName' = $factionname.Text;
         'Backstory' = $characterbackstory.Text;
-        #'Feat+Traits' =  ;
-        'Treasure' = $Gold;
+        'Feat+Traits' = $AddionalfeatTraits.Text;
+        #'Treasure' = ;
         #'Spellcasting Class 2' =  ;
         #'SpellcastingAbility 2' =  ;
         #'SpellSaveDC  2' =  ;

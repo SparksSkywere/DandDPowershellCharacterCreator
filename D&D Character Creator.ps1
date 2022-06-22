@@ -27,7 +27,7 @@ function Show-Console
 }
 #end of powershell console hiding
 #To show the console change "-hide" to "-show"
-show-console -show
+show-console -hide
 
 #Sparks's D&D Character Creator powershell script, this is intended for fun and feel free to edit fields for future use but please keep me credited
 #This is a powershell produced program, it is written in C# and powershell functions
@@ -134,6 +134,20 @@ $SilverSP = ""
 $ElectrumEP = ""
 $GoldGP = "10"
 $PlatinumPP = ""
+#Spells
+$SpellCastingClass = "N/A"
+$SpellCastingAbility = ""
+$SpellCastingSaveDC = ""
+$SpellCastingAttackBonus = ""
+$Cantrip01 = "Cantrip1"
+$Cantrip02 = "Cantrip2"
+$Cantrip03 = "Cantrip3"
+$Cantrip04 = "Cantrip4"
+$Cantrip05 = "Cantrip5"
+$Cantrip06 = "Cantrip6"
+$Cantrip07 = "Cantrip7"
+$Cantrip08 = "Cantrip8"
+$Cantrip11 = "Cantrip11"
 
 #Checkbox# Skills
 $Check23 = 'Yes' 
@@ -1326,6 +1340,7 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Wild Magic') | Out-Null
             $HitDiceTotal = "1d12"
             $ClassLevel = "Barbarian 1"
+            $SpellCastingClass = "Barbarian"
             $Check11 = 'Yes'
             $Check19 = 'Yes'
 
@@ -1360,6 +1375,7 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('College of Creation') | Out-Null
             $HitDiceTotal = "1d8"
             $ClassLevel = "Bard 1"
+            $SpellCastingClass = "Bard"
             $Check18 = 'Yes'
             $Check22 = 'Yes'
             
@@ -1407,6 +1423,7 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Twilight Domain') | Out-Null
             $HitDiceTotal = "1d8"
             $ClassLevel = "Cleric 1"
+            $SpellCastingClass = "Cleric"
             $Check21 = 'Yes'
             $Check22 = 'Yes'
             
@@ -1443,6 +1460,7 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Circle of Wildlife') | Out-Null
             $HitDiceTotal = "1d8"
             $ClassLevel = "Druid 1"
+            $SpellCastingClass = "Druid"
             $Check20 = 'Yes'
             $Check21 = 'Yes'
             
@@ -1482,6 +1500,7 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Rune Knight') | Out-Null
             $HitDiceTotal = "1d10"
             $ClassLevel = "Fighter 1"
+            $SpellCastingClass = "Fighter"
             $Check11 = 'Yes'
             $Check19 = 'Yes'
             
@@ -1520,6 +1539,7 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Way of Astral Self') | Out-Null
             $HitDiceTotal = "1d8"
             $ClassLevel = "Monk 1"
+            $SpellCastingClass = "Monk"
             $Check11 = 'Yes'
             $Check18 = 'Yes'
             
@@ -1558,6 +1578,7 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Oath Of The Watchers') | Out-Null
             $HitDiceTotal = "1d10"
             $ClassLevel = "Paladin 1"
+            $SpellCastingClass = "Paladin"
             $Check21 = 'Yes'
             $Check22 = 'Yes'
             
@@ -1594,6 +1615,7 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Swarmkeeper') | Out-Null
             $HitDiceTotal = "1d10"
             $ClassLevel = "Ranger 1"
+            $SpellCastingClass = "Ranger"
             $Check11 = 'Yes'
             $Check18 = 'Yes'
             
@@ -1632,6 +1654,7 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Soulknife') | Out-Null
             $HitDiceTotal = "1d8"
             $ClassLevel = "Rogue 1"
+            $SpellCastingClass = "Rogue"
             $Check18 = 'Yes'
             $Check20 = 'Yes'
             
@@ -1669,6 +1692,7 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Clockwork Soul') | Out-Null
             $HitDiceTotal = "1d6"
             $ClassLevel = "Sorcerer 1"
+            $SpellCastingClass = "Sorcerer"
             $Check19 = 'Yes'
             $Check22 = 'Yes'
             
@@ -1706,6 +1730,7 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('The Genie') | Out-Null
             $HitDiceTotal = "1d8"
             $ClassLevel = "Warlock 1"
+            $SpellCastingClass = "Warlock"
             $Check21 = 'Yes'
             $Check22 = 'Yes'
             
@@ -1748,6 +1773,7 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Order Of Scribes') | Out-Null
             $HitDiceTotal = "1d6"
             $ClassLevel = "Wizard 1"
+            $SpellCastingClass = "Wizard"
             $Check20 = 'Yes'
             $Check21 = 'Yes'
             
@@ -7014,21 +7040,21 @@ $characterparameters = @{
         'Backstory' = $characterbackstory.Text;
         'Feat+Traits' = $AddionalfeatTraits.Text;
         #'Treasure' = ;
-        #'Spellcasting Class 2' =  ;
+        'Spellcasting Class 2' = $SpellCastingClass;
         #'SpellcastingAbility 2' =  ;
         #'SpellSaveDC  2' =  ;
         #'SpellAtkBonus 2' =  ;
         #'SlotsTotal 19' =  ;
         #'SlotsRemaining 19' =  ;
-        #'Spells 1014' =  ;
-        #'Spells 1015' =  ;
-        #'Spells 1016' =  ;
-        #'Spells 1017' =  ;
-        #'Spells 1018' =  ;
-        #'Spells 1019' =  ;
-        #'Spells 1020' =  ;
-        #'Spells 1021' =  ;
-        #'Spells 1022' =  ;
+        'Spells 1014' = $Cantrip01; #Cantrip 0 slot 1 (top)
+        'Spells 1015' = $Cantrip11; #Cantrip 1 slot 1 (top)
+        'Spells 1016' = $Cantrip02; #Cantrip 0 slot 2
+        'Spells 1017' = $Cantrip03; #Cantrip 0 slot 3
+        'Spells 1018' = $Cantrip04; #Cantrip 0 slot 4
+        'Spells 1019' = $Cantrip05; #Cantrip 0 slot 5
+        'Spells 1020' = $Cantrip06; #Cantrip 0 slot 6
+        'Spells 1021' = $Cantrip07; #Cantrip 0 slot 7
+        'Spells 1022' = $Cantrip08; #Cantrip 0 slot 8
         #'Check Box 314' =  ;
         #'Check Box 3031' =  ;
         #'Check Box 3032' =  ;

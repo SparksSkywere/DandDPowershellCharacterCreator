@@ -34,7 +34,7 @@ show-console -hide
 #Due to the way paths are written in some parts this script is tied to Windows ONLY
 #Remember to comment/remove all "Write-Output" statements as this is only for testing purposes
 #This powershell script follows original 5E rules, the website to get the information is:
-#https://www.dndbeyond.com/sources/basic-rules
+#Sources: https://www.dndbeyond.com/sources/basic-rules
 
 #IF YOU HAVEN'T PLEASE READ THE RULEBOOK FOR D&D AS THIS POWERSHELL SCRIPT JUST SIMPLIFIES MAKING A CHARACTER
 #CURRENTLY INDEV SO EXPECT ISSUES / BUGS OR DESIGN WEIRDNESS
@@ -45,28 +45,28 @@ show-console -hide
 #Every part of the powershell script is changable, this is for custom games, hence why things aren't grouped together
 #Majority of the stats used came from the cards for D&D
 
-# Hey Sparks, 
-# Nice code you've got here >:3
-# - Quasar <3
-
-#START OF THE POWERSHELL SCRIPT
 #Type loader
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName PresentationCore,PresentationFramework
-
-#PDF Module loader
+#PDF Module + Type
 Import-Module -Name .\Assets\iText\PDFForm | Out-Null
 Add-Type -Path ".\Assets\iText\itextsharp.dll"
 
-#Some default value's for later in the script, this is to fill out empty fields / references for later code
 #These values can also be used for indexing | Verify Output
-#DO NOT DELETE, any of the values as they are needed
+#DO NOT DELETE, any of the values as they are needed for the skipping
 #-Basic Character Information-
 $charactername = "No-Name"
 $playername = "No-Name"
 $age = "Unknown"
 $characterbackground = "Unknown"
+#Character Appearance
+$Age = "0"
+$Playerheight = "0"
+$PlayerSize = "0"
+$characterfeatureseyes = "N/A"
+$characterfeatureshair = "N/A"
+$characterfeaturesskin = "N/A"
 #-Character Stats-
 $ChosenRace = "None Selected"
 $ExportRace = "None Selected"
@@ -106,24 +106,11 @@ $Ideals = "Unknown"
 $Bonds = "Unknown"
 $Flaws = "Unknown"
 #-Weapon Stats-
-$selectweapon1panel = "Unknown"
-$selectweapon2panel = "Unknown"
-$selectweapon3panel = "Unknown"
-$Weapon1DamageSimpleMelee = "Unknown"
-$Weapon2DamageSimpleMelee = "Unknown"
-$Weapon3DamageSimpleMelee = "Unknown"
-$WPN1ATK_Bonus = "N/A"
-$WPN2ATK_Bonus = "N/A"
-$WPN3ATK_Bonus = "N/A"
-$Weapon1Weight = "0"
-$Weapon2Weight = "0"
-$Weapon3Weight = "0"
-$CombinedWeaponStats = "Null"
+$CombinedWeaponStats = "N/A"
 $ChosenArmour = "Unknown"
 $ArmourClass = "0"
 $checkboxshield = "Unknown"
 $ArmourClassWithShield = "Unknown"
-$Weapon1Weight = "0"
 #-Extra-
 $HitDiceTotal = "0"
 $XP = "1"
@@ -136,40 +123,38 @@ $GoldGP = "10"
 $PlatinumPP = ""
 #Spells
 $SpellCastingClass = "N/A"
-$SpellCastingAbility = ""
-$SpellCastingSaveDC = ""
-$SpellCastingAttackBonus = ""
-$Cantrip01 = "Cantrip1"
-$Cantrip02 = "Cantrip2"
-$Cantrip03 = "Cantrip3"
-$Cantrip04 = "Cantrip4"
-$Cantrip05 = "Cantrip5"
-$Cantrip06 = "Cantrip6"
-$Cantrip07 = "Cantrip7"
-$Cantrip08 = "Cantrip8"
-$Cantrip11 = "Cantrip11"
-
-#Checkbox# Skills
-$Check23 = 'Yes' 
-$Check24 = 'Yes'
-$Check25 = 'Yes'
-$Check26 = 'Yes'
-$Check27 = 'Yes'
-$Check28 = 'Yes'
-$Check29 = 'Yes'
-$Check30 = 'Yes'
-$Check31 = 'Yes'
-$Check32 = 'Yes'
-$Check33 = 'Yes'
-$Check34 = 'Yes'
-$Check35 = 'Yes'
-$Check36 = 'Yes'
-$Check37 = 'Yes'
-$Check38 = 'Yes'
-$Check39 = 'Yes'
-$Check40 = 'Yes'
-
+$SpellCastingAbility = "N/A"
+$SpellCastingSaveDC = "N/A"
+$SpellCastingAttackBonus = "N/A"
+#Skills
+$Acrobatics = "0"
+$AnimalHandling = "0"
+$Arcana = "0"
+$Athletics = "0"
+$Deception = "0"
+$History = "0"
+$Insight = "0"
+$Intimidation = "0"
+$Investigation = "0"
+$Medicine = "0"
+$Nature = "0"
+$Perception = "0"
+$Performance = "0"
+$Persuation = "0"
+$Religion = "0"
+$SleightOfHand = "0"
+$Stealth = "0"
+$Survival = "0"
+#Passive Wisdom
+$Passive = "0"
 #End of default value's
+#Special $Variables (DO NOT TOUCH THESE!)
+$Comma = ", "
+
+#Another quick set of documentation explaining some of powershells rules
+#When adding $Var together for things like combined numbers or words you need to do:
+#$TotalVar = $Var1 + $Var2 + $Var3 and not have {} in there as that does not work
+
 #Basic user information gathering - Basic Information
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Sparks D&D Character Creator'
@@ -355,8 +340,7 @@ $Check40 = 'Yes'
     $ChosenRace.Location = New-Object System.Drawing.Point(220,40)
     $ChosenRace.Size = New-Object System.Drawing.Size(200,20)
     $ChosenRace.Height = 200
-
-    #Background List
+#Background List
         $characterbackgroundselect.Items.Add('Acolyte') | Out-Null
         $characterbackgroundselect.Items.Add('Criminal') | Out-Null
         $characterbackgroundselect.Items.Add('Noble') | Out-Null
@@ -366,13 +350,9 @@ $Check40 = 'Yes'
         $characterbackgroundselect.Items.Add('Entertainer') | Out-Null
         $characterbackgroundselect.Items.Add('Sage') | Out-Null
         $characterbackgroundselect.Items.Add('Lone Wanderer') | Out-Null
-
-    #Player backgrounds have been migrated to backstory text forms later down the script
-    #To add custom player backgrounds you can either type in the box provided
-    #If you wish to set only pre-generated backgrounds use this:
-    #$characterbackgroundgenerated.Items.Add('custom')
-    #you may also comment out the "$characterbackgroundtextbox = $form.ShowDialog()"
-
+#Character backstory is part of the forms later down the script
+#If you wish to add character backgrounds:
+#$characterbackgroundselect.Items.Add('custom') | Out-Null
     #Race List
         $ChosenRace.Items.Add('Dragonborn') | Out-Null
         $ChosenRace.Items.Add('Dwarf') | Out-Null
@@ -426,11 +406,11 @@ $Check40 = 'Yes'
         $ChosenRace.Items.Add('Gnoll') | Out-Null
         $ChosenRace.Items.Add('Wolf') | Out-Null
 
-    #To add a custom race use this line with a name given and then follow
-    #down the script to add it to the rest of the script
-    #$ChosenRace.Items.Add('Custom')
-    #You need to also add a race description if you wish other players to use it
-    #Along with a race picture, this is all in the "Assets" folder
+#To add a custom race use this line with a name given and then follow
+#down the script to add it to the rest of the script
+#$ChosenRace.Items.Add('Custom') | Out-Null
+#You need to also add a race description if you wish other players to use it
+#Along with a race picture, this is all in the "Assets" folder
 
     $form.Controls.Add($characterbackgroundselect)
     $form.Controls.AddRange($characterbackgroundselect)
@@ -475,8 +455,6 @@ $Check40 = 'Yes'
 #race, this allows a waaay bigger pool of characters
 
 #Small race choices like skin and hair
-#Reference: https://www.dandwiki.com/wiki/Random_Hair_and_Eye_Color_(DnD_Other)
-#Start of race features
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(500,350)
@@ -684,6 +662,7 @@ $Check40 = 'Yes'
         Exit
     }
 #End of race additions
+#Source: https://www.dandwiki.com/wiki/Random_Hair_and_Eye_Color_(DnD_Other)
 #Basic user information gathering - SubRace
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Sparks D&D Character Creator'
@@ -1037,7 +1016,7 @@ $Check40 = 'Yes'
 #To add a custom race list to the subraces do:
 #if ($ChosenSubRace.SelectedItem -match 'Custom')
 #{
-#
+#   $ChosenSubRace.Items.Add('**') | Out-Null
 #}
 
 #Basic user information gathering - Primary Class + Alignment
@@ -1122,7 +1101,7 @@ $Check40 = 'Yes'
 
         #To add a custom alignment use this line with a name given and then follow
         #down the script to add it to the rest of the script
-        #$ChosenAlignment.Items.Add('Custom')
+        #$ChosenAlignment.Items.Add('Custom') | Out-Null
         #You need to also add a race description if you wish other players to use it
         #Along with a race picture, this is all in the "Assets" folder
         #Alignment can also be just a race trait, potentially pulling out choice?
@@ -1143,7 +1122,8 @@ $Check40 = 'Yes'
         $ChosenClass.Items.Add('Warlock') | Out-Null
         $ChosenClass.Items.Add('Wizard') | Out-Null
 
-    #To add a custom class use: #$ChosenClass.Items.Add('CUSTOM')
+    #To add a custom class use: #$ChosenClass.Items.Add('CUSTOM') | Out-Null
+    #Then make sure to add below on the "IF" statements
 
     if ($ChosenClass.SelectedItem -match 'Artificer')
     {
@@ -1227,7 +1207,6 @@ $Check40 = 'Yes'
     #    if ($ChosenClass.SelectedItem -match 'Custom')
     #{
     #    $ChosenClassCustom = $ChosenClassCustom.SelectedItem 
-    #    $ChosenClassCustom
     #}
 
 #end of class + alignment selection
@@ -1292,41 +1271,32 @@ $Check40 = 'Yes'
     $Chosensubclass.Location = New-Object System.Drawing.Point(10,40)
     $Chosensubclass.Size = New-Object System.Drawing.Size(260,20)
     $Chosensubclass.Height = 200
+    $form.Topmost = $true
 
     #Subclass Lists, all split up to only match a primary class list
     #Post any class stats here that are needed as this is the best place for the information to go to
-
-    $form.Topmost = $true
+    #~Starting packs by class~
+    #Barbarian = Explorers pack 
+    #Bard = Diplomat pack / Entertainers pack 
+    #Cleric = Priest pack / explorer pack 
+    #Druid = Explorers pack 
+    #Fighter = Dungeoneers pack / explorer pack 
+    #Monk = Dungeoneers pack / explorer pack 
+    #Paladin = Priest pack / explorer pack 
+    #Ranger = Dungeoneers pack / explorer pack 
+    #Rogue = Burgular pack / dungeoneer pack / explorer pack 
+    #Sorcerer = Dungeroneer pack / explorer pack 
+    #Warlock = Scholar pack / dungeoneer pack 
+    #Wizard = Scholar pack / explorer pack 
+    #~Back Selection Data~
+    #Burgulars Pack | $Selectedpack = "A backpack, a bag of 1,000 ball bearings, 10 feet of string, a bell, 5 candles, a crowbar, a hammer, 10 pitons, a hooded lantern, 2 flasks of oil, 5 days rations, a tinderbox and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
+    #Diplomats Pack | $Selectedpack = "A chest, 2 cases of maps and scrolls, a set of fine clothes, a bottle of ink, an ink pen, a lamp, 2 flasks of oil, 5 sheets of paper, a vial of perfume, sealing wax and soap"
+    #Dungeoneers Pack | $Selectedpack = "A backpack, a crowbar, a hammer, 10 pitons, 10 torches, a tinderbox, 10 days of rations and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
+    #Entertainers Pack | $Selectedpack = "A backpack, a bedroll, 2 costumes, 5 candles,5 days of rations, a waterskin and a disguise kit"
+    #Explorers Pack | $Selectedpack = "A backpack, a bedroll, a mess kit, a tinderbox, 10 torches, 10 days of rations and a waterskin, the backpack also has 50 feet of hempen rope strapped to the side of it"
+    #Priests Pack | $Selectedpack = "A backpack, a blanket, 10 candles, a tinderbox, an alms box, 2 blocks of incense, a censer, vestments, 2 days of rations and a waterskin"
+    #Scholar's Pack | $Selectedpack = "A backpack, a book of lore, a bottle of ink, an ink pen, 10 sheets of parchment, a little bag of sand and a small knife"
     
-    if ($ChosenClass.SelectedItem -match 'Artificer')
-    {
-        $form.Controls.Add($Chosensubclass)        
-            $Chosensubclass.Items.Add('Alchemist') | Out-Null
-            $Chosensubclass.Items.Add('Armorer') | Out-Null
-            $Chosensubclass.Items.Add('Artillerist') | Out-Null
-            $Chosensubclass.Items.Add('Battle Smith') | Out-Null
-            $HitDiceTotal = "d12"
-            $ClassLevel = "Artificer 1"
-            
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
-            {
-                $SelectedSubClass = $ChosenSubClass.SelectedItem
-                $SelectedSubClass
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
-            {
-                $ChosenSubClass = "None Selected"
-            }
-            $subclass = $form.ShowDialog()
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
-            {
-                return
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
-            {
-                Exit
-            }
-    }
     if ($ChosenClass.SelectedItem -match 'Barbarian')
     {
         $form.Controls.Add($Chosensubclass)        
@@ -1340,9 +1310,9 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Wild Magic') | Out-Null
             $HitDiceTotal = "1d12"
             $ClassLevel = "Barbarian 1"
-            $SpellCastingClass = "Barbarian"
             $Check11 = 'Yes'
             $Check19 = 'Yes'
+            $Selectedpack = "A backpack, a bedroll, a mess kit, a tinderbox, 10 torches, 10 days of rations and a waterskin, the backpack also has 50 feet of hempen rope strapped to the side of it"
 
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1376,8 +1346,12 @@ $Check40 = 'Yes'
             $HitDiceTotal = "1d8"
             $ClassLevel = "Bard 1"
             $SpellCastingClass = "Bard"
+            $Cantrip01 = "Blaze Ward"
+            $Cantrip02 = "Dancing Lights"
+            $Cantrip03 = "Friends"
             $Check18 = 'Yes'
             $Check22 = 'Yes'
+            $Selectedpack = "A backpack, a bedroll, 2 costumes, 5 candles,5 days of rations, a waterskin and a disguise kit"
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1424,8 +1398,12 @@ $Check40 = 'Yes'
             $HitDiceTotal = "1d8"
             $ClassLevel = "Cleric 1"
             $SpellCastingClass = "Cleric"
+            $Cantrip01 = "Guidance"
+            $Cantrip02 = "Light"
+            $Cantrip03 = "Mending"
             $Check21 = 'Yes'
             $Check22 = 'Yes'
+            $Selectedpack = "A backpack, a blanket, 10 candles, a tinderbox, an alms box, 2 blocks of incense, a censer, vestments, 2 days of rations and a waterskin"
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1461,8 +1439,12 @@ $Check40 = 'Yes'
             $HitDiceTotal = "1d8"
             $ClassLevel = "Druid 1"
             $SpellCastingClass = "Druid"
+            $Cantrip01 = "Druidcraft"
+            $Cantrip02 = "Guidance"
+            $Cantrip03 = "Mending"
             $Check20 = 'Yes'
             $Check21 = 'Yes'
+            $Selectedpack = "A backpack, a bedroll, a mess kit, a tinderbox, 10 torches, 10 days of rations and a waterskin, the backpack also has 50 feet of hempen rope strapped to the side of it"
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1500,9 +1482,9 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Rune Knight') | Out-Null
             $HitDiceTotal = "1d10"
             $ClassLevel = "Fighter 1"
-            $SpellCastingClass = "Fighter"
             $Check11 = 'Yes'
             $Check19 = 'Yes'
+            $Selectedpack = "A backpack, a crowbar, a hammer, 10 pitons, 10 torches, a tinderbox, 10 days of rations and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1539,9 +1521,9 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Way of Astral Self') | Out-Null
             $HitDiceTotal = "1d8"
             $ClassLevel = "Monk 1"
-            $SpellCastingClass = "Monk"
             $Check11 = 'Yes'
             $Check18 = 'Yes'
+            $Selectedpack = "A backpack, a crowbar, a hammer, 10 pitons, 10 torches, a tinderbox, 10 days of rations and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1579,8 +1561,12 @@ $Check40 = 'Yes'
             $HitDiceTotal = "1d10"
             $ClassLevel = "Paladin 1"
             $SpellCastingClass = "Paladin"
+            $Cantrip01 = "Bless"
+            $Cantrip02 = "Command"
+            $Cantrip03 = "Compelled Duel"
             $Check21 = 'Yes'
             $Check22 = 'Yes'
+            $Selectedpack = "A backpack, a blanket, 10 candles, a tinderbox, an alms box, 2 blocks of incense, a censer, vestments, 2 days of rations and a waterskin"
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1616,8 +1602,12 @@ $Check40 = 'Yes'
             $HitDiceTotal = "1d10"
             $ClassLevel = "Ranger 1"
             $SpellCastingClass = "Ranger"
+            $Cantrip01 = "Alarm"
+            $Cantrip02 = "Animal Friendship"
+            $Cantrip03 = "Cure Wounds"
             $Check11 = 'Yes'
             $Check18 = 'Yes'
+            $Selectedpack = "A backpack, a crowbar, a hammer, 10 pitons, 10 torches, a tinderbox, 10 days of rations and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1654,9 +1644,9 @@ $Check40 = 'Yes'
             $Chosensubclass.Items.Add('Soulknife') | Out-Null
             $HitDiceTotal = "1d8"
             $ClassLevel = "Rogue 1"
-            $SpellCastingClass = "Rogue"
             $Check18 = 'Yes'
             $Check20 = 'Yes'
+            $Selectedpack = "A backpack, a bag of 1,000 ball bearings, 10 feet of string, a bell, 5 candles, a crowbar, a hammer, 10 pitons, a hooded lantern, 2 flasks of oil, 5 days rations, a tinderbox and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1693,8 +1683,12 @@ $Check40 = 'Yes'
             $HitDiceTotal = "1d6"
             $ClassLevel = "Sorcerer 1"
             $SpellCastingClass = "Sorcerer"
+            $Cantrip01 = "Acid Splash"
+            $Cantrip02 = "Blade Ward"
+            $Cantrip03 = "Chill Torch"
             $Check19 = 'Yes'
             $Check22 = 'Yes'
+            $Selectedpack = "A backpack, a crowbar, a hammer, 10 pitons, 10 torches, a tinderbox, 10 days of rations and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1731,8 +1725,12 @@ $Check40 = 'Yes'
             $HitDiceTotal = "1d8"
             $ClassLevel = "Warlock 1"
             $SpellCastingClass = "Warlock"
+            $Cantrip01 = "Blade Ward"
+            $Cantrip02 = "Chill Torch"
+            $Cantrip03 = "Eldritch Blast"
             $Check21 = 'Yes'
             $Check22 = 'Yes'
+            $Selectedpack = "A backpack, a book of lore, a bottle of ink, an ink pen, 10 sheets of parchment, a little bag of sand and a small knife"
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1774,8 +1772,12 @@ $Check40 = 'Yes'
             $HitDiceTotal = "1d6"
             $ClassLevel = "Wizard 1"
             $SpellCastingClass = "Wizard"
+            $Cantrip01 = "Acid Splash"
+            $Cantrip02 = "Blade Ward"
+            $Cantrip03 = "Chill Touch"
             $Check20 = 'Yes'
             $Check21 = 'Yes'
+            $Selectedpack = "A backpack, a book of lore, a bottle of ink, an ink pen, 10 sheets of parchment, a little bag of sand and a small knife"
             
             if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
             {
@@ -1804,48 +1806,55 @@ $Check40 = 'Yes'
         #{
         #    $form.Controls.Add($Chosensubclass)
         #        $Chosensubclass.Items.Add('Starting name - Custom Class')
-        #    $subclass = $form.ShowDialog()
+        #   $subclass = $form.ShowDialog()
+            #$HitDiceTotal = "*"
+            #$ClassLevel = "*"
+            #$SpellCastingClass = "*"
+            #$Cantrip01 = "*"
+            #$Cantrip02 = "*"
+            #$Cantrip03 = "*"
+            #$Check** = 'Yes'
+            #$Check** = 'Yes'
+            #Selectedpack = "*Equiptment*"
         #}    
-
 #End of subclass selection
-
 #Filling out final details from selected above
 if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         #Race Stats
-        $ChosenRaceDragonborn = $ChosenRaceDragonborn.SelectedItem 
+        $ChosenRaceDragonborn = $ChosenRaceDragonborn.SelectedItem
+        $ChosenRaceDragonborn
         $ExportRace = "Dragonborn"
         $HP = "20"
         $SpeedTotal = "30"
         $PlayerSize = "250 Pounds, Medium"
         $Playerheight = "6 Feet"
-
-        #Saving Throws Attributes
-        $ST_STR = "2456"
-        $ST_DEX = "5"
-        $ST_CON = "262"
-        $ST_INT = "765"
-        $ST_WIS = "987"
-        $ST_CHA = "6557"
-
-        #Saving Throws Tickbox's
-        
-
+    
         #Attributes Basic
-        $STR = "99"
-        $DEX = "0"
-        $CON = "50"
-        $INT = "30"
-        $WIS = "03"
-        $CHA = "01"
+        $STR = "15"
+        $DEX = "11"
+        $CON = "12"
+        $INT = "10"
+        $WIS = "15"
+        $CHA = "15"
 
         #Attribute Modifiers
-        $STRmod = "99"
-        $DEXmod = "40"
-        $CONmod = "65"
-        $INTmod = "01"
-        $WISmod = "25"
-        $CHAmod = "71"
+        $STRmod = "+3"
+        $DEXmod = "+2"
+        $CONmod = "+3"
+        $INTmod = "+0"
+        $WISmod = "+2"
+        $CHAmod = "+4"
+
+        #Saving Throws Attributes
+        $ST_STR = "0"
+        $ST_DEX = "0"
+        $ST_CON = "0"
+        $ST_INT = "0"
+        $ST_WIS = "0"
+        $ST_CHA = "0"
+        #Saving Throws Tickbox's
+
 
         ##Skills Values
 
@@ -3860,7 +3869,6 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $RacialSpecialAbility = "Keen Hearing and Smell"
     }
 #End of race details
-
 #If adding a new race, please use the code below as an example:
     #if ($ChosenRace.SelectedItem -match '**')
     #{
@@ -3898,18 +3906,16 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         #$ST_WIS = "0"
         #$ST_CHA = "0"
 
-        ##$Skills = "Unknown"
-        ##$Senses = "Unknown"
-        ##$Damage_Immunities = "Unknown"
-        ##$Condition_Immunities = "Unknown"
+        #$Skills = "Unknown"
+        #$Senses = "Unknown"
+        #$Damage_Immunities = "Unknown"
+        #$Condition_Immunities = "Unknown"
 
         #$SpokenLanguages = "Unknown"
         #$RaceDescription = "Unknown"
         #$RacialSpecialAbility = "Unknown"
     #}
-
 #Sizes and squares
-
 #Size 	        Space	            Number of 5×5 foot squares
 #Tiny	    2 ½ ft x 2 ½ ft.	        ½ of a square
 #Small	    5 x 5 ft.	                   1 square
@@ -3919,7 +3925,6 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
 #Gargantuan	20 x 20 ft.                    16 squares
 
 #Default sizes of main races
-
 #Race               Base Height	 Base Weight    Height Modifier	Weight Modifier	Average Height and Weight
 #Aarakocra	            4’4″	    90	        1d6	                1d6	            4’8″ 106 lbs.
 #Bugbear	            6’0″	    110	        2d10	            2d4	            7’1″ 291 lbs.
@@ -3960,10 +3965,9 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
 #Warforged	            5’10”	    270	        2d6	                4	            6’5″ 298 lbs.
 #Yuan-ti	            4′ 8″	    110	        2d10	            2d4	            5′ 7″ 165 lbs.
 
-#Sourced: https://blackcitadelrpg.com/height-age-weight-5e/
-
+#Source: https://blackcitadelrpg.com/height-age-weight-5e/
 #Chosen Subrace override for name of race, this is for anyone who chose a subrace
-$ExportRace
+#This also can be used to add more custom Subraces to a single race (for custom games)
     if ($ChosenSubRace.SelectedItem -match 'Draconic Ancestory')
     {
         $ExportRace = "Draconic Ancestory"
@@ -4581,20 +4585,34 @@ $ExportRace
         #$Skills = "Perception +3, stealth +4"
         #$Senses = "passive perception 13"
     }
-
     #If adding a custom SubRace, you can add the override using:    
     #    if ($ChosenSubRace.SelectedItem -match '**')
     #{
-    #    $ExportRace = "**"
+    #   $ExportRace = "**"
+        #Attributes Basic
+        #$STR = "0"
+        #$DEX = "0"
+        #$CON = "0"
+        #$INT = "0"
+        #$WIS = "0"
+        #$CHA = "0"
+        #Attribute Modifiers
+        #$STRmod = "+0"
+        #$DEXmod = "+0"
+        #$CONmod = "+0"
+        #$INTmod = "+0"
+        #$WISmod = "+0"
+        #$CHAmod = "+0"
+        #Saving Throws
+        #$ST_STR = "0"
+        #$ST_DEX = "0"
+        #$ST_CON = "0"
+        #$ST_INT = "0"
+        #$ST_WIS = "0"
+        #$ST_CHA = "0"
     #}
-
-    #Please finish adding - IF you select a race a picture appears to the rightside
-    #of the form, along with a description below that in a larger box
-    #make is scrollable
-
-    #New weapon selection compared to the old one, 3 weapon scroll panels
-    #All 3 must be a duplicate of the previous, but weapon stats need to be carried.
-#New Weapon selection
+#End of Subrace Extra's
+#Weapon selection
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(500,600)
@@ -4698,8 +4716,7 @@ $ExportRace
     $checkboxshield.Size = new-object System.Drawing.Size(120,40)
     $checkboxshield.Text = "Do you want a shield?"
     $checkboxshield.Checked = $false
-
-    #Weapon Lists, they correspond to the actual GUI, so don't mess up the co-ordinates
+#Weapon Lists, they correspond to the actual GUI, so don't mess up the co-ordinates
     #Weapon 1
         $selectweapon1panel.Items.Add('Iron Dagger') | Out-Null
         $selectweapon1panel.Items.Add('Steel Dagger') | Out-Null
@@ -4814,7 +4831,6 @@ $ExportRace
         $selectweapon3panel.Items.Add('Crossbow - Heavy') | Out-Null
         $selectweapon3panel.Items.Add('Crossbow - Hand') | Out-Null
         $selectweapon3panel.Items.Add('Longbow') | Out-Null
-
     #Adventuring Gear List
         $selectadventuinggearpanel.Items.Add('Abacus') | Out-Null
         $selectadventuinggearpanel.Items.Add('Acid (vial)') | Out-Null
@@ -4898,11 +4914,9 @@ $ExportRace
         $selectadventuinggearpanel.Items.Add('Vial') | Out-Null
         $selectadventuinggearpanel.Items.Add('Waterskin') | Out-Null
         $selectadventuinggearpanel.Items.Add('Whetstone') | Out-Null
-
     #List from: https://www.dndbeyond.com/sources/basic-rules/equipment#AdventuringGear
     #Each class needs to be limited to armour types to stop OP characters
     #Make this a later thing to do as classes are still being worked on
-
         $ChosenArmour.Items.Add('Light Armour - Naked') | Out-Null
         $ChosenArmour.Items.Add('Light Armour - Padded') | Out-Null
         $ChosenArmour.Items.Add('Light Armour - Leather') | Out-Null
@@ -4916,7 +4930,6 @@ $ExportRace
         $ChosenArmour.Items.Add('Heavy Armour - Chain Mail') | Out-Null
         $ChosenArmour.Items.Add('Heavy Armour - Splint') | Out-Null
         $ChosenArmour.Items.Add('Heavy Armour - Plate') | Out-Null
-
     #Shield as an option with tickbox, completely optional to a player
     $checkboxshield.Add_CheckStateChanged({
         $checkboxshield.Enabled = $checkboxshield.Checked 
@@ -4966,21 +4979,15 @@ $ExportRace
     }
 #End of Weapon choice
 
-#Input a Damage, weight and properties into sup categories for the export
-#This also is for inventory purposes and types of character builds
-
-#splitting up each inventory weapons with name, cost, damage, weight and properties
-#Add descriptions to all weapons with the attributes when chosen
-
-#Remember to add a second weapon and third weapon choice, also gold count (affected by class)
-
-#Attack Bonuses According to weapon choice
-
 #If added custom to the weapon list, make sure to add the correct listed item to the weapon selection below
-#Make sure to split all sup parts of weapon stats up so when making files
-#it can be done via value's 
+#Above:
+#$selectweapon1panel.Items.Add('**') | Out-Null
+#$selectweapon2panel.Items.Add('**') | Out-Null
+#$selectweapon3panel.Items.Add('**') | Out-Null
+#$selectadventuinggearpanel.Items.Add('**') | Out-Null
+#$ChosenArmour.Items.Add('**') | Out-Null
 
-#remember these types of armour are affected with cost, armour class, strength, stealth and weight
+#Remember DM's! These types of armour are affected with cost, armour class, strength, stealth and weight
 #There is one type of shield with a base code of 10gp, armour class of +2 and weight of 453g
 #Getting out of armour has times for "DON" and "DOFF" DON = Put on, DOff = Take off
 #Light armour has a don of 1 min and doff of 1 min
@@ -4988,1564 +4995,796 @@ $ExportRace
 #Heavy armour has a don of 10 mins and a doff off 5mins
 #shield has a don of 1 action and doff of 1 action
 
-#Currently adding weapon damage types to each weapon, finish this please
+#Weapons+Gear+Armour
     #Weapon 1 Choice
     if ($selectweapon1panel.SelectedItem -match 'Iron Dagger')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d4 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d4 Piercing"
         $Weapon1Weight = "1lb"
-        $Weapon1Weight
-
-        $Weapon1Propertiessimplemelee = "Finesse, Light, thrown (range 20/60)"
-        $Weapon1Propertiessimplemelee
+        $Weapon1Properties = "Finesse, Light, thrown (range 20/60)"
     }
     if ($selectweapon1panel.SelectedItem -match 'Steel Dagger')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d4 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d4 Piercing"
         $Weapon1Weight = "2lb"
-        $Weapon1Weight
-
-        $Weapon1Propertiessimplemelee = "Finesse, Light, thrown (range 20/60)"
-        $Weapon1Propertiessimplemelee
+        $Weapon1Properties = "Finesse, Light, thrown (range 20/60)"
     }
     if ($selectweapon1panel.SelectedItem -match 'Club')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d4 Bludgeoning"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d4 Bludgeoning"
         $Weapon1Weight = "2lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessimplemelee = "Light"
-        $WeaponPropertiessimplemelee
+        $Weapon1Properties = "Light"
     }
     if ($selectweapon1panel.SelectedItem -match 'Great Club')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d8 Bludgeoning"
-        $Weapon1DamageSimpleMelee
-        
+        $Weapon1Damage = "1d8 Bludgeoning"
         $Weapon1Weight = "10lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessimplemelee = "Two-Handed"
-        $WeaponPropertiessimplemelee
+        $Weapon1Properties = "Two-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'HandAxe')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d6 slashing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d6 slashing"
         $Weapon1Weight = "2lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessimplemelee = "Light, Thrown (range 20/60)"
-        $WeaponPropertiessimplemelee
+        $Weapon1Properties = "Light, Thrown (range 20/60)"
     }
     if ($selectweapon1panel.SelectedItem -match 'Javelin')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d6 piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d6 piercing"
         $Weapon1Weight = "2lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessimplemelee = "Thrown (range 30/120"
-        $WeaponPropertiessimplemelee
+        $Weapon1Properties = "Thrown (range 30/120"
     }
     if ($selectweapon1panel.SelectedItem -match 'Light Hammer')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d4 Bludgeoning"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d4 Bludgeoning"
         $Weapon1Weight = "2lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessimplemelee = "Light, Thrown (range 20/60)"
-        $WeaponPropertiessimplemelee
+        $Weapon1Properties = "Light, Thrown (range 20/60)"
     }
     if ($selectweapon1panel.SelectedItem -match 'Mace')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d6 Bludgeoning"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d6 Bludgeoning"
         $Weapon1Weight = "4lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessimplemelee = "One-Handed"
-        $WeaponPropertiessimplemelee
+        $Weapon1Properties = "One-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'QuarterStaff')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d6 Bludgeoning"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d6 Bludgeoning"
         $Weapon1Weight = "4lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessimplemelee = "Versatile (1d8)"
-        $WeaponPropertiessimplemelee
+        $Weapon1Properties = "Versatile (1d8)"
     }
     if ($selectweapon1panel.SelectedItem -match 'Spear')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d6 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d6 Piercing"
         $Weapon1Weight = "3lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessimplemelee = "Thrown (range 20/60, versatile (qd8)"
-        $WeaponPropertiessimplemelee
+        $Weapon1Properties = "Thrown (range 20/60, versatile (qd8)"
     }
     if ($selectweapon1panel.SelectedItem -match 'Nunchucks')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d4 Bludgeoning"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d4 Bludgeoning"
         $Weapon1Weight = "5lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessimplemelee = "Two-Handed, Thrown (range 20/30)"
-        $WeaponPropertiessimplemelee
+        $Weapon1Properties = "Two-Handed, Thrown (range 20/30)"
     }
     if ($selectweapon1panel.SelectedItem -match 'Iron Sword')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d6 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d6 Piercing"
         $Weapon1Weight = "6lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessimplemelee = "One-Handed"
-        $WeaponPropertiessimplemelee
+        $Weapon1Properties = "One-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'Iron Short Sword')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d4 Piercing"
-        $Weapon1DamageSimpleMelee
-        
+        $Weapon1Damage = "1d4 Piercing"
         $Weapon1Weight = "3lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessimplemelee = "One-Handed"
-        $WeaponPropertiessimplemelee
+        $Weapon1Properties = "One-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'Crossbow - Light')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d8 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d8 Piercing"
         $Weapon1Weight = "5lb"
-        $Weapon1Weight
-        
-        $WeaponPropertiessimpleranged = "Ammunition (range 80/320), Loading, Two-Handed"
-        $WeaponPropertiessimpleranged
+        $Weapon1Properties = "Ammunition (range 80/320), Loading, Two-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'Shortbow')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d6 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d6 Piercing"
         $Weapon1Weight = "2lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessimpleranged = "Ammunition (range 80/320), Two-Handed"
-        $WeaponPropertiessimpleranged
+        $Weapon1Properties = "Ammunition (range 80/320), Two-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'Sling')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d4 Bludgeoning"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d4 Bludgeoning"
         $Weapon1Weight = "0lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessimpleranged = "Ammunition (range 30/120)"
-        $WeaponPropertiessimpleranged
+        $Weapon1Properties = "Ammunition (range 30/120)"
     }
     if ($selectweapon1panel.SelectedItem -match 'Dart')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d4 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d4 Piercing"
         $Weapon1Weight = "1/4lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessimpleranged = "Finesse, thrown (range 20/60)"
-        $WeaponPropertiessimpleranged
+        $Weapon1Properties = "Finesse, thrown (range 20/60)"
     }
     if ($selectweapon1panel.SelectedItem -match 'BattleAxe')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d8 Slashing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d8 Slashing"
         $Weapon1Weight = "4lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "Versatile (1d10)"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "Versatile (1d10)"
     }
     if ($selectweapon1panel.SelectedItem -match 'Flail')
     {
         $WPN1ATK_Bonus = "+4"
-
-        $Weapon1DamageSimpleMelee = "1d8 Bludgeoning"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d8 Bludgeoning"
         $Weapon1Weight = "2lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "One-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "One-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'Great Axe')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d12 Slashing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d12 Slashing"
         $Weapon1Weight = "7lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "Heavy, Two-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'Great Sword')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "2d6 Slashing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "2d6 Slashing"
         $Weapon1Weight = "6lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "Heavy, Two-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'Halberd')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d10 Slashing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d10 Slashing"
         $Weapon1Weight = "6lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Reach, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "Heavy, Reach, Two-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'Longsword')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d8 Slashing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d8 Slashing"
         $Weapon1Weight = "3lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "Versatile (1d10)"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "Versatile (1d10)"
     }
     if ($selectweapon1panel.SelectedItem -match 'Maul')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "2d6 Bludgeoning"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "2d6 Bludgeoning"
         $Weapon1Weight = "10lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "Heavy, Two-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'MorningStar')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d8 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d8 Piercing"
         $Weapon1Weight = "4lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "Two-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'Rapier')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d8 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d8 Piercing"
         $Weapon1Weight = "2lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "Finesse"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "Finesse"
     }
     if ($selectweapon1panel.SelectedItem -match 'Sicimitar')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d6 Slashing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d6 Slashing"
         $Weapon1Weight = "3lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "Finesse, Light"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "Finesse, Light"
     }
     if ($selectweapon1panel.SelectedItem -match 'ShortSword')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d6 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d6 Piercing"
         $Weapon1Weight = "2lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "Finesse, Light"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "Finesse, Light"
     }
     if ($selectweapon1panel.SelectedItem -match 'Trident')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d6 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d6 Piercing"
         $Weapon1Weight = "4lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "Thrown (range 20/60), Versatile (1d8)"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "Thrown (range 20/60), Versatile (1d8)"
     }
     if ($selectweapon1panel.SelectedItem -match 'Warhammer')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d8 Bludgeoning"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d8 Bludgeoning"
         $Weapon1Weight = "2lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "Versatile (1d10)"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "Versatile (1d10)"
     }
     if ($selectweapon1panel.SelectedItem -match 'DoomHammer')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d12 Bludgeoning"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d12 Bludgeoning"
         $Weapon1Weight = "10lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "Heavy, Two-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'Dual-Wield Staff')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d8 Budgeoning"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d8 Budgeoning"
         $Weapon1Weight = "7lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "Two-Handed, Light"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "Two-Handed, Light"
     }
     if ($selectweapon1panel.SelectedItem -match 'Broadsword')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d8 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d8 Piercing"
         $Weapon1Weight = "8lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "Heavy, Two-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'Steel Sword')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d8 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d8 Piercing"
         $Weapon1Weight = "8lb"
-        $Weapon1Weight
-
-        $WeaponPropertiesmartialmelee = "One-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon1Properties = "One-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'Crossbow - Heavy')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d10 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d10 Piercing"
         $Weapon1Weight = "18lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessmartialranged = "Ammunition (range 30/120), light, loading"
-        $WeaponPropertiessmartialranged
+        $Weapon1Properties = "Ammunition (range 30/120), light, loading"
     }
     if ($selectweapon1panel.SelectedItem -match 'Crossbow - Hand')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d6 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d6 Piercing"
         $Weapon1Weight = "3lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessmartialranged = "Ammunition (range 100/400), Heavy, Loading, Two-Handed"
-        $WeaponPropertiessmartialranged
+        $Weapon1Properties = "Ammunition (range 100/400), Heavy, Loading, Two-Handed"
     }
     if ($selectweapon1panel.SelectedItem -match 'Longbow')
     {
         $WPN1ATK_Bonus = "+4"
-        $WPN1ATK_Bonus
-
-        $Weapon1DamageSimpleMelee = "1d8 Piercing"
-        $Weapon1DamageSimpleMelee
-
+        $Weapon1Damage = "1d8 Piercing"
         $Weapon1Weight = "2lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessmartialranged = "Ammunition (range 150/600), Heavy, Two-Handed"
-        $WeaponPropertiessmartialranged
+        $Weapon1Properties = "Ammunition (range 150/600), Heavy, Two-Handed"
     }
     #Weapon 2 Choice
     if ($selectweapon2panel.SelectedItem -match 'Iron Dagger')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d4 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d4 Piercing"
         $Weapon2Weight = "1lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessimplemelee = "Finesse, Light, thrown (range 20/60)"
-        $WeaponPropertiessimplemelee
+        $Weapon2Properties = "Finesse, Light, thrown (range 20/60)"
     }
     if ($selectweapon2panel.SelectedItem -match 'Steel Dagger')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d4 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d4 Piercing"
         $Weapon2Weight = "2lb"
-        $Weapon1Weight
-
-        $WeaponPropertiessimplemelee = "Finesse, Light, thrown (range 20/60)"
-        $WeaponPropertiessimplemelee
+        $Weapon2Properties = "Finesse, Light, thrown (range 20/60)"
     }
     if ($selectweapon2panel.SelectedItem -match 'Club')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d4 Bludgeoning"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d4 Bludgeoning"
         $Weapon2Weight = "2lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessimplemelee = "Light"
-        $WeaponPropertiessimplemelee
+        $Weapon2Properties = "Light"
     }
     if ($selectweapon2panel.SelectedItem -match 'Great Club')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d8 Bludgeoning"
-        $Weapon2DamageSimpleMelee
-        
+        $Weapon2Damage = "1d8 Bludgeoning"
         $Weapon2Weight = "10lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessimplemelee = "Two-Handed"
-        $WeaponPropertiessimplemelee
+        $Weapon2Properties = "Two-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'HandAxe')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d6 slashing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d6 slashing"
         $Weapon2Weight = "2lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessimplemelee = "Light, Thrown (range 20/60)"
-        $WeaponPropertiessimplemelee
+        $Weapon2Properties = "Light, Thrown (range 20/60)"
     }
     if ($selectweapon2panel.SelectedItem -match 'Javelin')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d6 piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d6 piercing"
         $Weapon2Weight = "2lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessimplemelee = "Thrown (range 30/120"
-        $WeaponPropertiessimplemelee
+        $Weapon2Properties = "Thrown (range 30/120"
     }
     if ($selectweapon2panel.SelectedItem -match 'Light Hammer')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d4 Bludgeoning"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d4 Bludgeoning"
         $Weapon2Weight = "2lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessimplemelee = "Light, Thrown (range 20/60)"
-        $WeaponPropertiessimplemelee
+        $Weapon2Properties = "Light, Thrown (range 20/60)"
     }
     if ($selectweapon2panel.SelectedItem -match 'Mace')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d6 Bludgeoning"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d6 Bludgeoning"
         $Weapon2Weight = "4lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessimplemelee = "One-Handed"
-        $WeaponPropertiessimplemelee
+        $Weapon2Properties = "One-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'QuarterStaff')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d6 Bludgeoning"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d6 Bludgeoning"
         $Weapon2Weight = "4lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessimplemelee = "Versatile (1d8)"
-        $WeaponPropertiessimplemelee
+        $Weapon2Properties = "Versatile (1d8)"
     }
     if ($selectweapon2panel.SelectedItem -match 'Spear')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d6 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d6 Piercing"
         $Weapon2Weight = "3lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessimplemelee = "Thrown (range 20/60, versatile (qd8)"
-        $WeaponPropertiessimplemelee
+        $Weapon2Properties = "Thrown (range 20/60, versatile (qd8)"
     }
     if ($selectweapon2panel.SelectedItem -match 'Nunchucks')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d4 Bludgeoning"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d4 Bludgeoning"
         $Weapon2Weight = "5lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessimplemelee = "Two-Handed, Thrown (range 20/30)"
-        $WeaponPropertiessimplemelee
+        $Weapon2Properties = "Two-Handed, Thrown (range 20/30)"
     }
     if ($selectweapon2panel.SelectedItem -match 'Iron Sword')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d6 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d6 Piercing"
         $Weapon2Weight = "6lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessimplemelee = "One-Handed"
-        $WeaponPropertiessimplemelee
+        $Weapon2Properties = "One-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'Iron Short Sword')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d4 Piercing"
-        $Weapon2DamageSimpleMelee
-        
+        $Weapon2Damage = "1d4 Piercing"
         $Weapon2Weight = "3lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessimplemelee = "One-Handed"
-        $WeaponPropertiessimplemelee
+        $Weapon2Properties = "One-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'Crossbow - Light')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d8 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d8 Piercing"
         $Weapon2Weight = "5lb"
-        $Weapon2Weight
-        
-        $WeaponPropertiessimpleranged = "Ammunition (range 80/320), Loading, Two-Handed"
-        $WeaponPropertiessimpleranged
+        $Weapon2Properties = "Ammunition (range 80/320), Loading, Two-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'Shortbow')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d6 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d6 Piercing"
         $Weapon2Weight = "2lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessimpleranged = "Ammunition (range 80/320), Two-Handed"
-        $WeaponPropertiessimpleranged
+        $Weapon2Properties = "Ammunition (range 80/320), Two-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'Sling')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d4 Bludgeoning"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d4 Bludgeoning"
         $Weapon2Weight = "0lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessimpleranged = "Ammunition (range 30/120)"
-        $WeaponPropertiessimpleranged
+        $Weapon2Properties = "Ammunition (range 30/120)"
     }
     if ($selectweapon2panel.SelectedItem -match 'Dart')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d4 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d4 Piercing"
         $Weapon2Weight = "1/4lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessimpleranged = "Finesse, thrown (range 20/60)"
-        $WeaponPropertiessimpleranged
+        $Weapon2Properties = "Finesse, thrown (range 20/60)"
     }
     if ($selectweapon2panel.SelectedItem -match 'BattleAxe')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d8 Slashing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d8 Slashing"
         $Weapon2Weight = "4lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "Versatile (1d10)"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "Versatile (1d10)"
     }
     if ($selectweapon2panel.SelectedItem -match 'Flail')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d8 Bludgeoning"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d8 Bludgeoning"
         $Weapon2Weight = "2lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "One-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "One-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'Great Axe')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d12 Slashing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d12 Slashing"
         $Weapon2Weight = "7lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "Heavy, Two-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'Great Sword')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "2d6 Slashing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "2d6 Slashing"
         $Weapon2Weight = "6lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "Heavy, Two-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'Halberd')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d10 Slashing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d10 Slashing"
         $Weapon2Weight = "6lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Reach, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "Heavy, Reach, Two-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'Longsword')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d8 Slashing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d8 Slashing"
         $Weapon2Weight = "3lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "Versatile (1d10)"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "Versatile (1d10)"
     }
     if ($selectweapon2panel.SelectedItem -match 'Maul')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "2d6 Bludgeoning"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "2d6 Bludgeoning"
         $Weapon2Weight = "10lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "Heavy, Two-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'MorningStar')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d8 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d8 Piercing"
         $Weapon2Weight = "4lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "Two-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'Rapier')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d8 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d8 Piercing"
         $Weapon2Weight = "2lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "Finesse"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "Finesse"
     }
     if ($selectweapon2panel.SelectedItem -match 'Sicimitar')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d6 Slashing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d6 Slashing"
         $Weapon2Weight = "3lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "Finesse, Light"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "Finesse, Light"
     }
     if ($selectweapon2panel.SelectedItem -match 'ShortSword')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d6 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d6 Piercing"
         $Weapon2Weight = "2lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "Finesse, Light"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "Finesse, Light"
     }
     if ($selectweapon2panel.SelectedItem -match 'Trident')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d6 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d6 Piercing"
         $Weapon2Weight = "4lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "Thrown (range 20/60), Versatile (1d8)"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "Thrown (range 20/60), Versatile (1d8)"
     }
     if ($selectweapon2panel.SelectedItem -match 'Warhammer')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d8 Bludgeoning"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d8 Bludgeoning"
         $Weapon2Weight = "2lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "Versatile (1d10)"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "Versatile (1d10)"
     }
     if ($selectweapon2panel.SelectedItem -match 'DoomHammer')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d12 Bludgeoning"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d12 Bludgeoning"
         $Weapon2Weight = "10lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "Heavy, Two-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'Dual-Wield Staff')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d8 Budgeoning"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d8 Budgeoning"
         $Weapon2Weight = "7lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "Two-Handed, Light"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "Two-Handed, Light"
     }
     if ($selectweapon2panel.SelectedItem -match 'Broadsword')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d8 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d8 Piercing"
         $Weapon2Weight = "8lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "Heavy, Two-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'Steel Sword')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d8 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d8 Piercing"
         $Weapon2Weight = "8lb"
-        $Weapon2Weight
-
-        $WeaponPropertiesmartialmelee = "One-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon2Properties = "One-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'Crossbow - Heavy')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d10 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d10 Piercing"
         $Weapon2Weight = "18lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessmartialranged = "Ammunition (range 30/120), light, loading"
-        $WeaponPropertiessmartialranged
+        $Weapon2Properties = "Ammunition (range 30/120), light, loading"
     }
     if ($selectweapon2panel.SelectedItem -match 'Crossbow - Hand')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d6 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d6 Piercing"
         $Weapon2Weight = "3lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessmartialranged = "Ammunition (range 100/400), Heavy, Loading, Two-Handed"
-        $WeaponPropertiessmartialranged
+        $Weapon2Properties = "Ammunition (range 100/400), Heavy, Loading, Two-Handed"
     }
     if ($selectweapon2panel.SelectedItem -match 'Longbow')
     {
         $WPN2ATK_Bonus = "+4"
-        $WPN2ATK_Bonus
-
-        $Weapon2DamageSimpleMelee = "1d8 Piercing"
-        $Weapon2DamageSimpleMelee
-
+        $Weapon2Damage = "1d8 Piercing"
         $Weapon2Weight = "2lb"
-        $Weapon2Weight
-
-        $WeaponPropertiessmartialranged = "Ammunition (range 150/600), Heavy, Two-Handed"
-        $WeaponPropertiessmartialranged
+        $Weapon2Properties = "Ammunition (range 150/600), Heavy, Two-Handed"
     }
     #Weapon 3 Choice
     if ($selectweapon3panel.SelectedItem -match 'Iron Dagger')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d4 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d4 Piercing"
         $Weapon3Weight = "1lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimplemelee = "Finesse, Light, thrown (range 20/60)"
-        $WeaponPropertiessimplemelee
+        $Weapon3Properties = "Finesse, Light, thrown (range 20/60)"
     }
     if ($selectweapon3panel.SelectedItem -match 'Steel Dagger')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d4 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d4 Piercing"
         $Weapon3Weight = "2lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimplemelee = "Finesse, Light, thrown (range 20/60)"
-        $WeaponPropertiessimplemelee
+        $Weapon3Properties = "Finesse, Light, thrown (range 20/60)"
     }
     if ($selectweapon3panel.SelectedItem -match 'Club')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d4 Bludgeoning"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d4 Bludgeoning"
         $Weapon3Weight = "2lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimplemelee = "Light"
-        $WeaponPropertiessimplemelee
+        $Weapon3Properties = "Light"
     }
     if ($selectweapon3panel.SelectedItem -match 'Great Club')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d8 Bludgeoning"
-        $Weapon3DamageSimpleMelee
-        
+        $Weapon3Damage = "1d8 Bludgeoning"
         $Weapon3Weight = "10lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimplemelee = "Two-Handed"
-        $WeaponPropertiessimplemelee
+        $Weapon3Properties = "Two-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'HandAxe')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d6 slashing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d6 slashing"
         $Weapon3Weight = "2lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimplemelee = "Light, Thrown (range 20/60)"
-        $WeaponPropertiessimplemelee
+        $Weapon3Properties = "Light, Thrown (range 20/60)"
     }
     if ($selectweapon3panel.SelectedItem -match 'Javelin')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d6 piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d6 piercing"
         $Weapon3Weight = "2lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimplemelee = "Thrown (range 30/120"
-        $WeaponPropertiessimplemelee
+        $Weapon3Properties = "Thrown (range 30/120"
     }
     if ($selectweapon3panel.SelectedItem -match 'Light Hammer')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d4 Bludgeoning"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d4 Bludgeoning"
         $Weapon3Weight = "2lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimplemelee = "Light, Thrown (range 20/60)"
-        $WeaponPropertiessimplemelee
+        $Weapon3Properties = "Light, Thrown (range 20/60)"
     }
     if ($selectweapon3panel.SelectedItem -match 'Mace')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d6 Bludgeoning"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d6 Bludgeoning"
         $Weapon3Weight = "4lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimplemelee = "One-Handed"
-        $WeaponPropertiessimplemelee
+        $Weapon3Properties = "One-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'QuarterStaff')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d6 Bludgeoning"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d6 Bludgeoning"
         $Weapon3Weight = "4lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimplemelee = "Versatile (1d8)"
-        $WeaponPropertiessimplemelee
+        $Weapon3Properties = "Versatile (1d8)"
     }
     if ($selectweapon3panel.SelectedItem -match 'Spear')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d6 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d6 Piercing"
         $Weapon3Weight = "3lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimplemelee = "Thrown (range 20/60, versatile (qd8)"
-        $WeaponPropertiessimplemelee
+        $Weapon3Properties = "Thrown (range 20/60, versatile (qd8)"
     }
     if ($selectweapon3panel.SelectedItem -match 'Nunchucks')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d4 Bludgeoning"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d4 Bludgeoning"
         $Weapon3Weight = "5lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimplemelee = "Two-Handed, Thrown (range 20/30)"
-        $WeaponPropertiessimplemelee
+        $Weapon3Properties = "Two-Handed, Thrown (range 20/30)"
     }
     if ($selectweapon3panel.SelectedItem -match 'Iron Sword')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d6 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d6 Piercing"
         $Weapon3Weight = "6lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimplemelee = "One-Handed"
-        $WeaponPropertiessimplemelee
+        $Weapon3Properties = "One-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'Iron Short Sword')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d4 Piercing"
-        $Weapon3DamageSimpleMelee
-        
+        $Weapon3Damage = "1d4 Piercing"
         $Weapon3Weight = "3lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimplemelee = "One-Handed"
-        $WeaponPropertiessimplemelee
+        $Weapon3Properties = "One-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'Crossbow - Light')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d8 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d8 Piercing"
         $Weapon3Weight = "5lb"
-        $Weapon3Weight
-        
-        $WeaponPropertiessimpleranged = "Ammunition (range 80/320), Loading, Two-Handed"
-        $WeaponPropertiessimpleranged
+        $Weapon3Properties = "Ammunition (range 80/320), Loading, Two-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'Shortbow')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d6 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d6 Piercing"
         $Weapon3Weight = "2lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimpleranged = "Ammunition (range 80/320), Two-Handed"
-        $WeaponPropertiessimpleranged
+        $Weapon3Properties = "Ammunition (range 80/320), Two-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'Sling')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d4 Bludgeoning"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d4 Bludgeoning"
         $Weapon3Weight = "0lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimpleranged = "Ammunition (range 30/120)"
-        $WeaponPropertiessimpleranged
+        $Weapon3Properties = "Ammunition (range 30/120)"
     }
     if ($selectweapon3panel.SelectedItem -match 'Dart')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d4 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d4 Piercing"
         $Weapon3Weight = "1/4lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessimpleranged = "Finesse, thrown (range 20/60)"
-        $WeaponPropertiessimpleranged
+        $Weapon3Properties = "Finesse, thrown (range 20/60)"
     }
     if ($selectweapon3panel.SelectedItem -match 'BattleAxe')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d8 Slashing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d8 Slashing"
         $Weapon3Weight = "4lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "Versatile (1d10)"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "Versatile (1d10)"
     }
     if ($selectweapon3panel.SelectedItem -match 'Flail')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d8 Bludgeoning"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d8 Bludgeoning"
         $Weapon3Weight = "2lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "One-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "One-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'Great Axe')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d12 Slashing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d12 Slashing"
         $Weapon3Weight = "7lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "Heavy, Two-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'Great Sword')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "2d6 Slashing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "2d6 Slashing"
         $Weapon3Weight = "6lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "Heavy, Two-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'Halberd')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d10 Slashing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d10 Slashing"
         $Weapon3Weight = "6lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Reach, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "Heavy, Reach, Two-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'Longsword')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d8 Slashing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d8 Slashing"
         $Weapon3Weight = "3lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "Versatile (1d10)"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "Versatile (1d10)"
     }
     if ($selectweapon3panel.SelectedItem -match 'Maul')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "2d6 Bludgeoning"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "2d6 Bludgeoning"
         $Weapon3Weight = "10lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "Heavy, Two-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'MorningStar')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d8 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d8 Piercing"
         $Weapon3Weight = "4lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "Two-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'Rapier')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d8 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d8 Piercing"
         $Weapon3Weight = "2lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "Finesse"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "Finesse"
     }
     if ($selectweapon3panel.SelectedItem -match 'Sicimitar')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d6 Slashing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d6 Slashing"
         $Weapon3Weight = "3lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "Finesse, Light"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "Finesse, Light"
     }
     if ($selectweapon3panel.SelectedItem -match 'ShortSword')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d6 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d6 Piercing"
         $Weapon3Weight = "2lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "Finesse, Light"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "Finesse, Light"
     }
     if ($selectweapon3panel.SelectedItem -match 'Trident')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d6 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d6 Piercing"
         $Weapon3Weight = "4lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "Thrown (range 20/60), Versatile (1d8)"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "Thrown (range 20/60), Versatile (1d8)"
     }
     if ($selectweapon3panel.SelectedItem -match 'Warhammer')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d8 Bludgeoning"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d8 Bludgeoning"
         $Weapon3Weight = "2lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "Versatile (1d10)"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "Versatile (1d10)"
     }
     if ($selectweapon3panel.SelectedItem -match 'DoomHammer')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d12 Bludgeoning"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d12 Bludgeoning"
         $Weapon3Weight = "10lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "Heavy, Two-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'Dual-Wield Staff')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d8 Budgeoning"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d8 Budgeoning"
         $Weapon3Weight = "7lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "Two-Handed, Light"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "Two-Handed, Light"
     }
     if ($selectweapon3panel.SelectedItem -match 'Broadsword')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d8 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d8 Piercing"
         $Weapon3Weight = "8lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "Heavy, Two-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "Heavy, Two-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'Steel Sword')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d8 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d8 Piercing"
         $Weapon3Weight = "8lb"
-        $Weapon3Weight
-
-        $WeaponPropertiesmartialmelee = "One-Handed"
-        $WeaponPropertiesmartialmelee
+        $Weapon3Properties = "One-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'Crossbow - Heavy')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d10 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d10 Piercing"
         $Weapon3Weight = "18lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessmartialranged = "Ammunition (range 30/120), light, loading"
-        $WeaponPropertiessmartialranged
+        $Weapon3Properties = "Ammunition (range 30/120), light, loading"
     }
     if ($selectweapon3panel.SelectedItem -match 'Crossbow - Hand')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d6 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d6 Piercing"
         $Weapon3Weight = "3lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessmartialranged = "Ammunition (range 100/400), Heavy, Loading, Two-Handed"
-        $WeaponPropertiessmartialranged
+        $Weapon3Properties = "Ammunition (range 100/400), Heavy, Loading, Two-Handed"
     }
     if ($selectweapon3panel.SelectedItem -match 'Longbow')
     {
         $WPN3ATK_Bonus = "+4"
-        $WPN3ATK_Bonus
-
-        $Weapon3DamageSimpleMelee = "1d8 Piercing"
-        $Weapon3DamageSimpleMelee
-
+        $Weapon3Damage = "1d8 Piercing"
         $Weapon3Weight = "2lb"
-        $Weapon3Weight
-
-        $WeaponPropertiessmartialranged = "Ammunition (range 150/600), Heavy, Two-Handed"
-        $WeaponPropertiessmartialranged
+        $Weapon3Properties = "Ammunition (range 150/600), Heavy, Two-Handed"
     }
-
-
 #End of attack bonuses
 #for a custom attack bonuse use:
 #if ($chosenprimaryweapon.selectedItem -match 'Custom')
 #{
-#    $ATK_Bonus = +0
-#    $ATK_Bonus
-
-     #$WeapomDamageCHOICE = "0"
-     #$WeaponDamageCHOICE
-
-     #$Weapon1Weight ="0"
-     #$Weapon1Weight
-
-     #$weaponpropertiesCHOICE = ""
-     #$weaponpropertiesCHOICE
+#    $WPN*ATK_Bonus = "+0"
+     #$Weapon*Damage = "0"
+     #$Weapon*Weight = "0"
+     #$Weapon*Properties = ""
 #}
-
 #Armour Class additions
 $ArmourClass = 0
 
@@ -6632,14 +5871,10 @@ $ArmourClass = 0
         $ArmourClassWithShield
     }
 #End Armour Class additions
-#Damage per weapon is added to the index above
-#This also should include weight and properties
-
-#Attacks and Spellcasting fill box
-#Weight calculation
-#$EquiptmentArray = @(ForEach-Object {Measure-Object -Sum} $selectedweapon1, $selectedweapon2, $selectedweapon3)
-#$TotalWeight = ($EquiptmentArray | ForEach-Object {Measure-Object -Sum})
-
+#Weight calculations
+$CombinedWeaponStats = $Weapon1Properties + $Weapon2Properties + $Weapon3Properties
+$TotalWeight = $Weapon1Weight + $Weapon2Weight + $Weapon3Weight + $ArmourWeight + $AdventuringGearWeight
+$TotalEquiptment = $selectweapon1panel.SelectedItem + $Comma + $selectweapon2panel.SelectedItem + $Comma + $selectweapon3panel.SelectedItem + $Comma + $selectadventuinggearpanel.SelectedItem + $Comma + $SelectedPack
 #Custom Backstory
     $form = New-Object System.Windows.Forms.Form
     $form.Text = 'Sparks D&D Character Creator'
@@ -6790,7 +6025,6 @@ $ArmourClass = 0
     {
         Exit
     }
-
 #More Background details
 $form = New-Object System.Windows.Forms.Form
 $form.Text = 'Sparks D&D Character Creator'
@@ -6902,7 +6136,6 @@ if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::Cancel)
 {
     Exit
 }
-
 #Select Path for export
 $SaveChooser = New-Object -Typename System.Windows.Forms.SaveFileDialog
     $SaveChooser.Title = "Save as"
@@ -6915,16 +6148,16 @@ if($SaveResult){
     $PathSelected
 }
 #End of path selection
-
 #PDF Values Import before save
 #PLEASE LEAVE ALL "NULL" STATEMENTS ALONE AS THEY ARE MEANT TO BE LEFT NULL
+#Do not un-comment unless you know what you are writing in
 $characterparameters = @{
     Fields = @{
         'ClassLevel' = $ClassLevel;
         'PlayerName' = $playername.Text;
         'CharacterName' = $charactername.Text;
         'Background' = $characterbackgroundselect.SelectedItem;
-        'Race' = $ExportRace;
+        'Race ' = $ExportRace;
         'Alignment' = $ChosenAlignment.SelectedItem;
         'XP' = $XP;
         'Inspiration' = $Inspiration;
@@ -6957,16 +6190,16 @@ $characterparameters = @{
         'ST Intelligence' = $ST_INT;
         'ST Wisdom' = $ST_WIS;
         'ST Charisma' = $ST_CHA;
-        #'Acrobatics' =  ;
-        #'Animal' =  ;
-        #'Athletics' =  ;
-        #'Deception ' =  ;
-        #'History ' =  ;
+        'Acrobatics' = $Acrobatics;
+        'Animal' = $AnimalHandling;
+        'Athletics' = $Athletics;
+        'Deception ' = $Deception;
+        'History ' = $History;
         'Wpn Name' = $selectweapon1panel.SelectedItem;
         'Wpn1 AtkBonus' = $WPN1ATK_Bonus;
-        'Wpn1 Damage' = $Weapon1DamageSimpleMelee;
-        #'Insight' =  ;
-        #'Intimidation' =  ;
+        'Wpn1 Damage' = $Weapon1Damage;
+        'Insight' = $Insight;
+        'Intimidation' = $Intimidation;
         'Wpn Name 2' = $selectweapon2panel.SelectedItem;
         'Wpn2 AtkBonus ' = $WPN2ATK_Bonus;
         'Wpn Name 3' = $selectweapon3panel.SelectedItem;
@@ -6978,18 +6211,18 @@ $characterparameters = @{
         'Check Box 21' = $Check21; #Wisdom Button
         'Check Box 22' = $Check22; #Charisma Button
         'INTmod' = $INTmod;
-        'Wpn2 Damage' = $Weapon2DamageSimpleMelee;
-        #'Investigation ' =  ;
+        'Wpn2 Damage ' = $Weapon2Damage;
+        'Investigation ' = $Investigation;
         'WIS' = $WIS;
-        #'Arcana' =  ;
-        #'Perception ' =  ;
+        'Arcana' = $Arcana;
+        'Perception ' = $Perception;
         'WISmod' = $WISmod;
         'CHA' = $CHA;
-        #'Nature' =  ;
-        #'Performance' =  ;
-        #'Medicine' =  ;
-        #'Religion' =  ;
-        #'Stealth ' =  ;
+        'Nature' = $Nature;
+        'Performance' = $Performance;
+        'Medicine' = $Medicine;
+        'Religion' = $Religion;
+        'Stealth ' =  $Stealth;
         'Check Box 23' = $Check23; #Acrobatics Button
         'Check Box 24' = $Check24; #Animal Handling Button
         'Check Box 25' = $Check25; #Arcana Button
@@ -7008,23 +6241,23 @@ $characterparameters = @{
         'Check Box 38' = $Check38; #Slight of Hand Button
         'Check Box 39' = $Check39; #Stealth Button
         'Check Box 40' = $Check40; #Survival Button
-        #'Persuasion' =  ;
+        'Persuasion' = $Persuation;
         'HPMax' = $HP;
-        #'HPCurrent' = NULL;
-        #'HPTemp' = NULL;
-        'Wpn3 Damage ' = $Weapon3DamageSimpleMelee;
-        #'SleightofHand' =  ;
+        'HPCurrent' = $HP;
+        #'HPTemp' = ;
+        'Wpn3 Damage ' = $Weapon3Damage;
+        'SleightofHand' = $SleightOfHand;
         'CHamod' = $CHAmod;
-        #'Survival' =  ;
+        'Survival' = $Survival;
         'AttacksSpellcasting' = $CombinedWeaponStats;
-        #'Passive' =  ;
+        'Passive' = $Passive;
         'CP' = $CopperCP;
         'ProficienciesLang' = $SpokenLanguages;
         'SP' = $SilverSP;
         'EP' = $ElectrumEP;
         'GP' = $GoldGP;
         'PP' = $PlatinumPP;
-        'Equipment' = $selectadventuinggearpanel.SelectedItem;
+        'Equipment' = $TotalEquiptment;
         'Features and Traits' = $RacialSpecialAbility;
         'CharacterName 2' = $charactername.Text;
         'Age' = $age.Text;
@@ -7041,9 +6274,9 @@ $characterparameters = @{
         'Feat+Traits' = $AddionalfeatTraits.Text;
         #'Treasure' = ;
         'Spellcasting Class 2' = $SpellCastingClass;
-        #'SpellcastingAbility 2' =  ;
-        #'SpellSaveDC  2' =  ;
-        #'SpellAtkBonus 2' =  ;
+        'SpellcastingAbility 2' = $SpellCastingAbility;
+        'SpellSaveDC  2' = $SpellCastingSaveDC;
+        'SpellAtkBonus 2' = $SpellCastingAttackBonus;
         #'SlotsTotal 19' =  ;
         #'SlotsRemaining 19' =  ;
         'Spells 1014' = $Cantrip01; #Cantrip 0 slot 1 (top)
@@ -7260,15 +6493,15 @@ $characterparameters = @{
     OutputPdfFilePath = $PathSelected
 }
 Save-PdfField @characterparameters
-
-#'.\Exported_Characters\D&D Avatar - ChangeMe.pdf'
-
 #End of character Creation Dialog box
     $ButtonType = [System.Windows.MessageBoxButton]::Ok
     $MessageIcon = [System.Windows.MessageBoxImage]::Information
     $MessageBody = "Dungeons And Dragons Character Successfully Created!"
     $MessageTitle = "Spark's D&D Character Creator"
 [System.Windows.MessageBox]::Show($MessageBody,$MessageTitle,$ButtonType,$MessageIcon)
-
 #Script Created By (Sparks Skywere) - Christopher Masters
-#END OF THE POWERSHELL SCRIPT
+#Friends Notes:
+
+# Hey Sparks, 
+# Nice code you've got here >:3
+# - Quasar <3

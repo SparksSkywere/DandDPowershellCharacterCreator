@@ -29,22 +29,23 @@ function Show-Console
 #To show the console change "-hide" to "-show"
 show-console -hide
 
+#IF YOU HAVEN'T PLEASE READ THE RULEBOOK FOR D&D AS THIS POWERSHELL SCRIPT JUST SIMPLIFIES MAKING A CHARACTER
+#CURRENTLY INDEV SO EXPECT ISSUES / BUGS OR DESIGN WEIRDNESS
+#~
 #Sparks's D&D Character Creator powershell script, this is intended for fun and feel free to edit fields for future use but please keep me credited
-#This is a powershell produced program, it is written in C# and powershell functions
-#Due to the way paths are written in some parts this script is tied to Windows ONLY
 #Remember to comment/remove all "Write-Output" statements as this is only for testing purposes
 #This powershell script follows original 5E rules, the website to get the information is:
 #Sources: https://www.dndbeyond.com/sources/basic-rules
-
-#IF YOU HAVEN'T PLEASE READ THE RULEBOOK FOR D&D AS THIS POWERSHELL SCRIPT JUST SIMPLIFIES MAKING A CHARACTER
-#CURRENTLY INDEV SO EXPECT ISSUES / BUGS OR DESIGN WEIRDNESS
-
+#~
 #Further down the script you see $value.statement = New-Object System.Drawing.Size(240,50)
 #The (240,50) means width,height for incase you forget
 #(10,50) 50 = up/down, 10 = left/right - Orientation 
 #Every part of the powershell script is changable, this is for custom games, hence why things aren't grouped together
 #Majority of the stats used came from the cards for D&D
-
+#~
+#When adding $Var together for things like combined numbers or words you need to do:
+#$TotalVar = $Var1 + $Var2 + $Var3 and not have {} in there as that does not work
+#Script Start
 #Type loader
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -55,22 +56,24 @@ Add-Type -Path ".\Assets\iText\itextsharp.dll"
 
 #These values can also be used for indexing | Verify Output
 #DO NOT DELETE, any of the values as they are needed for the skipping
-#-Basic Character Information-
-$charactername = "No-Name"
-$playername = "No-Name"
+#~Basic Character Information~
+$charactername = "Unknown"
+$playername = "Unknown"
 $age = "Unknown"
 $characterbackground = "Unknown"
-#Character Appearance
+#~Character Appearance~
 $Age = "0"
 $Playerheight = "0"
 $PlayerSize = "0"
 $characterfeatureseyes = "N/A"
 $characterfeatureshair = "N/A"
 $characterfeaturesskin = "N/A"
-#-Character Stats-
-$ChosenRace = "None Selected"
-$ExportRace = "None Selected"
-$ChosenSubRace = "None Selected"
+$CharacterImage = "N/A"
+$FactionSymbol = "N/A"
+#~Character Stats~
+$ChosenRace = "N/A"
+$ExportRace = "N/A"
+$ChosenSubRace = "N/A"
 $RaceDescription = "Unknown"
 #$RacialSpecialAbility = "Unknown"
 $PersonalityTraits = "Unknown"
@@ -78,7 +81,6 @@ $ProficencyBonus = "+0"
 $ClassLevel = "0"
 $HP = "0"
 $HD = "0"
-#$HPCurrent = "0"
 $SpeedTotal = "0"
 $PlayerSize = "Unknown"
 $Playerheight = "Unknown"
@@ -97,7 +99,7 @@ $ChosenAlignment = "None Selected"
 $InitiativeTotal = "0"
 #$Damage_Immunities = "Unknown"
 #$Condition_Immunities = "Unknown"
-#Extra Character Information
+#~Extra Character Information~
 $characterbackstory = "Unknown"
 $factionname = "Unknown"
 $alliesandorganisations = "Unknown"
@@ -105,28 +107,28 @@ $AddionalfeatTraits = "Unknown"
 $Ideals = "Unknown"
 $Bonds = "Unknown"
 $Flaws = "Unknown"
-#-Weapon Stats-
+#~Weapon Stats~
 $CombinedWeaponStats = "N/A"
 $ChosenArmour = "Unknown"
 $ArmourClass = "0"
 $checkboxshield = "Unknown"
 $ArmourClassWithShield = "Unknown"
-#-Extra-
+#~Extra~
 $HitDiceTotal = "0"
 $XP = "1"
 $Inspiration = "1"
-#Treasure
+#~Treasure~
 $CopperCP = ""
 $SilverSP = ""
 $ElectrumEP = ""
 $GoldGP = "10"
 $PlatinumPP = ""
-#Spells
+#~Spells~
 $SpellCastingClass = "N/A"
 $SpellCastingAbility = "N/A"
 $SpellCastingSaveDC = "N/A"
 $SpellCastingAttackBonus = "N/A"
-#Skills
+#~Skills~
 $Acrobatics = "0"
 $AnimalHandling = "0"
 $Arcana = "0"
@@ -147,13 +149,12 @@ $Stealth = "0"
 $Survival = "0"
 #Passive Wisdom
 $Passive = "0"
-#End of default value's
-#Special $Variables (DO NOT TOUCH THESE!)
+#~Special $Variables (DO NOT TOUCH THESE!)~
 $Comma = ", "
 
-#Another quick set of documentation explaining some of powershells rules
-#When adding $Var together for things like combined numbers or words you need to do:
-#$TotalVar = $Var1 + $Var2 + $Var3 and not have {} in there as that does not work
+#Hovertext (this is to help customisation)
+$CharacternameHoverText = {"TestName"}
+$CharacterAgeHoverText = {"TestAge"}
 
 #Basic user information gathering - Basic Information
     $form = New-Object System.Windows.Forms.Form
@@ -173,7 +174,7 @@ $Comma = ", "
     $okButton = New-Object System.Windows.Forms.Button
     $okButton.Location = New-Object System.Drawing.Point(75,270)
     $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'OK'
+    $okButton.Text = 'Next'
     $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
     $form.AcceptButton = $okButton
     $form.Controls.Add($okButton)
@@ -212,6 +213,11 @@ $Comma = ", "
     $charactername.Location = New-Object System.Drawing.Point(10,40)
     $charactername.Size = New-Object System.Drawing.Size(180,20)
     $charactername.MaxLength = 30
+    $charactername.add_mouseleave
+    $charactername.add_mousehover($CharacternameHoverText)
+    $charactername.OnmouseHover($CharacternameHoverText)
+    #$CharacternameHoverText.SetToolTip($charactername, "This is a button")
+    #$CharacternameHoverText.Active = $True
     $form.Controls.Add($charactername)
     $form.Topmost = $true
 
@@ -248,7 +254,6 @@ $Comma = ", "
     #$charactername.Add_TextChanged({
     #    $charactername.Text = $charactername.Text -replace '\W'
     #})
-    
         if ($characternameformdialog -eq [System.Windows.Forms.DialogResult]::OK)
         {
             $charactername = $charactername.Text
@@ -290,7 +295,7 @@ $Comma = ", "
     $okButton = New-Object System.Windows.Forms.Button
     $okButton.Location = New-Object System.Drawing.Point(75,270)
     $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'OK'
+    $okButton.Text = 'Next'
     $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
     $form.AcceptButton = $okButton
     $form.Controls.Add($okButton)
@@ -417,28 +422,28 @@ $Comma = ", "
     $form.Controls.Add($ChosenRace)
     $form.Topmost = $true
     $Form.Add_Shown({$Form.Activate()})
-    if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::OK)
-    {
-        $chosenbackground = $characterbackgroundselect.SelectedItem
-        $chosenbackground
+        if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::OK)
+        {
+            $chosenbackground = $characterbackgroundselect.SelectedItem
+            $chosenbackground
 
-        $selectedrace = $ChosenRace.SelectedItem
-        $selectedrace
-    }
-    if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::Ignore)
-    {
-        $characterbackgroundselect = "Unknown"
-        $selectedrace = "N/A"
-    }
-    $characterbackgroundtextbox = $form.ShowDialog()
-    if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::Retry)
-    {
-        return
-    }
-    if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::Cancel)
-    {
-        Exit
-    }
+            $selectedrace = $ChosenRace.SelectedItem
+            $selectedrace
+        }
+        if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::Ignore)
+        {
+            $characterbackgroundselect = "Unknown"
+            $selectedrace = "N/A"
+        }
+        $characterbackgroundtextbox = $form.ShowDialog()
+        if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::Retry)
+        {
+            return
+        }
+        if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::Cancel)
+        {
+            Exit
+        }
 #end of Character race and background
     
     #if ($ -match '**')
@@ -472,7 +477,7 @@ $Comma = ", "
     $okButton = New-Object System.Windows.Forms.Button
     $okButton.Location = New-Object System.Drawing.Point(75,270)
     $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'OK'
+    $okButton.Text = 'Next'
     $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
     $form.AcceptButton = $okButton
     $form.Controls.Add($okButton)
@@ -637,30 +642,32 @@ $Comma = ", "
     $form.Controls.AddRange($characterfeaturesselectskin)
     $form.Topmost = $true
     $Form.Add_Shown({$Form.Activate()})
-    if ($characterfeaturestextbox -eq [System.Windows.Forms.DialogResult]::OK)
-    {
-        $chosenfeatureseyes = $characterfeaturesselecteyes.SelectedItem
-        $chosenfeatureseyes
+        if ($characterfeaturestextbox -eq [System.Windows.Forms.DialogResult]::OK)
+        {
+            $chosenfeatureseyes = $characterfeaturesselecteyes.SelectedItem
+            $chosenfeatureseyes
 
-        $chosenfeatureshair = $characterfeaturesselecthair.SelectedItem
-        $chosenfeatureshair
+            $chosenfeatureshair = $characterfeaturesselecthair.SelectedItem
+            $chosenfeatureshair
 
-        $chosenfeaturesskin = $characterfeaturesselectskin.SelectedItem
-        $chosenfeaturesskin
-    }
-    if ($characterfeaturestextbox -eq [System.Windows.Forms.DialogResult]::Ignore)
-    {
-        $characterfeaturesselecteyes = "Unknown"
-    }
-    $characterfeaturestextbox = $form.ShowDialog()
-    if ($characterfeaturestextbox -eq [System.Windows.Forms.DialogResult]::Retry)
-    {
-        return
-    }
-    if ($characterfeaturestextbox -eq [System.Windows.Forms.DialogResult]::Cancel)
-    {
-        Exit
-    }
+            $chosenfeaturesskin = $characterfeaturesselectskin.SelectedItem
+            $chosenfeaturesskin
+        }
+        if ($characterfeaturestextbox -eq [System.Windows.Forms.DialogResult]::Ignore)
+        {
+            $characterfeaturesselecteyes = "Unknown"
+            $characterfeaturesselecthair = "Unknown"
+            $characterfeaturesselectskin = "Unknown"
+        }
+        $characterfeaturestextbox = $form.ShowDialog()
+        if ($characterfeaturestextbox -eq [System.Windows.Forms.DialogResult]::Retry)
+        {
+            return
+        }
+        if ($characterfeaturestextbox -eq [System.Windows.Forms.DialogResult]::Cancel)
+        {
+            Exit
+        }
 #End of race additions
 #Source: https://www.dandwiki.com/wiki/Random_Hair_and_Eye_Color_(DnD_Other)
 #Basic user information gathering - SubRace
@@ -681,7 +688,7 @@ $Comma = ", "
     $okButton = New-Object System.Windows.Forms.Button
     $okButton.Location = New-Object System.Drawing.Point(75,270)
     $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'OK'
+    $okButton.Text = 'Next'
     $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
     $form.AcceptButton = $okButton
     $form.Controls.Add($okButton)
@@ -724,290 +731,289 @@ $Comma = ", "
     $form.Controls.Add($ChosenSubRace)
     $form.Topmost = $true
 
-    if ($ChosenRace.SelectedItem -match 'Dragonborn')
-    {
-        $ChosenSubRace.Items.Add('Dragonborn') | Out-Null
-        $ChosenSubRace.Items.Add('Draconic Ancestory') | Out-Null
-        $ChosenSubRace.Items.Add('DraconBlood Dragonborn') | Out-Null
-        $ChosenSubRace.Items.Add('Chromatic Dragonborn') | Out-Null
-        $ChosenSubRace.Items.Add('Gem Dragonborn') | Out-Null
-        $ChosenSubRace.Items.Add('Ravenite Dragonborn') | Out-Null
-        $ChosenSubRace.Items.Add('Metallic Dragonborn') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Dwarf')
-    {
-        $ChosenSubRace.Items.Add('Dwarf') | Out-Null
-        $ChosenSubRace.Items.Add('Hill Dwarves') | Out-Null
-        $ChosenSubRace.Items.Add('Mountain Dwarves') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Elf')
-    {
-        $ChosenSubRace.Items.Add('Elf') | Out-Null
-        $ChosenSubRace.Items.Add('Eladrin') | Out-Null
-        $ChosenSubRace.Items.Add('High Elf') | Out-Null
-        $ChosenSubRace.Items.Add('Wood Elf') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Gnome')
-    {
-        $ChosenSubRace.Items.Add('Gnome') | Out-Null
-        $ChosenSubRace.Items.Add('Deep Gnome') | Out-Null
-        $ChosenSubRace.Items.Add('Rock Gnome') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Half-Elf')
-    {
-        $ChosenSubRace.Items.Add('Half-Elf') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Halfling')
-    {
-        $ChosenSubRace.Items.Add('Halfling') | Out-Null
-        $ChosenSubRace.Items.Add('Lightfoot Halfling') | Out-Null
-        $ChosenSubRace.Items.Add('Stout Halfling') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Half-Orc')
-    {
-        $ChosenSubRace.Items.Add('Half-Orc') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Human')
-    {
-        $ChosenSubRace.Items.Add('Human') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Tiefling')
-    {
-        $ChosenSubRace.Items.Add('Tiefling') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Orc')
-    {
-        $ChosenSubRace.Items.Add('Orc') | Out-Null
-        $ChosenSubRace.Items.Add('Eye of Gruumsh') | Out-Null
-        $ChosenSubRace.Items.Add('Ranging Scavengers') | Out-Null
-        $ChosenSubRace.Items.Add('Orc Crossbreed') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Leonin')
-    {
-        $ChosenSubRace.Items.Add('Leonin') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Satyr')
-    {
-        $ChosenSubRace.Items.Add('Satyr') | Out-Null
-        $ChosenSubRace.Items.Add('Hedonistic Revelers') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Fairy')
-    {
-        $ChosenSubRace.Items.Add('Fairy') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Harengon')
-    {
-        $ChosenSubRace.Items.Add('Herengon') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Aarakocra')
-    {
-        $ChosenSubRace.Items.Add('Aarakocra') | Out-Null
-        $ChosenSubRace.Items.Add('Enemies of Elemental Evil') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Genasi')
-    {
-        $ChosenSubRace.Items.Add('Genasi') | Out-Null
-        $ChosenSubRace.Items.Add('Air Genasi') | Out-Null
-        $ChosenSubRace.Items.Add('Earth Genasi') | Out-Null
-        $ChosenSubRace.Items.Add('Fire Genasi') | Out-Null
-        $ChosenSubRace.Items.Add('Water Genasi') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Goliath')
-    {
-        $ChosenSubRace.Items.Add('Goliath') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Aasimar')
-    {
-        $ChosenSubRace.Items.Add('Aasimar') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Bugbear')
-    {
-        $ChosenSubRace.Items.Add('Bugbear') | Out-Null
-        $ChosenSubRace.Items.Add('Bugbear Chief') | Out-Null
-        $ChosenSubRace.Items.Add('Followers of Hruggek') | Out-Null
-        $ChosenSubrace.Items.Add('Venal Ambushers') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Firbolg')
-    {
-        $ChosenSubRace.Items.Add('Firbolg') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Goblin')
-    {
-        $ChosenSubRace.Items.Add('Goblin') | Out-Null
-        $ChosenSubRace.Items.Add('Goblinoids') | Out-Null
-        $ChosenSubRace.Items.Add('Malicious Glee') | Out-Null
-        $ChosenSubRace.Items.Add('Challenging Liers') | Out-Null
-        $ChosenSubRace.Items.Add('Rat Keepers and Wolf Riders') | Out-Null
-        $ChosenSubRace.Items.Add('Worshipers of Maglubiyet') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Hobgoblin')
-    {
-        $ChosenSubRace.Items.Add('Hobgoblin') | Out-Null
-        $ChosenSubRace.Items.Add('Hobgoblin Captain') | Out-Null
-        $ChosenSubRace.Items.Add('Legion of Maglubiyet') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Kenku')
-    {
-        $ChosenSubRace.Items.Add('Kenku') | Out-Null
-        $ChosenSubRace.Items.Add('Fallen Flocks') | Out-Null
-        $ChosenSubRace.Items.Add('The Whistful Wingless') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Kobold')
-    {
-        $ChosenSubRace.Items.Add('Kobold') | Out-Null
-        $ChosenSubRace.Items.Add('Winged Kobold') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Lizardfolk')
-    {
-        $ChosenSubRace.Items.Add('Lizardfolk') | Out-Null
-        $ChosenSubRace.Items.Add('Lizardfolk Shamen') | Out-Null
-        $ChosenSubRace.Items.Add('Territorial Xenophobes') | Out-Null
-        $ChosenSubRace.Items.Add('Great Feasts and Sacrifices') | Out-Null
-        $ChosenSubRace.Items.Add('Canny Crafters') | Out-Null
-        $ChosenSubRace.Items.Add('Lizardfolk Leaders') | Out-Null
-        $ChosenSubRace.Items.Add('Dragon Worshipers') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Tabaxi')
-    {
-        $ChosenSubRace.Items.Add('Tabaxi') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Triton')
-    {
-        $ChosenSubRace.Items.Add('Triton') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Yuan-ti Pureblood')
-    {
-        $ChosenSubRace.Items.Add('Yuan-ti Pureblood') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Feral Tiefling')
-    {
-        $ChosenSubRace.Items.Add('Feral Tiefling') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Tortle')
-    {
-        $ChosenSubRace.Items.Add('Tortle') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Changling')
-    {
-        $ChosenSubRace.Items.Add('Changling') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Kalashtar')
-    {
-        $ChosenSubRace.Items.Add('Kalashtar') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Shifter')
-    {
-        $ChosenSubRace.Items.Add('Shifter') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Warforged')
-    {
-        $ChosenSubRace.Items.Add('Warforged') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Gith')
-    {
-        $ChosenSubRace.Items.Add('Gith') | Out-Null
-        $ChosenSubRace.Items.Add('Githyanki') | Out-Null
-        $ChosenSubRace.Items.Add('Githyanki Warrior') | Out-Null
-        $ChosenSubRace.Items.Add('Githyanki Knight') | Out-Null
-        $ChosenSubRace.Items.Add('Astral Raiders') | Out-Null
-        $ChosenSubRace.Items.Add('Followers of Gith') | Out-Null
-        $ChosenSubRace.Items.Add('Silver Swords') | Out-Null
-        $ChosenSubRace.Items.Add('Red Dragon Riders') | Out-Null
-        $ChosenSubRace.Items.Add('Githzerai') | Out-Null
-        $ChosenSubRace.Items.Add('Githzerai Monk') | Out-Null
-        $ChosenSubRace.Items.Add('Githzerai Zerth') | Out-Null
-        $ChosenSubRace.Items.Add('Psionic Adepts') | Out-Null
-        $ChosenSubRace.Items.Add('Order amid Chaos') | Out-Null
-        $ChosenSubRace.Items.Add('Disciples of Zerthimon') | Out-Null
-        $ChosenSubRace.Items.Add('Beyond Limbo') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Centaur')
-    {
-        $ChosenSubRace.Items.Add('Centaur') | Out-Null
-        $ChosenSubRace.Items.Add('Wilderness Nomads') | Out-Null
-        $ChosenSubRace.Items.Add('Reluctant Settlers') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Loxodon')
-    {
-        $ChosenSubRace.Items.Add('Loxodon') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Minotaur')
-    {
-        $ChosenSubRace.Items.Add('Minotaur') | Out-Null
-        $ChosenSubRace.Items.Add('The Beast Within') | Out-Null
-        $ChosenSubRace.Items.Add('Cults of the Horned King') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Simic Hybrid')
-    {
-        $ChosenSubRace.Items.Add('Simic Hybrid') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Vedalken')
-    {
-        $ChosenSubRace.Items.Add('Vadelken') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Verdan')
-    {
-        $ChosenSubRace.Items.Add('Verdan') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Locathah')
-    {
-        $ChosenSubRace.Items.Add('Locathah') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Grung')
-    {
-        $ChosenSubRace.Items.Add('Grung') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Lycanth')
-    {
-        $ChosenSubRace.Items.Add('Lycanth') | Out-Null
-        $ChosenSubRace.Items.Add('Curse of Lycanthropy') | Out-Null
-        $ChosenSubRace.Items.Add('Werebear') | Out-Null
-        $ChosenSubRace.Items.Add('Wereboar') | Out-Null
-        $ChosenSubRace.Items.Add('Wererat') | Out-Null
-        $ChosenSubRace.Items.Add('Weretiger') | Out-Null
-        $ChosenSubRace.Items.Add('Werewolf') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Troll')
-    {
-        $ChosenSubRace.Items.Add('Troll') | Out-Null
-        $ChosenSubRace.Items.Add('Troll Freaks') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Ogre')
-    {
-        $ChosenSubRace.Items.Add('Ogre') | Out-Null
-        $ChosenSubRace.Items.Add('Furious Tempers') | Out-Null
-        $ChosenSubRace.Items.Add('Gruesome Gluttons') | Out-Null
-        $ChosenSubRace.Items.Add('Greedy Collectors') | Out-Null
-        $ChosenSubRace.Items.Add('Legendary Stupidity') | Out-Null
-        $ChosenSubRace.Items.Add('Primitive Wanderers') | Out-Null
-    }
-    if ($ChosenRace.SelectedItem -match 'Wolf')
-    {
-        $ChosenSubRace.Items.Add('Wolf') | Out-Null
-        $ChosenSubRace.Items.Add('Winter Wolf') | Out-Null
-        $ChosenSubRace.Items.Add('Timber Wolf') | Out-Null
-        $ChosenSubRace.Items.Add('Dire Wolf') | Out-Null
-    }
-    
-    if ($subracetype -eq [System.Windows.Forms.DialogResult]::OK)
-    {
-        $selectedsubrace = $ChosenSubRace.SelectedItem
-        $selectedsubrace
-    }
-    if ($subracetype -eq [System.Windows.Forms.DialogResult]::Ignore)
-    {
-        $selectedsubrace = "N/A"
-        $selectedsubrace
-    }
-    $subracetype = $form.ShowDialog()
-    if ($subracetype -eq [System.Windows.Forms.DialogResult]::Retry)
-    {
-        return
-    }
-    if ($subracetype -eq [System.Windows.Forms.DialogResult]::Cancel)
-    {
-        Exit
-    }
+        if ($ChosenRace.SelectedItem -match 'Dragonborn')
+        {
+            $ChosenSubRace.Items.Add('Dragonborn') | Out-Null
+            $ChosenSubRace.Items.Add('Draconic Ancestory') | Out-Null
+            $ChosenSubRace.Items.Add('DraconBlood Dragonborn') | Out-Null
+            $ChosenSubRace.Items.Add('Chromatic Dragonborn') | Out-Null
+            $ChosenSubRace.Items.Add('Gem Dragonborn') | Out-Null
+            $ChosenSubRace.Items.Add('Ravenite Dragonborn') | Out-Null
+            $ChosenSubRace.Items.Add('Metallic Dragonborn') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Dwarf')
+        {
+            $ChosenSubRace.Items.Add('Dwarf') | Out-Null
+            $ChosenSubRace.Items.Add('Hill Dwarves') | Out-Null
+            $ChosenSubRace.Items.Add('Mountain Dwarves') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Elf')
+        {
+            $ChosenSubRace.Items.Add('Elf') | Out-Null
+            $ChosenSubRace.Items.Add('Eladrin') | Out-Null
+            $ChosenSubRace.Items.Add('High Elf') | Out-Null
+            $ChosenSubRace.Items.Add('Wood Elf') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Gnome')
+        {
+            $ChosenSubRace.Items.Add('Gnome') | Out-Null
+            $ChosenSubRace.Items.Add('Deep Gnome') | Out-Null
+            $ChosenSubRace.Items.Add('Rock Gnome') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Half-Elf')
+        {
+            $ChosenSubRace.Items.Add('Half-Elf') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Halfling')
+        {
+            $ChosenSubRace.Items.Add('Halfling') | Out-Null
+            $ChosenSubRace.Items.Add('Lightfoot Halfling') | Out-Null
+            $ChosenSubRace.Items.Add('Stout Halfling') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Half-Orc')
+        {
+            $ChosenSubRace.Items.Add('Half-Orc') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Human')
+        {
+            $ChosenSubRace.Items.Add('Human') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Tiefling')
+        {
+            $ChosenSubRace.Items.Add('Tiefling') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Orc')
+        {
+            $ChosenSubRace.Items.Add('Orc') | Out-Null
+            $ChosenSubRace.Items.Add('Eye of Gruumsh') | Out-Null
+            $ChosenSubRace.Items.Add('Ranging Scavengers') | Out-Null
+            $ChosenSubRace.Items.Add('Orc Crossbreed') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Leonin')
+        {
+            $ChosenSubRace.Items.Add('Leonin') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Satyr')
+        {
+            $ChosenSubRace.Items.Add('Satyr') | Out-Null
+            $ChosenSubRace.Items.Add('Hedonistic Revelers') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Fairy')
+        {
+            $ChosenSubRace.Items.Add('Fairy') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Harengon')
+        {
+            $ChosenSubRace.Items.Add('Herengon') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Aarakocra')
+        {
+            $ChosenSubRace.Items.Add('Aarakocra') | Out-Null
+            $ChosenSubRace.Items.Add('Enemies of Elemental Evil') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Genasi')
+        {
+            $ChosenSubRace.Items.Add('Genasi') | Out-Null
+            $ChosenSubRace.Items.Add('Air Genasi') | Out-Null
+            $ChosenSubRace.Items.Add('Earth Genasi') | Out-Null
+            $ChosenSubRace.Items.Add('Fire Genasi') | Out-Null
+            $ChosenSubRace.Items.Add('Water Genasi') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Goliath')
+        {
+            $ChosenSubRace.Items.Add('Goliath') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Aasimar')
+        {
+            $ChosenSubRace.Items.Add('Aasimar') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Bugbear')
+        {
+            $ChosenSubRace.Items.Add('Bugbear') | Out-Null
+            $ChosenSubRace.Items.Add('Bugbear Chief') | Out-Null
+            $ChosenSubRace.Items.Add('Followers of Hruggek') | Out-Null
+            $ChosenSubrace.Items.Add('Venal Ambushers') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Firbolg')
+        {
+            $ChosenSubRace.Items.Add('Firbolg') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Goblin')
+        {
+            $ChosenSubRace.Items.Add('Goblin') | Out-Null
+            $ChosenSubRace.Items.Add('Goblinoids') | Out-Null
+            $ChosenSubRace.Items.Add('Malicious Glee') | Out-Null
+            $ChosenSubRace.Items.Add('Challenging Liers') | Out-Null
+            $ChosenSubRace.Items.Add('Rat Keepers and Wolf Riders') | Out-Null
+            $ChosenSubRace.Items.Add('Worshipers of Maglubiyet') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Hobgoblin')
+        {
+            $ChosenSubRace.Items.Add('Hobgoblin') | Out-Null
+            $ChosenSubRace.Items.Add('Hobgoblin Captain') | Out-Null
+            $ChosenSubRace.Items.Add('Legion of Maglubiyet') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Kenku')
+        {
+            $ChosenSubRace.Items.Add('Kenku') | Out-Null
+            $ChosenSubRace.Items.Add('Fallen Flocks') | Out-Null
+            $ChosenSubRace.Items.Add('The Whistful Wingless') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Kobold')
+        {
+            $ChosenSubRace.Items.Add('Kobold') | Out-Null
+            $ChosenSubRace.Items.Add('Winged Kobold') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Lizardfolk')
+        {
+            $ChosenSubRace.Items.Add('Lizardfolk') | Out-Null
+            $ChosenSubRace.Items.Add('Lizardfolk Shamen') | Out-Null
+            $ChosenSubRace.Items.Add('Territorial Xenophobes') | Out-Null
+            $ChosenSubRace.Items.Add('Great Feasts and Sacrifices') | Out-Null
+            $ChosenSubRace.Items.Add('Canny Crafters') | Out-Null
+            $ChosenSubRace.Items.Add('Lizardfolk Leaders') | Out-Null
+            $ChosenSubRace.Items.Add('Dragon Worshipers') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Tabaxi')
+        {
+            $ChosenSubRace.Items.Add('Tabaxi') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Triton')
+        {
+            $ChosenSubRace.Items.Add('Triton') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Yuan-ti Pureblood')
+        {
+            $ChosenSubRace.Items.Add('Yuan-ti Pureblood') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Feral Tiefling')
+        {
+            $ChosenSubRace.Items.Add('Feral Tiefling') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Tortle')
+        {
+            $ChosenSubRace.Items.Add('Tortle') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Changling')
+        {
+            $ChosenSubRace.Items.Add('Changling') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Kalashtar')
+        {
+            $ChosenSubRace.Items.Add('Kalashtar') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Shifter')
+        {
+            $ChosenSubRace.Items.Add('Shifter') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Warforged')
+        {
+            $ChosenSubRace.Items.Add('Warforged') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Gith')
+        {
+            $ChosenSubRace.Items.Add('Gith') | Out-Null
+            $ChosenSubRace.Items.Add('Githyanki') | Out-Null
+            $ChosenSubRace.Items.Add('Githyanki Warrior') | Out-Null
+            $ChosenSubRace.Items.Add('Githyanki Knight') | Out-Null
+            $ChosenSubRace.Items.Add('Astral Raiders') | Out-Null
+            $ChosenSubRace.Items.Add('Followers of Gith') | Out-Null
+            $ChosenSubRace.Items.Add('Silver Swords') | Out-Null
+            $ChosenSubRace.Items.Add('Red Dragon Riders') | Out-Null
+            $ChosenSubRace.Items.Add('Githzerai') | Out-Null
+            $ChosenSubRace.Items.Add('Githzerai Monk') | Out-Null
+            $ChosenSubRace.Items.Add('Githzerai Zerth') | Out-Null
+            $ChosenSubRace.Items.Add('Psionic Adepts') | Out-Null
+            $ChosenSubRace.Items.Add('Order amid Chaos') | Out-Null
+            $ChosenSubRace.Items.Add('Disciples of Zerthimon') | Out-Null
+            $ChosenSubRace.Items.Add('Beyond Limbo') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Centaur')
+        {
+            $ChosenSubRace.Items.Add('Centaur') | Out-Null
+            $ChosenSubRace.Items.Add('Wilderness Nomads') | Out-Null
+            $ChosenSubRace.Items.Add('Reluctant Settlers') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Loxodon')
+        {
+            $ChosenSubRace.Items.Add('Loxodon') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Minotaur')
+        {
+            $ChosenSubRace.Items.Add('Minotaur') | Out-Null
+            $ChosenSubRace.Items.Add('The Beast Within') | Out-Null
+            $ChosenSubRace.Items.Add('Cults of the Horned King') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Simic Hybrid')
+        {
+            $ChosenSubRace.Items.Add('Simic Hybrid') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Vedalken')
+        {
+            $ChosenSubRace.Items.Add('Vadelken') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Verdan')
+        {
+            $ChosenSubRace.Items.Add('Verdan') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Locathah')
+        {
+            $ChosenSubRace.Items.Add('Locathah') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Grung')
+        {
+            $ChosenSubRace.Items.Add('Grung') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Lycanth')
+        {
+            $ChosenSubRace.Items.Add('Lycanth') | Out-Null
+            $ChosenSubRace.Items.Add('Curse of Lycanthropy') | Out-Null
+            $ChosenSubRace.Items.Add('Werebear') | Out-Null
+            $ChosenSubRace.Items.Add('Wereboar') | Out-Null
+            $ChosenSubRace.Items.Add('Wererat') | Out-Null
+            $ChosenSubRace.Items.Add('Weretiger') | Out-Null
+            $ChosenSubRace.Items.Add('Werewolf') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Troll')
+        {
+            $ChosenSubRace.Items.Add('Troll') | Out-Null
+            $ChosenSubRace.Items.Add('Troll Freaks') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Ogre')
+        {
+            $ChosenSubRace.Items.Add('Ogre') | Out-Null
+            $ChosenSubRace.Items.Add('Furious Tempers') | Out-Null
+            $ChosenSubRace.Items.Add('Gruesome Gluttons') | Out-Null
+            $ChosenSubRace.Items.Add('Greedy Collectors') | Out-Null
+            $ChosenSubRace.Items.Add('Legendary Stupidity') | Out-Null
+            $ChosenSubRace.Items.Add('Primitive Wanderers') | Out-Null
+        }
+        if ($ChosenRace.SelectedItem -match 'Wolf')
+        {
+            $ChosenSubRace.Items.Add('Wolf') | Out-Null
+            $ChosenSubRace.Items.Add('Winter Wolf') | Out-Null
+            $ChosenSubRace.Items.Add('Timber Wolf') | Out-Null
+            $ChosenSubRace.Items.Add('Dire Wolf') | Out-Null
+        }
+        
+        if ($subracetype -eq [System.Windows.Forms.DialogResult]::OK)
+        {
+            $selectedsubrace = $ChosenSubRace.SelectedItem
+            $selectedsubrace
+        }
+        if ($subracetype -eq [System.Windows.Forms.DialogResult]::Ignore)
+        {
+            $ChosenSubRace = "N/A"
+        }
+        $subracetype = $form.ShowDialog()
+        if ($subracetype -eq [System.Windows.Forms.DialogResult]::Retry)
+        {
+            return
+        }
+        if ($subracetype -eq [System.Windows.Forms.DialogResult]::Cancel)
+        {
+            Exit
+        }
 #End of SubRace Selection
 
 #Books need to be purchased so the rest of these creatures can be filled out, or found on the internet
@@ -1037,7 +1043,7 @@ $Comma = ", "
     $okButton = New-Object System.Windows.Forms.Button
     $okButton.Location = New-Object System.Drawing.Point(75,270)
     $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'OK'
+    $okButton.Text = 'Next'
     $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
     $form.AcceptButton = $okButton
     $form.Controls.Add($okButton)
@@ -1125,90 +1131,89 @@ $Comma = ", "
     #To add a custom class use: #$ChosenClass.Items.Add('CUSTOM') | Out-Null
     #Then make sure to add below on the "IF" statements
 
-    if ($ChosenClass.SelectedItem -match 'Artificer')
-    {
-        $ChosenClassArtificer = $ChosenClassArtificer.SelectedItem 
-    }
-    if ($ChosenClass.SelectedItem -match 'Barbarian')
-    {
-        $ChosenClassBarbarian = $ChosenClassBarbarian.SelectedItem 
-    }
-    if ($ChosenClass.SelectedItem -match 'Bard')
-    {
-        $ChosenClassBard = $ChosenClassBard.SelectedItem 
-    }
-    if ($ChosenClass.SelectedItem -match 'Cleric')
-    {
-        $ChosenClassCleric = $ChosenClassCleric.SelectedItem 
-    }
-    if ($ChosenClass.SelectedItem -match 'Druid')
-    {
-        $ChosenClassDruid = $ChosenClassDruid.SelectedItem 
-    }
-    if ($ChosenClass.SelectedItem -match 'Fighter')
-    {
-        $ChosenClassFighter = $ChosenClassFighter.SelectedItem 
-    }
-    if ($ChosenClass.SelectedItem -match 'Monk')
-    {
-        $ChosenClassMonk = $ChosenClassMonk.SelectedItem 
-    }
-    if ($ChosenClass.SelectedItem -match 'Paladin')
-    {
-        $ChosenClassPaladin = $ChosenClassPaladin.SelectedItem 
-    }
-    if ($ChosenClass.SelectedItem -match 'Ranger')
-    {
-        $ChosenClassRanger = $ChosenClassRanger.SelectedItem 
-    }
-    if ($ChosenClass.SelectedItem -match 'Rogue')
-    {
-        $ChosenClassRogue = $ChosenClassRogue.SelectedItem 
-    }
-    if ($ChosenClass.SelectedItem -match 'Sorcerer')
-    {
-        $ChosenClassSorcerer = $ChosenClassSorcerer.SelectedItem 
-    }
-    if ($ChosenClass.SelectedItem -match 'Warlock')
-    {
-        $ChosenClassWarlock = $ChosenClassWarlock.SelectedItem 
-    }
-    if ($ChosenClass.SelectedItem -match 'Wizard')
-    {
-        $ChosenClassWizard = $ChosenClassWizard.SelectedItem 
-    }
-    $form.Controls.Add($ChosenClass)
-    $form.Controls.Add($ChosenAlignment)
-    $form.Topmost = $true
+        if ($ChosenClass.SelectedItem -match 'Artificer')
+        {
+            $ChosenClassArtificer = $ChosenClassArtificer.SelectedItem 
+        }
+        if ($ChosenClass.SelectedItem -match 'Barbarian')
+        {
+            $ChosenClassBarbarian = $ChosenClassBarbarian.SelectedItem 
+        }
+        if ($ChosenClass.SelectedItem -match 'Bard')
+        {
+            $ChosenClassBard = $ChosenClassBard.SelectedItem 
+        }
+        if ($ChosenClass.SelectedItem -match 'Cleric')
+        {
+            $ChosenClassCleric = $ChosenClassCleric.SelectedItem 
+        }
+        if ($ChosenClass.SelectedItem -match 'Druid')
+        {
+            $ChosenClassDruid = $ChosenClassDruid.SelectedItem 
+        }
+        if ($ChosenClass.SelectedItem -match 'Fighter')
+        {
+            $ChosenClassFighter = $ChosenClassFighter.SelectedItem 
+        }
+        if ($ChosenClass.SelectedItem -match 'Monk')
+        {
+            $ChosenClassMonk = $ChosenClassMonk.SelectedItem 
+        }
+        if ($ChosenClass.SelectedItem -match 'Paladin')
+        {
+            $ChosenClassPaladin = $ChosenClassPaladin.SelectedItem 
+        }
+        if ($ChosenClass.SelectedItem -match 'Ranger')
+        {
+            $ChosenClassRanger = $ChosenClassRanger.SelectedItem 
+        }
+        if ($ChosenClass.SelectedItem -match 'Rogue')
+        {
+            $ChosenClassRogue = $ChosenClassRogue.SelectedItem 
+        }
+        if ($ChosenClass.SelectedItem -match 'Sorcerer')
+        {
+            $ChosenClassSorcerer = $ChosenClassSorcerer.SelectedItem 
+        }
+        if ($ChosenClass.SelectedItem -match 'Warlock')
+        {
+            $ChosenClassWarlock = $ChosenClassWarlock.SelectedItem 
+        }
+        if ($ChosenClass.SelectedItem -match 'Wizard')
+        {
+            $ChosenClassWizard = $ChosenClassWizard.SelectedItem 
+        }
+        $form.Controls.Add($ChosenClass)
+        $form.Controls.Add($ChosenAlignment)
+        $form.Topmost = $true
 
-    if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::OK)
-    {
-        $SelectedClass = $ChosenClass.SelectedItem
-        $SelectedClass
-        
-        $selectedalignment = $ChosenAlignment.SelectedItem
-        $selectedalignment
-    }
-    if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::Ignore)
-    {
-        $ChosenClass = "None Selected"
-        $ChosenAlignment = "None Selected"
-    }
-    $chosencharacter = $form.ShowDialog()
-    if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::Retry)
-    {
-        return
-    }
-    if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::Cancel)
-    {
-        Exit
-    }
+        if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::OK)
+        {
+            $SelectedClass = $ChosenClass.SelectedItem
+            $SelectedClass
+            
+            $selectedalignment = $ChosenAlignment.SelectedItem
+            $selectedalignment
+        }
+        if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::Ignore)
+        {
+            $ChosenClass = "None Selected"
+            $ChosenAlignment = "None Selected"
+        }
+        $chosencharacter = $form.ShowDialog()
+        if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::Retry)
+        {
+            return
+        }
+        if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::Cancel)
+        {
+            Exit
+        }
     #use this for an example when adding a chosen class for future script parts
     #    if ($ChosenClass.SelectedItem -match 'Custom')
     #{
     #    $ChosenClassCustom = $ChosenClassCustom.SelectedItem 
     #}
-
 #end of class + alignment selection
 #For future reference, setup the chosen class then tells the rest of the document what you can and cant select with IF statements
 #This will mean that this powershell script is going to get BIG, but worth it!
@@ -1232,7 +1237,7 @@ $Comma = ", "
     $okButton = New-Object System.Windows.Forms.Button
     $okButton.Location = New-Object System.Drawing.Point(75,270)
     $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'OK'
+    $okButton.Text = 'Next'
     $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
     $form.AcceptButton = $okButton
     $form.Controls.Add($okButton)
@@ -1297,510 +1302,510 @@ $Comma = ", "
     #Priests Pack | $Selectedpack = "A backpack, a blanket, 10 candles, a tinderbox, an alms box, 2 blocks of incense, a censer, vestments, 2 days of rations and a waterskin"
     #Scholar's Pack | $Selectedpack = "A backpack, a book of lore, a bottle of ink, an ink pen, 10 sheets of parchment, a little bag of sand and a small knife"
     
-    if ($ChosenClass.SelectedItem -match 'Barbarian')
-    {
-        $form.Controls.Add($Chosensubclass)        
-            $Chosensubclass.Items.Add('Berserker') | Out-Null
-            $Chosensubclass.Items.Add('Totem Warrior') | Out-Null
-            $Chosensubclass.Items.Add('Battlerager') | Out-Null
-            $Chosensubclass.Items.Add('Ancestorial Guardian') | Out-Null
-            $Chosensubclass.Items.Add('Storm Herald') | Out-Null
-            $Chosensubclass.Items.Add('Zealot') | Out-Null
-            $Chosensubclass.Items.Add('Beast') | Out-Null
-            $Chosensubclass.Items.Add('Wild Magic') | Out-Null
-            $HitDiceTotal = "1d12"
-            $ClassLevel = "Barbarian 1"
-            $Check11 = 'Yes'
-            $Check19 = 'Yes'
-            $Selectedpack = "A backpack, a bedroll, a mess kit, a tinderbox, 10 torches, 10 days of rations and a waterskin, the backpack also has 50 feet of hempen rope strapped to the side of it"
+        if ($ChosenClass.SelectedItem -match 'Barbarian')
+        {
+            $form.Controls.Add($Chosensubclass)        
+                $Chosensubclass.Items.Add('Berserker') | Out-Null
+                $Chosensubclass.Items.Add('Totem Warrior') | Out-Null
+                $Chosensubclass.Items.Add('Battlerager') | Out-Null
+                $Chosensubclass.Items.Add('Ancestorial Guardian') | Out-Null
+                $Chosensubclass.Items.Add('Storm Herald') | Out-Null
+                $Chosensubclass.Items.Add('Zealot') | Out-Null
+                $Chosensubclass.Items.Add('Beast') | Out-Null
+                $Chosensubclass.Items.Add('Wild Magic') | Out-Null
+                $HitDiceTotal = "1d12"
+                $ClassLevel = "Barbarian 1"
+                $Check11 = 'Yes'
+                $Check19 = 'Yes'
+                $Selectedpack = "A backpack, a bedroll, a mess kit, a tinderbox, 10 torches, 10 days of rations and a waterskin, the backpack also has 50 feet of hempen rope strapped to the side of it"
 
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
-            {
-                $SelectedSubClass = $ChosenSubClass.SelectedItem
-                $SelectedSubClass
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
-            {
-                $ChosenSubClass = "None Selected"
-            }
-            $subclass = $form.ShowDialog()
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
-            {
-                return
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
-            {
-                Exit
-            }
-    }
-    if ($ChosenClass.SelectedItem -match 'Bard')
-    {
-        $form.Controls.Add($Chosensubclass) 
-            $Chosensubclass.Items.Add('College of Lore') | Out-Null
-            $Chosensubclass.Items.Add('College of Valor') | Out-Null
-            $Chosensubclass.Items.Add('College of Glamour') | Out-Null
-            $Chosensubclass.Items.Add('College of Swords') | Out-Null
-            $Chosensubclass.Items.Add('College of Whispers') | Out-Null
-            $Chosensubclass.Items.Add('College of Eloquence') | Out-Null
-            $Chosensubclass.Items.Add('College of Creation') | Out-Null
-            $HitDiceTotal = "1d8"
-            $ClassLevel = "Bard 1"
-            $SpellCastingClass = "Bard"
-            $Cantrip01 = "Blaze Ward"
-            $Cantrip02 = "Dancing Lights"
-            $Cantrip03 = "Friends"
-            $Check18 = 'Yes'
-            $Check22 = 'Yes'
-            $Selectedpack = "A backpack, a bedroll, 2 costumes, 5 candles,5 days of rations, a waterskin and a disguise kit"
-            
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
-            {
-                $SelectedSubClass = $ChosenSubClass.SelectedItem
-                $SelectedSubClass
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
-            {
-                $ChosenSubClass = "None Selected"
-                $SelectedSubClass = $ChosenSubClass
-                $SelectedSubClass
-            }
-            $subclass = $form.ShowDialog()
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
-            {
-                return
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
-            {
-                Exit
-            }
-    }
-    if ($ChosenClass.SelectedItem -match 'Cleric')
-    {
-        $form.Controls.Add($Chosensubclass)
-            $Chosensubclass.Items.Add('Knowledge Domain') | Out-Null
-            $Chosensubclass.Items.Add('Life Domain') | Out-Null
-            $Chosensubclass.Items.Add('Light Domain') | Out-Null
-            $Chosensubclass.Items.Add('Nature Domain') | Out-Null
-            $Chosensubclass.Items.Add('Tempest Domain') | Out-Null
-            $Chosensubclass.Items.Add('Trickery Domain') | Out-Null
-            $Chosensubclass.Items.Add('War Domain') | Out-Null
-            $Chosensubclass.Items.Add('Death Domain') | Out-Null
-            $Chosensubclass.Items.Add('Arcana Domain') | Out-Null
-            $Chosensubclass.Items.Add('Solidarity Domain') | Out-Null
-            $Chosensubclass.Items.Add('Strength Domain') | Out-Null
-            $Chosensubclass.Items.Add('Ambition Domain') | Out-Null
-            $Chosensubclass.Items.Add('Zeal Domain') | Out-Null
-            $Chosensubclass.Items.Add('Forge Domain') | Out-Null
-            $Chosensubclass.Items.Add('Grave Domain') | Out-Null
-            $Chosensubclass.Items.Add('Order Domain') | Out-Null
-            $Chosensubclass.Items.Add('Peace Domain') | Out-Null
-            $Chosensubclass.Items.Add('Twilight Domain') | Out-Null
-            $HitDiceTotal = "1d8"
-            $ClassLevel = "Cleric 1"
-            $SpellCastingClass = "Cleric"
-            $Cantrip01 = "Guidance"
-            $Cantrip02 = "Light"
-            $Cantrip03 = "Mending"
-            $Check21 = 'Yes'
-            $Check22 = 'Yes'
-            $Selectedpack = "A backpack, a blanket, 10 candles, a tinderbox, an alms box, 2 blocks of incense, a censer, vestments, 2 days of rations and a waterskin"
-            
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
-            {
-                $SelectedSubClass = $ChosenSubClass.SelectedItem
-                $SelectedSubClass
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
-            {
-                $ChosenSubClass = "None Selected"
-                $SelectedSubClass = $ChosenSubClass
-                $SelectedSubClass
-            }
-            $subclass = $form.ShowDialog()
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
-            {
-                return
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
-            {
-                Exit
-            }
-    }
-    if ($ChosenClass.SelectedItem -match 'Druid')
-    {
-        $form.Controls.Add($Chosensubclass)
-            $Chosensubclass.Items.Add('Circle of Land') | Out-Null
-            $Chosensubclass.Items.Add('Circle of The Moon') | Out-Null
-            $Chosensubclass.Items.Add('Circle of Dreams') | Out-Null
-            $Chosensubclass.Items.Add('Circle of The Shepherd') | Out-Null
-            $Chosensubclass.Items.Add('Circle of Spores') | Out-Null
-            $Chosensubclass.Items.Add('Circle of Stars') | Out-Null
-            $Chosensubclass.Items.Add('Circle of Wildlife') | Out-Null
-            $HitDiceTotal = "1d8"
-            $ClassLevel = "Druid 1"
-            $SpellCastingClass = "Druid"
-            $Cantrip01 = "Druidcraft"
-            $Cantrip02 = "Guidance"
-            $Cantrip03 = "Mending"
-            $Check20 = 'Yes'
-            $Check21 = 'Yes'
-            $Selectedpack = "A backpack, a bedroll, a mess kit, a tinderbox, 10 torches, 10 days of rations and a waterskin, the backpack also has 50 feet of hempen rope strapped to the side of it"
-            
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
-            {
-                $SelectedSubClass = $ChosenSubClass.SelectedItem
-                $SelectedSubClass
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
-            {
-                $ChosenSubClass = "None Selected"
-                $SelectedSubClass = $ChosenSubClass
-                $SelectedSubClass
-            }
-            $subclass = $form.ShowDialog()
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
-            {
-                return
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
-            {
-                Exit
-            }
-    }
-    if ($ChosenClass.SelectedItem -match 'Fighter')
-    {
-        $form.Controls.Add($Chosensubclass)
-            $Chosensubclass.Items.Add('Champion') | Out-Null
-            $Chosensubclass.Items.Add('Battle Master') | Out-Null
-            $Chosensubclass.Items.Add('Eldritch Knight') | Out-Null
-            $Chosensubclass.Items.Add('Purple Dragon Knight') | Out-Null
-            $Chosensubclass.Items.Add('Arcane Archer') | Out-Null
-            $Chosensubclass.Items.Add('Cavalier') | Out-Null
-            $Chosensubclass.Items.Add('Samurai') | Out-Null
-            $Chosensubclass.Items.Add('Echo Knight') | Out-Null
-            $Chosensubclass.Items.Add('Psi Worrior') | Out-Null
-            $Chosensubclass.Items.Add('Rune Knight') | Out-Null
-            $HitDiceTotal = "1d10"
-            $ClassLevel = "Fighter 1"
-            $Check11 = 'Yes'
-            $Check19 = 'Yes'
-            $Selectedpack = "A backpack, a crowbar, a hammer, 10 pitons, 10 torches, a tinderbox, 10 days of rations and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
-            
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
-            {
-                $SelectedSubClass = $ChosenSubClass.SelectedItem
-                $SelectedSubClass
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
-            {
-                $ChosenSubClass = "None Selected"
-                $SelectedSubClass = $ChosenSubClass
-                $SelectedSubClass
-            }
-            $subclass = $form.ShowDialog()
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
-            {
-                return
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
-            {
-                Exit
-            }
-    }
-    if ($ChosenClass.SelectedItem -match 'Monk')
-    {
-        $form.Controls.Add($Chosensubclass)
-            $Chosensubclass.Items.Add('Way Of The Open Hand') | Out-Null
-            $Chosensubclass.Items.Add('Way of Shadow') | Out-Null
-            $Chosensubclass.Items.Add('Way of The Four Elements') | Out-Null
-            $Chosensubclass.Items.Add('Way of Long Death') | Out-Null
-            $Chosensubclass.Items.Add('Way of Sun Soul') | Out-Null
-            $Chosensubclass.Items.Add('Way of Drunken Master') | Out-Null
-            $Chosensubclass.Items.Add('Way of Kensei') | Out-Null
-            $Chosensubclass.Items.Add('Way of Mercy') | Out-Null
-            $Chosensubclass.Items.Add('Way of Astral Self') | Out-Null
-            $HitDiceTotal = "1d8"
-            $ClassLevel = "Monk 1"
-            $Check11 = 'Yes'
-            $Check18 = 'Yes'
-            $Selectedpack = "A backpack, a crowbar, a hammer, 10 pitons, 10 torches, a tinderbox, 10 days of rations and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
-            
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
-            {
-                $SelectedSubClass = $ChosenSubClass.SelectedItem
-                $SelectedSubClass
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
-            {
-                $ChosenSubClass = "None Selected"
-                $SelectedSubClass = $ChosenSubClass
-                $SelectedSubClass
-            }
-            $subclass = $form.ShowDialog()
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
-            {
-                return
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
-            {
-                Exit
-            }
-    }
-    if ($ChosenClass.SelectedItem -match 'Paladin')
-    {
-        $form.Controls.Add($Chosensubclass)
-            $Chosensubclass.Items.Add('Oath Of Devotion') | Out-Null
-            $Chosensubclass.Items.Add('Oath Of The Ancients') | Out-Null
-            $Chosensubclass.Items.Add('Oath Of Vengeance') | Out-Null
-            $Chosensubclass.Items.Add('Oathbreaker') | Out-Null
-            $Chosensubclass.Items.Add('Oath Of The Crown') | Out-Null
-            $Chosensubclass.Items.Add('Oath Of Conquest') | Out-Null
-            $Chosensubclass.Items.Add('Oath Of Redemption') | Out-Null
-            $Chosensubclass.Items.Add('Oath Of Glory') | Out-Null
-            $Chosensubclass.Items.Add('Oath Of The Watchers') | Out-Null
-            $HitDiceTotal = "1d10"
-            $ClassLevel = "Paladin 1"
-            $SpellCastingClass = "Paladin"
-            $Cantrip01 = "Bless"
-            $Cantrip02 = "Command"
-            $Cantrip03 = "Compelled Duel"
-            $Check21 = 'Yes'
-            $Check22 = 'Yes'
-            $Selectedpack = "A backpack, a blanket, 10 candles, a tinderbox, an alms box, 2 blocks of incense, a censer, vestments, 2 days of rations and a waterskin"
-            
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
-            {
-                $SelectedSubClass = $ChosenSubClass.SelectedItem
-                $SelectedSubClass
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
-            {
-                $ChosenSubClass = "None Selected"
-                $SelectedSubClass = $ChosenSubClass
-                $SelectedSubClass
-            }
-            $subclass = $form.ShowDialog()
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
-            {
-                return
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
-            {
-                Exit
-            }
-    }
-    if ($ChosenClass.SelectedItem -match 'Ranger')
-    {
-        $form.Controls.Add($Chosensubclass)
-            $Chosensubclass.Items.Add('Hunter') | Out-Null
-            $Chosensubclass.Items.Add('Beast Master') | Out-Null
-            $Chosensubclass.Items.Add('Gloom Stalker') | Out-Null
-            $Chosensubclass.Items.Add('Horizon Walker') | Out-Null
-            $Chosensubclass.Items.Add('Monster Slayer') | Out-Null
-            $Chosensubclass.Items.Add('Fey Wanderer') | Out-Null
-            $Chosensubclass.Items.Add('Swarmkeeper') | Out-Null
-            $HitDiceTotal = "1d10"
-            $ClassLevel = "Ranger 1"
-            $SpellCastingClass = "Ranger"
-            $Cantrip01 = "Alarm"
-            $Cantrip02 = "Animal Friendship"
-            $Cantrip03 = "Cure Wounds"
-            $Check11 = 'Yes'
-            $Check18 = 'Yes'
-            $Selectedpack = "A backpack, a crowbar, a hammer, 10 pitons, 10 torches, a tinderbox, 10 days of rations and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
-            
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
-            {
-                $SelectedSubClass = $ChosenSubClass.SelectedItem
-                $SelectedSubClass
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
-            {
-                $ChosenSubClass = "None Selected"
-                $SelectedSubClass = $ChosenSubClass
-                $SelectedSubClass
-            }
-            $subclass = $form.ShowDialog()
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
-            {
-                return
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
-            {
-                Exit
-            }
-    }
-    if ($ChosenClass.SelectedItem -match 'Rogue')
-    {
-        $form.Controls.Add($Chosensubclass)
-            $Chosensubclass.Items.Add('Theif') | Out-Null
-            $Chosensubclass.Items.Add('Assassin') | Out-Null
-            $Chosensubclass.Items.Add('Arcane Trickster') | Out-Null
-            $Chosensubclass.Items.Add('Mastermind') | Out-Null
-            $Chosensubclass.Items.Add('Swashbuckler') | Out-Null
-            $Chosensubclass.Items.Add('Inquisitive') | Out-Null
-            $Chosensubclass.Items.Add('Scout') | Out-Null
-            $Chosensubclass.Items.Add('Phantom') | Out-Null
-            $Chosensubclass.Items.Add('Soulknife') | Out-Null
-            $HitDiceTotal = "1d8"
-            $ClassLevel = "Rogue 1"
-            $Check18 = 'Yes'
-            $Check20 = 'Yes'
-            $Selectedpack = "A backpack, a bag of 1,000 ball bearings, 10 feet of string, a bell, 5 candles, a crowbar, a hammer, 10 pitons, a hooded lantern, 2 flasks of oil, 5 days rations, a tinderbox and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
-            
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
-            {
-                $SelectedSubClass = $ChosenSubClass.SelectedItem
-                $SelectedSubClass
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
-            {
-                $ChosenSubClass = "None Selected"
-                $SelectedSubClass = $ChosenSubClass
-                $SelectedSubClass
-            }
-            $subclass = $form.ShowDialog()
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
-            {
-                return
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
-            {
-                Exit
-            }
-    }
-    if ($ChosenClass.SelectedItem -match 'Sorcerer')
-    {
-        $form.Controls.Add($Chosensubclass)
-            $Chosensubclass.Items.Add('Draconic Bloodline') | Out-Null
-            $Chosensubclass.Items.Add('Wild Magic') | Out-Null
-            $Chosensubclass.Items.Add('Storm Sorcery') | Out-Null
-            $Chosensubclass.Items.Add('Pyromancer') | Out-Null
-            $Chosensubclass.Items.Add('Divine Soul') | Out-Null
-            $Chosensubclass.Items.Add('Shadow Magic') | Out-Null
-            $Chosensubclass.Items.Add('Aberrant Mind') | Out-Null
-            $Chosensubclass.Items.Add('Clockwork Soul') | Out-Null
-            $HitDiceTotal = "1d6"
-            $ClassLevel = "Sorcerer 1"
-            $SpellCastingClass = "Sorcerer"
-            $Cantrip01 = "Acid Splash"
-            $Cantrip02 = "Blade Ward"
-            $Cantrip03 = "Chill Torch"
-            $Check19 = 'Yes'
-            $Check22 = 'Yes'
-            $Selectedpack = "A backpack, a crowbar, a hammer, 10 pitons, 10 torches, a tinderbox, 10 days of rations and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
-            
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
-            {
-                $SelectedSubClass = $ChosenSubClass.SelectedItem
-                $SelectedSubClass
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
-            {
-                $ChosenSubClass = "None Selected"
-                $SelectedSubClass = $ChosenSubClass
-                $SelectedSubClass
-            }
-            $subclass = $form.ShowDialog()
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
-            {
-                return
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
-            {
-                Exit
-            }
-    }
-    if ($ChosenClass.SelectedItem -match 'Warlock')
-    {
-        $form.Controls.Add($Chosensubclass)
-            $Chosensubclass.Items.Add('The Archfey') | Out-Null
-            $Chosensubclass.Items.Add('The Fiend') | Out-Null
-            $Chosensubclass.Items.Add('The Great Old One') | Out-Null
-            $Chosensubclass.Items.Add('The Undying') | Out-Null
-            $Chosensubclass.Items.Add('The Celestial') | Out-Null
-            $Chosensubclass.Items.Add('The Hexblade') | Out-Null
-            $Chosensubclass.Items.Add('The Fathomless') | Out-Null
-            $Chosensubclass.Items.Add('The Genie') | Out-Null
-            $HitDiceTotal = "1d8"
-            $ClassLevel = "Warlock 1"
-            $SpellCastingClass = "Warlock"
-            $Cantrip01 = "Blade Ward"
-            $Cantrip02 = "Chill Torch"
-            $Cantrip03 = "Eldritch Blast"
-            $Check21 = 'Yes'
-            $Check22 = 'Yes'
-            $Selectedpack = "A backpack, a book of lore, a bottle of ink, an ink pen, 10 sheets of parchment, a little bag of sand and a small knife"
-            
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
-            {
-                $SelectedSubClass = $ChosenSubClass.SelectedItem
-                $SelectedSubClass
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
-            {
-                $ChosenSubClass = "None Selected"
-                $SelectedSubClass = $ChosenSubClass
-                $SelectedSubClass
-            }
-            $subclass = $form.ShowDialog()
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
-            {
-                return
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
-            {
-                Exit
-            }
-    }
-    if ($ChosenClass.SelectedItem -match 'Wizard')
-    {
-        $form.Controls.Add($Chosensubclass)
-            $Chosensubclass.Items.Add('School Of Abjuration') | Out-Null
-            $Chosensubclass.Items.Add('School Of Conjuration') | Out-Null
-            $Chosensubclass.Items.Add('School Of Divination') | Out-Null
-            $Chosensubclass.Items.Add('School Of Enchantment') | Out-Null
-            $Chosensubclass.Items.Add('School Of Evocation') | Out-Null
-            $Chosensubclass.Items.Add('School Of Illusion') | Out-Null
-            $Chosensubclass.Items.Add('School Of Necromancy') | Out-Null
-            $Chosensubclass.Items.Add('School Of Transmutation') | Out-Null
-            $Chosensubclass.Items.Add('Bladesinging') | Out-Null
-            $Chosensubclass.Items.Add('War Magic') | Out-Null
-            $Chosensubclass.Items.Add('Chronurgy Magic') | Out-Null
-            $Chosensubclass.Items.Add('Gravitygy Magic') | Out-Null
-            $Chosensubclass.Items.Add('Order Of Scribes') | Out-Null
-            $HitDiceTotal = "1d6"
-            $ClassLevel = "Wizard 1"
-            $SpellCastingClass = "Wizard"
-            $Cantrip01 = "Acid Splash"
-            $Cantrip02 = "Blade Ward"
-            $Cantrip03 = "Chill Touch"
-            $Check20 = 'Yes'
-            $Check21 = 'Yes'
-            $Selectedpack = "A backpack, a book of lore, a bottle of ink, an ink pen, 10 sheets of parchment, a little bag of sand and a small knife"
-            
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
-            {
-                $SelectedSubClass = $ChosenSubClass.SelectedItem
-                $SelectedSubClass
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
-            {
-                $ChosenSubClass = "N/A"
-                $SelectedSubClass = $ChosenSubClass
-                $SelectedSubClass
-                $ClassLevel = "N/A"
-            }
-            $subclass = $form.ShowDialog()
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
-            {
-                return
-            }
-            if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
-            {
-                Exit
-            } 
-    }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
+                {
+                    $SelectedSubClass = $ChosenSubClass.SelectedItem
+                    $SelectedSubClass
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
+                {
+                    $ChosenSubClass = "None Selected"
+                }
+                $subclass = $form.ShowDialog()
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
+                {
+                    return
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
+                {
+                    Exit
+                }
+        }
+        if ($ChosenClass.SelectedItem -match 'Bard')
+        {
+            $form.Controls.Add($Chosensubclass) 
+                $Chosensubclass.Items.Add('College of Lore') | Out-Null
+                $Chosensubclass.Items.Add('College of Valor') | Out-Null
+                $Chosensubclass.Items.Add('College of Glamour') | Out-Null
+                $Chosensubclass.Items.Add('College of Swords') | Out-Null
+                $Chosensubclass.Items.Add('College of Whispers') | Out-Null
+                $Chosensubclass.Items.Add('College of Eloquence') | Out-Null
+                $Chosensubclass.Items.Add('College of Creation') | Out-Null
+                $HitDiceTotal = "1d8"
+                $ClassLevel = "Bard 1"
+                $SpellCastingClass = "Bard"
+                $Cantrip01 = "Blaze Ward"
+                $Cantrip02 = "Dancing Lights"
+                $Cantrip03 = "Friends"
+                $Check18 = 'Yes'
+                $Check22 = 'Yes'
+                $Selectedpack = "A backpack, a bedroll, 2 costumes, 5 candles,5 days of rations, a waterskin and a disguise kit"
+                
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
+                {
+                    $SelectedSubClass = $ChosenSubClass.SelectedItem
+                    $SelectedSubClass
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
+                {
+                    $ChosenSubClass = "None Selected"
+                    $SelectedSubClass = $ChosenSubClass
+                    $SelectedSubClass
+                }
+                $subclass = $form.ShowDialog()
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
+                {
+                    return
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
+                {
+                    Exit
+                }
+        }
+        if ($ChosenClass.SelectedItem -match 'Cleric')
+        {
+            $form.Controls.Add($Chosensubclass)
+                $Chosensubclass.Items.Add('Knowledge Domain') | Out-Null
+                $Chosensubclass.Items.Add('Life Domain') | Out-Null
+                $Chosensubclass.Items.Add('Light Domain') | Out-Null
+                $Chosensubclass.Items.Add('Nature Domain') | Out-Null
+                $Chosensubclass.Items.Add('Tempest Domain') | Out-Null
+                $Chosensubclass.Items.Add('Trickery Domain') | Out-Null
+                $Chosensubclass.Items.Add('War Domain') | Out-Null
+                $Chosensubclass.Items.Add('Death Domain') | Out-Null
+                $Chosensubclass.Items.Add('Arcana Domain') | Out-Null
+                $Chosensubclass.Items.Add('Solidarity Domain') | Out-Null
+                $Chosensubclass.Items.Add('Strength Domain') | Out-Null
+                $Chosensubclass.Items.Add('Ambition Domain') | Out-Null
+                $Chosensubclass.Items.Add('Zeal Domain') | Out-Null
+                $Chosensubclass.Items.Add('Forge Domain') | Out-Null
+                $Chosensubclass.Items.Add('Grave Domain') | Out-Null
+                $Chosensubclass.Items.Add('Order Domain') | Out-Null
+                $Chosensubclass.Items.Add('Peace Domain') | Out-Null
+                $Chosensubclass.Items.Add('Twilight Domain') | Out-Null
+                $HitDiceTotal = "1d8"
+                $ClassLevel = "Cleric 1"
+                $SpellCastingClass = "Cleric"
+                $Cantrip01 = "Guidance"
+                $Cantrip02 = "Light"
+                $Cantrip03 = "Mending"
+                $Check21 = 'Yes'
+                $Check22 = 'Yes'
+                $Selectedpack = "A backpack, a blanket, 10 candles, a tinderbox, an alms box, 2 blocks of incense, a censer, vestments, 2 days of rations and a waterskin"
+                
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
+                {
+                    $SelectedSubClass = $ChosenSubClass.SelectedItem
+                    $SelectedSubClass
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
+                {
+                    $ChosenSubClass = "None Selected"
+                    $SelectedSubClass = $ChosenSubClass
+                    $SelectedSubClass
+                }
+                $subclass = $form.ShowDialog()
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
+                {
+                    return
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
+                {
+                    Exit
+                }
+        }
+        if ($ChosenClass.SelectedItem -match 'Druid')
+        {
+            $form.Controls.Add($Chosensubclass)
+                $Chosensubclass.Items.Add('Circle of Land') | Out-Null
+                $Chosensubclass.Items.Add('Circle of The Moon') | Out-Null
+                $Chosensubclass.Items.Add('Circle of Dreams') | Out-Null
+                $Chosensubclass.Items.Add('Circle of The Shepherd') | Out-Null
+                $Chosensubclass.Items.Add('Circle of Spores') | Out-Null
+                $Chosensubclass.Items.Add('Circle of Stars') | Out-Null
+                $Chosensubclass.Items.Add('Circle of Wildlife') | Out-Null
+                $HitDiceTotal = "1d8"
+                $ClassLevel = "Druid 1"
+                $SpellCastingClass = "Druid"
+                $Cantrip01 = "Druidcraft"
+                $Cantrip02 = "Guidance"
+                $Cantrip03 = "Mending"
+                $Check20 = 'Yes'
+                $Check21 = 'Yes'
+                $Selectedpack = "A backpack, a bedroll, a mess kit, a tinderbox, 10 torches, 10 days of rations and a waterskin, the backpack also has 50 feet of hempen rope strapped to the side of it"
+                
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
+                {
+                    $SelectedSubClass = $ChosenSubClass.SelectedItem
+                    $SelectedSubClass
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
+                {
+                    $ChosenSubClass = "None Selected"
+                    $SelectedSubClass = $ChosenSubClass
+                    $SelectedSubClass
+                }
+                $subclass = $form.ShowDialog()
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
+                {
+                    return
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
+                {
+                    Exit
+                }
+        }
+        if ($ChosenClass.SelectedItem -match 'Fighter')
+        {
+            $form.Controls.Add($Chosensubclass)
+                $Chosensubclass.Items.Add('Champion') | Out-Null
+                $Chosensubclass.Items.Add('Battle Master') | Out-Null
+                $Chosensubclass.Items.Add('Eldritch Knight') | Out-Null
+                $Chosensubclass.Items.Add('Purple Dragon Knight') | Out-Null
+                $Chosensubclass.Items.Add('Arcane Archer') | Out-Null
+                $Chosensubclass.Items.Add('Cavalier') | Out-Null
+                $Chosensubclass.Items.Add('Samurai') | Out-Null
+                $Chosensubclass.Items.Add('Echo Knight') | Out-Null
+                $Chosensubclass.Items.Add('Psi Worrior') | Out-Null
+                $Chosensubclass.Items.Add('Rune Knight') | Out-Null
+                $HitDiceTotal = "1d10"
+                $ClassLevel = "Fighter 1"
+                $Check11 = 'Yes'
+                $Check19 = 'Yes'
+                $Selectedpack = "A backpack, a crowbar, a hammer, 10 pitons, 10 torches, a tinderbox, 10 days of rations and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
+                
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
+                {
+                    $SelectedSubClass = $ChosenSubClass.SelectedItem
+                    $SelectedSubClass
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
+                {
+                    $ChosenSubClass = "None Selected"
+                    $SelectedSubClass = $ChosenSubClass
+                    $SelectedSubClass
+                }
+                $subclass = $form.ShowDialog()
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
+                {
+                    return
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
+                {
+                    Exit
+                }
+        }
+        if ($ChosenClass.SelectedItem -match 'Monk')
+        {
+            $form.Controls.Add($Chosensubclass)
+                $Chosensubclass.Items.Add('Way Of The Open Hand') | Out-Null
+                $Chosensubclass.Items.Add('Way of Shadow') | Out-Null
+                $Chosensubclass.Items.Add('Way of The Four Elements') | Out-Null
+                $Chosensubclass.Items.Add('Way of Long Death') | Out-Null
+                $Chosensubclass.Items.Add('Way of Sun Soul') | Out-Null
+                $Chosensubclass.Items.Add('Way of Drunken Master') | Out-Null
+                $Chosensubclass.Items.Add('Way of Kensei') | Out-Null
+                $Chosensubclass.Items.Add('Way of Mercy') | Out-Null
+                $Chosensubclass.Items.Add('Way of Astral Self') | Out-Null
+                $HitDiceTotal = "1d8"
+                $ClassLevel = "Monk 1"
+                $Check11 = 'Yes'
+                $Check18 = 'Yes'
+                $Selectedpack = "A backpack, a crowbar, a hammer, 10 pitons, 10 torches, a tinderbox, 10 days of rations and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
+                
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
+                {
+                    $SelectedSubClass = $ChosenSubClass.SelectedItem
+                    $SelectedSubClass
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
+                {
+                    $ChosenSubClass = "None Selected"
+                    $SelectedSubClass = $ChosenSubClass
+                    $SelectedSubClass
+                }
+                $subclass = $form.ShowDialog()
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
+                {
+                    return
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
+                {
+                    Exit
+                }
+        }
+        if ($ChosenClass.SelectedItem -match 'Paladin')
+        {
+            $form.Controls.Add($Chosensubclass)
+                $Chosensubclass.Items.Add('Oath Of Devotion') | Out-Null
+                $Chosensubclass.Items.Add('Oath Of The Ancients') | Out-Null
+                $Chosensubclass.Items.Add('Oath Of Vengeance') | Out-Null
+                $Chosensubclass.Items.Add('Oathbreaker') | Out-Null
+                $Chosensubclass.Items.Add('Oath Of The Crown') | Out-Null
+                $Chosensubclass.Items.Add('Oath Of Conquest') | Out-Null
+                $Chosensubclass.Items.Add('Oath Of Redemption') | Out-Null
+                $Chosensubclass.Items.Add('Oath Of Glory') | Out-Null
+                $Chosensubclass.Items.Add('Oath Of The Watchers') | Out-Null
+                $HitDiceTotal = "1d10"
+                $ClassLevel = "Paladin 1"
+                $SpellCastingClass = "Paladin"
+                $Cantrip01 = "Bless"
+                $Cantrip02 = "Command"
+                $Cantrip03 = "Compelled Duel"
+                $Check21 = 'Yes'
+                $Check22 = 'Yes'
+                $Selectedpack = "A backpack, a blanket, 10 candles, a tinderbox, an alms box, 2 blocks of incense, a censer, vestments, 2 days of rations and a waterskin"
+                
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
+                {
+                    $SelectedSubClass = $ChosenSubClass.SelectedItem
+                    $SelectedSubClass
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
+                {
+                    $ChosenSubClass = "None Selected"
+                    $SelectedSubClass = $ChosenSubClass
+                    $SelectedSubClass
+                }
+                $subclass = $form.ShowDialog()
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
+                {
+                    return
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
+                {
+                    Exit
+                }
+        }
+        if ($ChosenClass.SelectedItem -match 'Ranger')
+        {
+            $form.Controls.Add($Chosensubclass)
+                $Chosensubclass.Items.Add('Hunter') | Out-Null
+                $Chosensubclass.Items.Add('Beast Master') | Out-Null
+                $Chosensubclass.Items.Add('Gloom Stalker') | Out-Null
+                $Chosensubclass.Items.Add('Horizon Walker') | Out-Null
+                $Chosensubclass.Items.Add('Monster Slayer') | Out-Null
+                $Chosensubclass.Items.Add('Fey Wanderer') | Out-Null
+                $Chosensubclass.Items.Add('Swarmkeeper') | Out-Null
+                $HitDiceTotal = "1d10"
+                $ClassLevel = "Ranger 1"
+                $SpellCastingClass = "Ranger"
+                $Cantrip01 = "Alarm"
+                $Cantrip02 = "Animal Friendship"
+                $Cantrip03 = "Cure Wounds"
+                $Check11 = 'Yes'
+                $Check18 = 'Yes'
+                $Selectedpack = "A backpack, a crowbar, a hammer, 10 pitons, 10 torches, a tinderbox, 10 days of rations and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
+                
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
+                {
+                    $SelectedSubClass = $ChosenSubClass.SelectedItem
+                    $SelectedSubClass
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
+                {
+                    $ChosenSubClass = "None Selected"
+                    $SelectedSubClass = $ChosenSubClass
+                    $SelectedSubClass
+                }
+                $subclass = $form.ShowDialog()
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
+                {
+                    return
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
+                {
+                    Exit
+                }
+        }
+        if ($ChosenClass.SelectedItem -match 'Rogue')
+        {
+            $form.Controls.Add($Chosensubclass)
+                $Chosensubclass.Items.Add('Theif') | Out-Null
+                $Chosensubclass.Items.Add('Assassin') | Out-Null
+                $Chosensubclass.Items.Add('Arcane Trickster') | Out-Null
+                $Chosensubclass.Items.Add('Mastermind') | Out-Null
+                $Chosensubclass.Items.Add('Swashbuckler') | Out-Null
+                $Chosensubclass.Items.Add('Inquisitive') | Out-Null
+                $Chosensubclass.Items.Add('Scout') | Out-Null
+                $Chosensubclass.Items.Add('Phantom') | Out-Null
+                $Chosensubclass.Items.Add('Soulknife') | Out-Null
+                $HitDiceTotal = "1d8"
+                $ClassLevel = "Rogue 1"
+                $Check18 = 'Yes'
+                $Check20 = 'Yes'
+                $Selectedpack = "A backpack, a bag of 1,000 ball bearings, 10 feet of string, a bell, 5 candles, a crowbar, a hammer, 10 pitons, a hooded lantern, 2 flasks of oil, 5 days rations, a tinderbox and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
+                
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
+                {
+                    $SelectedSubClass = $ChosenSubClass.SelectedItem
+                    $SelectedSubClass
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
+                {
+                    $ChosenSubClass = "None Selected"
+                    $SelectedSubClass = $ChosenSubClass
+                    $SelectedSubClass
+                }
+                $subclass = $form.ShowDialog()
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
+                {
+                    return
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
+                {
+                    Exit
+                }
+        }
+        if ($ChosenClass.SelectedItem -match 'Sorcerer')
+        {
+            $form.Controls.Add($Chosensubclass)
+                $Chosensubclass.Items.Add('Draconic Bloodline') | Out-Null
+                $Chosensubclass.Items.Add('Wild Magic') | Out-Null
+                $Chosensubclass.Items.Add('Storm Sorcery') | Out-Null
+                $Chosensubclass.Items.Add('Pyromancer') | Out-Null
+                $Chosensubclass.Items.Add('Divine Soul') | Out-Null
+                $Chosensubclass.Items.Add('Shadow Magic') | Out-Null
+                $Chosensubclass.Items.Add('Aberrant Mind') | Out-Null
+                $Chosensubclass.Items.Add('Clockwork Soul') | Out-Null
+                $HitDiceTotal = "1d6"
+                $ClassLevel = "Sorcerer 1"
+                $SpellCastingClass = "Sorcerer"
+                $Cantrip01 = "Acid Splash"
+                $Cantrip02 = "Blade Ward"
+                $Cantrip03 = "Chill Torch"
+                $Check19 = 'Yes'
+                $Check22 = 'Yes'
+                $Selectedpack = "A backpack, a crowbar, a hammer, 10 pitons, 10 torches, a tinderbox, 10 days of rations and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it"
+                
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
+                {
+                    $SelectedSubClass = $ChosenSubClass.SelectedItem
+                    $SelectedSubClass
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
+                {
+                    $ChosenSubClass = "None Selected"
+                    $SelectedSubClass = $ChosenSubClass
+                    $SelectedSubClass
+                }
+                $subclass = $form.ShowDialog()
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
+                {
+                    return
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
+                {
+                    Exit
+                }
+        }
+        if ($ChosenClass.SelectedItem -match 'Warlock')
+        {
+            $form.Controls.Add($Chosensubclass)
+                $Chosensubclass.Items.Add('The Archfey') | Out-Null
+                $Chosensubclass.Items.Add('The Fiend') | Out-Null
+                $Chosensubclass.Items.Add('The Great Old One') | Out-Null
+                $Chosensubclass.Items.Add('The Undying') | Out-Null
+                $Chosensubclass.Items.Add('The Celestial') | Out-Null
+                $Chosensubclass.Items.Add('The Hexblade') | Out-Null
+                $Chosensubclass.Items.Add('The Fathomless') | Out-Null
+                $Chosensubclass.Items.Add('The Genie') | Out-Null
+                $HitDiceTotal = "1d8"
+                $ClassLevel = "Warlock 1"
+                $SpellCastingClass = "Warlock"
+                $Cantrip01 = "Blade Ward"
+                $Cantrip02 = "Chill Torch"
+                $Cantrip03 = "Eldritch Blast"
+                $Check21 = 'Yes'
+                $Check22 = 'Yes'
+                $Selectedpack = "A backpack, a book of lore, a bottle of ink, an ink pen, 10 sheets of parchment, a little bag of sand and a small knife"
+                
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
+                {
+                    $SelectedSubClass = $ChosenSubClass.SelectedItem
+                    $SelectedSubClass
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
+                {
+                    $ChosenSubClass = "None Selected"
+                    $SelectedSubClass = $ChosenSubClass
+                    $SelectedSubClass
+                }
+                $subclass = $form.ShowDialog()
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
+                {
+                    return
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
+                {
+                    Exit
+                }
+        }
+        if ($ChosenClass.SelectedItem -match 'Wizard')
+        {
+            $form.Controls.Add($Chosensubclass)
+                $Chosensubclass.Items.Add('School Of Abjuration') | Out-Null
+                $Chosensubclass.Items.Add('School Of Conjuration') | Out-Null
+                $Chosensubclass.Items.Add('School Of Divination') | Out-Null
+                $Chosensubclass.Items.Add('School Of Enchantment') | Out-Null
+                $Chosensubclass.Items.Add('School Of Evocation') | Out-Null
+                $Chosensubclass.Items.Add('School Of Illusion') | Out-Null
+                $Chosensubclass.Items.Add('School Of Necromancy') | Out-Null
+                $Chosensubclass.Items.Add('School Of Transmutation') | Out-Null
+                $Chosensubclass.Items.Add('Bladesinging') | Out-Null
+                $Chosensubclass.Items.Add('War Magic') | Out-Null
+                $Chosensubclass.Items.Add('Chronurgy Magic') | Out-Null
+                $Chosensubclass.Items.Add('Gravitygy Magic') | Out-Null
+                $Chosensubclass.Items.Add('Order Of Scribes') | Out-Null
+                $HitDiceTotal = "1d6"
+                $ClassLevel = "Wizard 1"
+                $SpellCastingClass = "Wizard"
+                $Cantrip01 = "Acid Splash"
+                $Cantrip02 = "Blade Ward"
+                $Cantrip03 = "Chill Touch"
+                $Check20 = 'Yes'
+                $Check21 = 'Yes'
+                $Selectedpack = "A backpack, a book of lore, a bottle of ink, an ink pen, 10 sheets of parchment, a little bag of sand and a small knife"
+                
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::OK)
+                {
+                    $SelectedSubClass = $ChosenSubClass.SelectedItem
+                    $SelectedSubClass
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Ignore)
+                {
+                    $ChosenSubClass = "N/A"
+                    $SelectedSubClass = $ChosenSubClass
+                    $SelectedSubClass
+                    $ClassLevel = "N/A"
+                }
+                $subclass = $form.ShowDialog()
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Retry)
+                {
+                    return
+                }
+                if ($subclass -eq [System.Windows.Forms.DialogResult]::Cancel)
+                {
+                    Exit
+                } 
+        }
         #To add a list of subclasses to a chosen class follow this:
         #if ($ChosenClass.SelectedItem -match 'Custom')
         #{
@@ -1855,9 +1860,7 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ST_CHA = "0"
         #Saving Throws Tickbox's
 
-
         ##Skills Values
-
 
         ##Skills Tickbox's
 
@@ -1870,10 +1873,10 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
 
         The blood of a particular type of dragon runs very strong through some dragonborn clans. These dragonborn often boast scales that more closely match those of their dragon ancestor bright red, green, blue, or white, lustrous black, or gleaming metallic gold, silver, brass, copper, or bronze."
         $RaceDescription
-
         $SpokenLanguages = "You can speak, read, and write Common and Draconic. Draconic is thought to be one of the oldest languages and is often used in the study of magic. The language sounds harsh to most other creatures and includes numerous hard consonants and sibilants."
         $RacialSpecialAbility = "Breath Weapon, You can use your action to exhale destructive energy. Your draconic ancestry determines the size, shape, and damage type of the exhalation. When you use your breath weapon, each creature in the area of the exhalation must make a saving throw, the type of which is determined by your draconic ancestry. The DC for this saving throw equals 8 and your Constitution modifier and your proficiency bonus. A creature takes 2d6 damage on a failed save, and half as much damage on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th level, and 5d6 at 16th level. After you use your breath weapon, you cant use it again until you complete a short or long rest."
-        $CharacterImage = Get-Item -path '.\Assets\Race_Pictures\Dragonborn.png'
+        $CharacterImage = '.\Assets\Race_Pictures\Dragonborn.png'
+        #$CharacterImage = Get-Item -path '.\Assets\Race_Pictures\Dragonborn.png'
     }
     if ($ChosenRace.SelectedItem -match 'Dwarf')
     {
@@ -1964,26 +1967,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenRaceGnome = $ChosenRaceGnome.SelectedItem 
         $ChosenRaceGnome
         $ExportRace = "Gnome"
-        $HP = "0"
+        $HP = "16"
         $SpeedTotal = "25"
         $PlayerSize = "40 Pounds, Small"
         $Playerheight = "4 Feet"
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "15"
+        $DEX = "14"
+        $CON = "14"
+        $INT = "12"
+        $WIS = "10"
+        $CHA = "9"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
-        $CONmod = "+0"
-        $INTmod = "+0"
+        $STRmod = "+2"
+        $DEXmod = "+2"
+        $CONmod = "+2"
+        $INTmod = "++1"
         $WISmod = "+0"
-        $CHAmod = "+0"
+        $CHAmod = "-1"
 
         #Saving Throws
         $ST_STR = "0"
@@ -1998,7 +2001,10 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "You can speak, read, and write Common and Gnomish. The Gnomish language, which uses the Dwarvish script, is renowned for its technical treatises and its catalogs of knowledge about the natural world."
         $RaceDescription = "A constant hum of busy activity pervades the warrens and neighborhoods where gnomes form their close knit communities. Louder sounds punctuate the hum: a crunch of grinding gears here, a minor explosion there, a yelp of surprise or triumph, and especially bursts of laughter. Gnomes take delight in life, enjoying every moment of invention, exploration, investigation, creation, and play."
-        $RacialSpecialAbility = "Unknown"
+        $RacialSpecialAbility = "Stone Camouflage. The gnome has advantage on Dexterity (stealth) checks made to hide in rocky terrain. 
+        Gnome Cunning. The gnome has advantage on Intelligence, Wisdom and Charisma saving throws against magic. 
+        Innate Spellcasting. The gnome's innate spellcasting ability is Intelligence (spell save DC 11). It can innately cast the following spells, requiring no material components: 
+        At will: nondetection (self only) 1/day each: blindness/deafness, blur, disguise self"
     }
     if ($ChosenRace.SelectedItem -match 'Half-Elf')
     {
@@ -2229,10 +2235,10 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "10"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
-        $CONmod = "+0"
-        $INTmod = "+0"
+        $STRmod = "+3"
+        $DEXmod = "+1"
+        $CONmod = "+3"
+        $INTmod = "-2"
         $WISmod = "+0"
         $CHAmod = "+0"
 
@@ -2313,12 +2319,12 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "14"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
+        $STRmod = "+1"
+        $DEXmod = "+3"
         $CONmod = "+0"
-        $INTmod = "+0"
+        $INTmod = "+1"
         $WISmod = "+0"
-        $CHAmod = "+0"
+        $CHAmod = "+2"
 
         #Saving Throws
         $ST_STR = "0"
@@ -2601,7 +2607,6 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenRaceBugbear = $ChosenRaceBugbear.SelectedItem 
         $ChosenRaceBugbear
         $ExportRace = "Bugbear"
-        
         $HP = "27"
         $SpeedTotal = "30"
         $PlayerSize = "0 Pounds"
@@ -2616,12 +2621,12 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "9"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
-        $CONmod = "+0"
-        $INTmod = "+0"
+        $STRmod = "+2"
+        $DEXmod = "+2"
+        $CONmod = "+1"
+        $INTmod = "-1"
         $WISmod = "+0"
-        $CHAmod = "+0"
+        $CHAmod = "-1"
 
         #Saving Throws
         $ST_STR = "0"
@@ -2702,12 +2707,12 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "8"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
+        $STRmod = "-1"
+        $DEXmod = "+2"
         $CONmod = "+0"
         $INTmod = "+0"
-        $WISmod = "+0"
-        $CHAmod = "+0"
+        $WISmod = "-1"
+        $CHAmod = "-1"
 
         #Saving Throws
         $ST_STR = "0"
@@ -2744,12 +2749,12 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "9"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
-        $CONmod = "+0"
+        $STRmod = "+1"
+        $DEXmod = "+1"
+        $CONmod = "+1"
         $INTmod = "+0"
         $WISmod = "+0"
-        $CHAmod = "+0"
+        $CHAmod = "-1"
 
         #Saving Throws
         $ST_STR = "0"
@@ -2787,7 +2792,7 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
 
         #Attribute Modifiers
         $STRmod = "+0"
-        $DEXmod = "+0"
+        $DEXmod = "+3"
         $CONmod = "+0"
         $INTmod = "+0"
         $WISmod = "+0"
@@ -2830,12 +2835,12 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "8"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
-        $CONmod = "+0"
-        $INTmod = "+0"
-        $WISmod = "+0"
-        $CHAmod = "+0"
+        $STRmod = "-2"
+        $DEXmod = "+2"
+        $CONmod = "-1"
+        $INTmod = "-1"
+        $WISmod = "-2"
+        $CHAmod = "-1"
 
         #Saving Throws
         $ST_STR = "0"
@@ -2849,9 +2854,10 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         #$Senses = "Darkvision 60ft, Passive perception 8"
         #$Damage_Immunities = "Unknown"
         #$Condition_Immunities = "Unknown"
-        $SpokenLanguages = "Unknown"
-        $RaceDescription = "Unknown"
-        $RacialSpecialAbility = "Sunlight Sensitivity"
+        $SpokenLanguages = "Common, Draconic"
+        $RaceDescription = "Kobolds are craven reptilian humanoids that worship evil dragons as demigods and serve them as minions and toadies. Kobolds inhabit dragons' lairs when they can but more commonly infest dungeons, gathering trasures and trinkets to add to their own tiny hoards."
+        $RacialSpecialAbility = "Sunlight Sensitivity. While in sunlight, the kobold has a disadvantage on attack rolls, as on Wisdom (Perception) checks that rely on sight.
+        Pack Tactics. The kobold has advantage on an attack roll against a creature if at least one of the kobold's allies is within 5 feet of the creature and that the ally isn't incapacitated."
     }
     if ($ChosenRace.SelectedItem -match 'Lizardfolk')
     {
@@ -2872,12 +2878,12 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $CHA = "7"
 
         #Attribute Modifiers
-        $STRmod = "+0"
+        $STRmod = "+2"
         $DEXmod = "+0"
-        $CONmod = "+0"
-        $INTmod = "+0"
-        $WISmod = "+0"
-        $CHAmod = "+0"
+        $CONmod = "+1"
+        $INTmod = "-2"
+        $WISmod = "+1"
+        $CHAmod = "-2"
 
         #Saving Throws
         $ST_STR = "0"
@@ -2893,7 +2899,7 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         #$Condition_Immunities = "Unknown"
         $SpokenLanguages = "Draconic"
         $RaceDescription = "Lizardfolk are primitive reptilian humanoids that lurk in the swamps and jungles of the world. Their hut villages thrive in forbidding grottos, half-sunken ruins and watery caverns."
-        $RacialSpecialAbility = "Hold Breath"
+        $RacialSpecialAbility = "Hold Breath. The lizardfolk can hold its breath for 15 minutes."
     }
     if ($ChosenRace.SelectedItem -match 'Tabaxi')
     {
@@ -2905,6 +2911,7 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $PlayerSize = "0 Pounds"
         $Playerheight = "0 Feet"
 
+        
         #Attributes
         $STR = "0"
         $DEX = "0"
@@ -2984,26 +2991,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenRaceYuan_Ti_Pureblood = $ChosenRaceYuan_Ti_Pureblood.SelectedItem 
         $ChosenRaceYuan_Ti_Pureblood
         $ExportRace = "Yuan-ti Pureblood"
-        $HP = "0"
-        $SpeedTotal = "0"
+        $HP = "40"
+        $SpeedTotal = "30"
         $PlayerSize = "0 Pounds"
         $Playerheight = "0 Feet"
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "11"
+        $DEX = "12"
+        $CON = "11"
+        $INT = "13"
+        $WIS = "12"
+        $CHA = "14"
 
         #Attribute Modifiers
         $STRmod = "+0"
-        $DEXmod = "+0"
+        $DEXmod = "+1"
         $CONmod = "+0"
-        $INTmod = "+0"
-        $WISmod = "+0"
-        $CHAmod = "+0"
+        $INTmod = "+1"
+        $WISmod = "+1"
+        $CHAmod = "+2"
 
         #Saving Throws
         $ST_STR = "0"
@@ -3017,9 +3024,12 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         #$Senses = "Unknown"
         #$Damage_Immunities = "Unknown"
         #$Condition_Immunities = "Unknown"
-        $SpokenLanguages = "Unknown"
-        $RaceDescription = "Unknown"
-        $RacialSpecialAbility = "Unknown"
+        $SpokenLanguages = "Abyssal, Common, Draconic"
+        $RaceDescription = "Purebloods from the lowest case of yuan-ti society. They closely resemble humans, yet a pureblood can't pass for human under close scrutiny because there's always some hint of its true nature, such as caly patches of skin, serpentine eyes, pointed teeth, or a forked tongue. Wearing cloaks and cowls, they masquerade as humans and infiltrate civilised lands to gather information, kidnap prisoners for interrogation and sacrifice, and trade with anyone who has something that can further their myriad plots."
+        $RacialSpecialAbility = "Innate Spellcasting. The yuan-ti's spellcasting ability is Charisma (spell save DC 12). The yuan-ti can innately cast the following spells, requiring no material components:
+        At will: animal friendship (snakes only) 
+        3/day each: poison spray, suggestion
+        Magic Resistance. The yuan-ti has advantage on saving throws against spells and other magical effects."
     }
     if ($ChosenRace.SelectedItem -match 'Feral Tiefling')
     {
@@ -4627,7 +4637,7 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     $okButton = New-Object System.Windows.Forms.Button
     $okButton.Location = New-Object System.Drawing.Point(75,530)
     $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'OK'
+    $okButton.Text = 'Next'
     $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
     $form.AcceptButton = $okButton
     $form.Controls.Add($okButton)
@@ -4931,52 +4941,52 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenArmour.Items.Add('Heavy Armour - Splint') | Out-Null
         $ChosenArmour.Items.Add('Heavy Armour - Plate') | Out-Null
     #Shield as an option with tickbox, completely optional to a player
-    $checkboxshield.Add_CheckStateChanged({
-        $checkboxshield.Enabled = $checkboxshield.Checked 
-    })
-    $Form.Add_Shown({$Form.Activate()})
-     
-    $form.Controls.Add($selectweapon1panel)
-    $form.Controls.Add($selectweapon2panel)
-    $form.Controls.Add($selectweapon3panel)
-    $form.Controls.Add($selectadventuinggearpanel)
-    $form.Controls.Add($ChosenArmour)
-    $Form.controls.AddRange(@($checkboxshield))
-    $form.Topmost = $true    
+        $checkboxshield.Add_CheckStateChanged({
+            $checkboxshield.Enabled = $checkboxshield.Checked 
+        })
+        $Form.Add_Shown({$Form.Activate()})
+        
+        $form.Controls.Add($selectweapon1panel)
+        $form.Controls.Add($selectweapon2panel)
+        $form.Controls.Add($selectweapon3panel)
+        $form.Controls.Add($selectadventuinggearpanel)
+        $form.Controls.Add($ChosenArmour)
+        $Form.controls.AddRange(@($checkboxshield))
+        $form.Topmost = $true    
 
-    if ($selectedweapons -eq [System.Windows.Forms.DialogResult]::OK)
-    {
-        $selectedweapon1 = $selectweapon1panel.SelectedItem
-        $selectedweapon1
+        if ($selectedweapons -eq [System.Windows.Forms.DialogResult]::OK)
+        {
+            $selectedweapon1 = $selectweapon1panel.SelectedItem
+            $selectedweapon1
 
-        $selectedweapon2 = $selectweapon2panel.SelectedItem
-        $selectedweapon2
+            $selectedweapon2 = $selectweapon2panel.SelectedItem
+            $selectedweapon2
 
-        $selectedweapon3 = $selectweapon3panel.SelectedItem
-        $selectedweapon3
+            $selectedweapon3 = $selectweapon3panel.SelectedItem
+            $selectedweapon3
 
-        $selectedadventuregear = $selectadventuinggearpanel.SelectedItem
-        $selectedadventuregear
+            $selectedadventuregear = $selectadventuinggearpanel.SelectedItem
+            $selectedadventuregear
 
-        $SelectedArmour = $ChosenArmour.SelectedItem
-        $SelectedArmour
-    }
-    if ($selectedweapons -eq [System.Windows.Forms.DialogResult]::Ignore)
-    {
-        $selectedweapon1 = "Non-Selected"
-        $selectedweapon2 = "Non-Selected"
-        $selectedweapon3 = "Non-Selected"
-        $ChosenArmour = "None Selected"
-    }
-    $selectedweapons = $form.ShowDialog()
-    if ($selectedweapons -eq [System.Windows.Forms.DialogResult]::Retry)
-    {
-        return
-    }
-    if ($selectedweapons -eq [System.Windows.Forms.DialogResult]::Cancel)
-    {
-        Exit
-    }
+            $SelectedArmour = $ChosenArmour.SelectedItem
+            $SelectedArmour
+        }
+        if ($selectedweapons -eq [System.Windows.Forms.DialogResult]::Ignore)
+        {
+            $selectedweapon1 = "Non-Selected"
+            $selectedweapon2 = "Non-Selected"
+            $selectedweapon3 = "Non-Selected"
+            $ChosenArmour = "None Selected"
+        }
+        $selectedweapons = $form.ShowDialog()
+        if ($selectedweapons -eq [System.Windows.Forms.DialogResult]::Retry)
+        {
+            return
+        }
+        if ($selectedweapons -eq [System.Windows.Forms.DialogResult]::Cancel)
+        {
+            Exit
+        }
 #End of Weapon choice
 
 #If added custom to the weapon list, make sure to add the correct listed item to the weapon selection below
@@ -5890,7 +5900,7 @@ $TotalEquiptment = $selectweapon1panel.SelectedItem + $Comma + $selectweapon2pan
     $okButton = New-Object System.Windows.Forms.Button
     $okButton.Location = New-Object System.Drawing.Point(420,535)
     $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'OK'
+    $okButton.Text = 'Next'
     $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
     $form.AcceptButton = $okButton
     $form.Controls.Add($okButton)
@@ -5990,152 +6000,153 @@ $TotalEquiptment = $selectweapon1panel.SelectedItem + $Comma + $selectweapon2pan
     $form.Controls.Add($Flaws)
 
     $form.Topmost = $true
-    if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::OK)
-    {
-        $characterbackstory = $characterbackstory.Text
-        $characterbackstory
+        if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::OK)
+        {
+            $characterbackstory = $characterbackstory.Text
+            $characterbackstory
 
-        $PersonalityTraits = $PersonalityTraits.Text
-        $PersonalityTraits
+            $PersonalityTraits = $PersonalityTraits.Text
+            $PersonalityTraits
 
-        $Ideals = $Ideals.Text
-        $Ideals
+            $Ideals = $Ideals.Text
+            $Ideals
 
-        $Bonds = $Bonds.Text
-        $Bonds
+            $Bonds = $Bonds.Text
+            $Bonds
 
-        $Flaws = $Flaws.Text
-        $Flaws
+            $Flaws = $Flaws.Text
+            $Flaws
 
-    }
-    if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::Ignore)
-    {
-        $characterbackstory = "Unknown"
-        $PersonalityTraits = "Unknown"
-        $Ideals = "Unknown"
-        $Bonds = "Unknown"
-        $Flaws = "Unknown"
-    }
-    $characterbackstoryformdialog = $form.ShowDialog()
-    if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::Retry)
-    {
-        Return
-    }
-    if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::Cancel)
-    {
-        Exit
-    }
+        }
+        if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::Ignore)
+        {
+            $characterbackstory = "Unknown"
+            $PersonalityTraits = "Unknown"
+            $Ideals = "Unknown"
+            $Bonds = "Unknown"
+            $Flaws = "Unknown"
+        }
+        $characterbackstoryformdialog = $form.ShowDialog()
+        if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::Retry)
+        {
+            Return
+        }
+        if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::Cancel)
+        {
+            Exit
+        }
 #More Background details
-$form = New-Object System.Windows.Forms.Form
-$form.Text = 'Sparks D&D Character Creator'
-$form.Size = New-Object System.Drawing.Size(790,620)
-$form.StartPosition = 'CenterScreen'
-$objIcon = New-Object system.drawing.icon (".\Assets\installer.ico")
-$form.Icon = $objIcon
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = 'Sparks D&D Character Creator'
+    $form.Size = New-Object System.Drawing.Size(790,620)
+    $form.StartPosition = 'CenterScreen'
+    $objIcon = New-Object system.drawing.icon (".\Assets\installer.ico")
+    $form.Icon = $objIcon
 
-$objImage = [system.drawing.image]::FromFile(".\Assets\form_background.png")
-$form.BackgroundImage = $objImage
-$form.BackgroundImageLayout = "Center"
+    $objImage = [system.drawing.image]::FromFile(".\Assets\form_background.png")
+    $form.BackgroundImage = $objImage
+    $form.BackgroundImageLayout = "Center"
 
-$okButton = New-Object System.Windows.Forms.Button
-$okButton.Location = New-Object System.Drawing.Point(420,545)
-$okButton.Size = New-Object System.Drawing.Size(75,23)
-$okButton.Text = 'OK'
-$okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-$form.AcceptButton = $okButton
-$form.Controls.Add($okButton)
+    $okButton = New-Object System.Windows.Forms.Button
+    $okButton.Location = New-Object System.Drawing.Point(420,545)
+    $okButton.Size = New-Object System.Drawing.Size(75,23)
+    $okButton.Text = 'Next'
+    $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
+    $form.AcceptButton = $okButton
+    $form.Controls.Add($okButton)
 
-$skipButton = New-Object System.Windows.Forms.Button
-$skipButton.Location = New-Object System.Drawing.Point(495,545)
-$skipButton.Size = New-Object System.Drawing.Size(75,23)
-$skipButton.Text = 'Skip'
-$skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
-$form.AcceptButton = $skipButton
-$form.Controls.Add($skipButton)
+    $skipButton = New-Object System.Windows.Forms.Button
+    $skipButton.Location = New-Object System.Drawing.Point(495,545)
+    $skipButton.Size = New-Object System.Drawing.Size(75,23)
+    $skipButton.Text = 'Skip'
+    $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
+    $form.AcceptButton = $skipButton
+    $form.Controls.Add($skipButton)
 
-$backButton = New-Object System.Windows.Forms.Button
-$backButton.Location = New-Object System.Drawing.Point(570,545)
-$backButton.Size = New-Object System.Drawing.Size(75,23)
-$backButton.Text = 'Back'
-$backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
-$form.CancelButton = $backButton
-$form.Controls.Add($backButton)
+    $backButton = New-Object System.Windows.Forms.Button
+    $backButton.Location = New-Object System.Drawing.Point(570,545)
+    $backButton.Size = New-Object System.Drawing.Size(75,23)
+    $backButton.Text = 'Back'
+    $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
+    $form.CancelButton = $backButton
+    $form.Controls.Add($backButton)
 
-$cancelButton = New-Object System.Windows.Forms.Button
-$cancelButton.Location = New-Object System.Drawing.Point(645,545)
-$cancelButton.Size = New-Object System.Drawing.Size(75,23)
-$cancelButton.Text = 'Cancel'
-$cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-$form.CancelButton = $cancelButton
-$form.Controls.Add($cancelButton)
+    $cancelButton = New-Object System.Windows.Forms.Button
+    $cancelButton.Location = New-Object System.Drawing.Point(645,545)
+    $cancelButton.Size = New-Object System.Drawing.Size(75,23)
+    $cancelButton.Text = 'Cancel'
+    $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
+    $form.CancelButton = $cancelButton
+    $form.Controls.Add($cancelButton)
 
-$alliesandorganisationslabel = New-Object System.Windows.Forms.Label
-$alliesandorganisationslabel.Location = New-Object System.Drawing.Point(10,20)
-$alliesandorganisationslabel.Size = New-Object System.Drawing.Size(220,18)
-$alliesandorganisationslabel.Text = 'Write about your Allies and Organisations:'
-$form.Controls.Add($alliesandorganisationslabel)
+    $alliesandorganisationslabel = New-Object System.Windows.Forms.Label
+    $alliesandorganisationslabel.Location = New-Object System.Drawing.Point(10,20)
+    $alliesandorganisationslabel.Size = New-Object System.Drawing.Size(220,18)
+    $alliesandorganisationslabel.Text = 'Write about your Allies and Organisations:'
+    $form.Controls.Add($alliesandorganisationslabel)
 
-$alliesandorganisations = New-Object System.Windows.Forms.TextBox
-$alliesandorganisations.Location = New-Object System.Drawing.Point(10,40)
-$alliesandorganisations.Size = New-Object System.Drawing.Size(360,480)
-$alliesandorganisations.Multiline = 1
-$alliesandorganisations.ScrollBars = 2
-$alliesandorganisations.AcceptsReturn = 1
-$form.Controls.Add($alliesandorganisations)
+    $alliesandorganisations = New-Object System.Windows.Forms.TextBox
+    $alliesandorganisations.Location = New-Object System.Drawing.Point(10,40)
+    $alliesandorganisations.Size = New-Object System.Drawing.Size(360,480)
+    $alliesandorganisations.Multiline = 1
+    $alliesandorganisations.ScrollBars = 2
+    $alliesandorganisations.AcceptsReturn = 1
+    $form.Controls.Add($alliesandorganisations)
 
-$addionalfeattraitslabel = New-Object System.Windows.Forms.Label
-$addionalfeattraitslabel.Location = New-Object System.Drawing.Point(420,20)
-$addionalfeattraitslabel.Size = New-Object System.Drawing.Size(220,18)
-$addionalfeattraitslabel.Text = 'Write your Additional features and traits:'
-$form.Controls.Add($addionalfeattraitslabel)
+    $addionalfeattraitslabel = New-Object System.Windows.Forms.Label
+    $addionalfeattraitslabel.Location = New-Object System.Drawing.Point(420,20)
+    $addionalfeattraitslabel.Size = New-Object System.Drawing.Size(220,18)
+    $addionalfeattraitslabel.Text = 'Write your Additional features and traits:'
+    $form.Controls.Add($addionalfeattraitslabel)
 
-$AddionalfeatTraits = New-Object System.Windows.Forms.TextBox
-$AddionalfeatTraits.Location = New-Object System.Drawing.Point(400,40)
-$AddionalfeatTraits.Size = New-Object System.Drawing.Size(360,480)
-$AddionalfeatTraits.Multiline = 1
-$AddionalfeatTraits.ScrollBars = 2
-$AddionalfeatTraits.AcceptsReturn = 1
-$form.Controls.Add($AddionalfeatTraits)
+    $AddionalfeatTraits = New-Object System.Windows.Forms.TextBox
+    $AddionalfeatTraits.Location = New-Object System.Drawing.Point(400,40)
+    $AddionalfeatTraits.Size = New-Object System.Drawing.Size(360,480)
+    $AddionalfeatTraits.Multiline = 1
+    $AddionalfeatTraits.ScrollBars = 2
+    $AddionalfeatTraits.AcceptsReturn = 1
+    $form.Controls.Add($AddionalfeatTraits)
 
-$factionslabel = New-Object System.Windows.Forms.Label
-$factionslabel.Location = New-Object System.Drawing.Point(10,530)
-$factionslabel.Size = New-Object System.Drawing.Size(220,18)
-$factionslabel.Text = 'Faction Name:'
-$form.Controls.Add($factionslabel)
+    $factionslabel = New-Object System.Windows.Forms.Label
+    $factionslabel.Location = New-Object System.Drawing.Point(10,530)
+    $factionslabel.Size = New-Object System.Drawing.Size(220,18)
+    $factionslabel.Text = 'Faction Name:'
+    $form.Controls.Add($factionslabel)
 
-$factionname = New-Object System.Windows.Forms.TextBox
-$factionname.Location = New-Object System.Drawing.Point(10,550)
-$factionname.Size = New-Object System.Drawing.Size(360,20)
-$factionname.AcceptsReturn = 1
-$form.Controls.Add($factionname)
+    $factionname = New-Object System.Windows.Forms.TextBox
+    $factionname.Location = New-Object System.Drawing.Point(10,550)
+    $factionname.Size = New-Object System.Drawing.Size(360,20)
+    $factionname.AcceptsReturn = 1
+    $form.Controls.Add($factionname)
 
-$form.Topmost = $true
-if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::OK)
-{
-    $alliesandorganisations = $alliesandorganisations.Text
-    $alliesandorganisations
+    $form.Topmost = $true
+        if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::OK)
+        {
+            $alliesandorganisations = $alliesandorganisations.Text
+            $alliesandorganisations
 
-    $AddionalfeatTraits = $AddionalfeatTraits.Text
-    $AddionalfeatTraits
+            $AddionalfeatTraits = $AddionalfeatTraits.Text
+            $AddionalfeatTraits
 
-    $factionname = $factionname.Text
-    $factionname
-}
-if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::Ignore)
-{
-    $AddionalfeatTraits = "Unknown"
-    $alliesandorganisations = "Unknown"
-    $factionname = "Unknown"
-}
-$characterextraformdialog = $form.ShowDialog()
-if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::Retry)
-{
-    Return
-}
-if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::Cancel)
-{
-    Exit
-}
+            $factionname = $factionname.Text
+            $factionname
+        }
+        if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::Ignore)
+        {
+            $AddionalfeatTraits = "Unknown"
+            $alliesandorganisations = "Unknown"
+            $factionname = "Unknown"
+        }
+        $characterextraformdialog = $form.ShowDialog()
+        if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::Retry)
+        {
+            Return
+        }
+        if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::Cancel)
+        {
+            Exit
+        }
+#End of extra details
 #Select Path for export
 $SaveChooser = New-Object -Typename System.Windows.Forms.SaveFileDialog
     $SaveChooser.Title = "Save as"
@@ -6143,9 +6154,12 @@ $SaveChooser = New-Object -Typename System.Windows.Forms.SaveFileDialog
     $SaveChooser.DefaultExt = ".pdf"
     $SaveChooser.Filter = 'PDF File (*.pdf)|*.pdf'
     $SaveResult = $SaveChooser.ShowDialog((New-Object System.Windows.Forms.Form -Property @{TopMost = $true }))
-if($SaveResult){
+if($SaveResult -eq [System.Windows.Forms.DialogResult]::OK ){
     $PathSelected = $SaveChooser.FileName
     $PathSelected
+}
+if ($SaveResult -eq [System.Windows.Forms.DialogResult]::Cancel){
+    Exit
 }
 #End of path selection
 #PDF Values Import before save
@@ -6267,7 +6281,7 @@ $characterparameters = @{
         'Skin' = $characterfeaturesselectskin.SelectedItem;
         'Hair' = $characterfeaturesselecthair.SelectedItem;
         'CHARACTER IMAGE' = $CharacterImage;
-        #'Faction Symbol Image' =  ;
+        'Faction Symbol Image' = $FactionSymbol;
         'Allies' = $alliesandorganisations.Text;
         'FactionName' = $factionname.Text;
         'Backstory' = $characterbackstory.Text;
@@ -6488,6 +6502,8 @@ $characterparameters = @{
         #'Spells 101013' =  ;
         #'Check Box 3083' =  ;
     }
+    #Most of the above comments are to stop needing to add null statements to all.
+    #If you want to add custom additions you will need to add all the code in
     InputPdfFilePath = ".\Assets\Empty_PDF\DnD_5E_CharacterSheet - Form Fillable.pdf"
     ITextSharpLibrary = '.\Assets\iText\itextsharp.dll'
     OutputPdfFilePath = $PathSelected
@@ -6499,8 +6515,10 @@ Save-PdfField @characterparameters
     $MessageBody = "Dungeons And Dragons Character Successfully Created!"
     $MessageTitle = "Spark's D&D Character Creator"
 [System.Windows.MessageBox]::Show($MessageBody,$MessageTitle,$ButtonType,$MessageIcon)
+Exit
 #Script Created By (Sparks Skywere) - Christopher Masters
-#Friends Notes:
+
+#~Friends Notes:~
 
 # Hey Sparks, 
 # Nice code you've got here >:3

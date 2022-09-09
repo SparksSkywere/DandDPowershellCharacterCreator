@@ -1,3 +1,5 @@
+# THIS IS STILL IN DEVELOPMENT
+
 # D&D Powershell Character Creator
 A Powershell script that is used to make a character in D&amp;D, it uses the windows forms and asks various questions to which by the end will auto-generate a character sheet.
 

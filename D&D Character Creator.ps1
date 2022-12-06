@@ -1,5 +1,6 @@
 clear-host
 #Hide powershell's console so only the forms show, unhide during development or need to varify output
+#Functions
 function Show-Console
 {
     param ([Switch]$Show,[Switch]$Hide)
@@ -25,7 +26,6 @@ function Show-Console
         $null = [Console.Window]::ShowWindow($consolePtr, 0)
     }
 }
-#end of powershell console hiding
 #To show the console change "-hide" to "-show"
 show-console -hide
 
@@ -213,11 +213,6 @@ $CharacterAgeHoverText = {"TestAge"}
     $charactername.Location = New-Object System.Drawing.Point(10,40)
     $charactername.Size = New-Object System.Drawing.Size(180,20)
     $charactername.MaxLength = 30
-    $charactername.add_mouseleave
-    $charactername.add_mousehover($CharacternameHoverText)
-    $charactername.OnmouseHover($CharacternameHoverText)
-    #$CharacternameHoverText.SetToolTip($charactername, "This is a button")
-    #$CharacternameHoverText.Active = $True
     $form.Controls.Add($charactername)
     $form.Topmost = $true
 
@@ -248,6 +243,8 @@ $CharacterAgeHoverText = {"TestAge"}
     $playername.MaxLength = 30
     $form.Controls.Add($playername)
     $form.Topmost = $true
+
+
     
     #REMEMBER TO ADD THE ONLY LETTERS FUNCTION, NO NUMBERS ALLOWED
     #$form.Add_Shown({$charactername.Select()})
@@ -561,6 +558,7 @@ $CharacterAgeHoverText = {"TestAge"}
         $characterfeaturesselecteyes.Items.Add('Sea Green') | Out-Null
         $characterfeaturesselecteyes.Items.Add('Emerald Green') | Out-Null
         $characterfeaturesselecteyes.Items.Add('Pink') | Out-Null
+        $characterfeaturesselecteyes.Items.Add('Blind') | Out-Null
 
     #Feature Hair List
         $characterfeaturesselecthair.Items.Add('Blue') | Out-Null
@@ -1277,7 +1275,7 @@ $CharacterAgeHoverText = {"TestAge"}
     $Chosensubclass.Size = New-Object System.Drawing.Size(260,20)
     $Chosensubclass.Height = 200
     $form.Topmost = $true
-
+    
     #Subclass Lists, all split up to only match a primary class list
     #Post any class stats here that are needed as this is the best place for the information to go to
     #~Starting packs by class~
@@ -1883,25 +1881,25 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenRaceDwarf = $ChosenRaceDwarf.SelectedItem 
         $ChosenRaceDwarf
         $ExportRace = "Dwarf"
-        $HP = "0"
+        $HP = "30"
         $SpeedTotal = "25"
         $PlayerSize = "150 Pounds, Medium"
         $Playerheight = "5 Feet"
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "14"
+        $DEX = "16"
+        $CON = "14"
+        $INT = "10"
+        $WIS = "15"
+        $CHA = "11"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
-        $CONmod = "+0"
+        $STRmod = "+2"
+        $DEXmod = "+3"
+        $CONmod = "+2"
         $INTmod = "+0"
-        $WISmod = "+0"
+        $WISmod = "+2"
         $CHAmod = "+0"
 
         #Saving Throws
@@ -1925,25 +1923,25 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenRaceElf = $ChosenRaceElf.SelectedItem 
         $ChosenRaceElf
         $ExportRace = "Elf"
-        $HP = "0"
+        $HP = "28"
         $SpeedTotal = "30"
         $PlayerSize = "Slender Builds, Medium"
         $Playerheight = "6 Feet"
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "14"
+        $DEX = "18"
+        $CON = "12"
+        $INT = "10"
+        $WIS = "15"
+        $CHA = "11"
 
         #Attribute Modifiers
-        $STRmod = "+0"
+        $STRmod = "+2"
         $DEXmod = "+4"
-        $CONmod = "+3"
+        $CONmod = "+1"
         $INTmod = "+0"
-        $WISmod = "+1"
+        $WISmod = "+2"
         $CHAmod = "+0"
 
         #Saving Throws
@@ -1984,7 +1982,7 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $STRmod = "+2"
         $DEXmod = "+2"
         $CONmod = "+2"
-        $INTmod = "++1"
+        $INTmod = "+1"
         $WISmod = "+0"
         $CHAmod = "-1"
 
@@ -2011,26 +2009,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenRaceHalf_Elf = $ChosenRaceHalf_Elf.SelectedItem 
         $ChosenRaceHalf_Elf
         $ExportRace = "Half-Elf"
-        $HP = "0"
+        $HP = "30"
         $SpeedTotal = "30"
         $PlayerSize = "Varies On Build, Medium"
         $Playerheight = "6 Feet"
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "14"
+        $DEX = "16"
+        $CON = "14"
+        $INT = "10"
+        $WIS = "13"
+        $CHA = "13"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
-        $CONmod = "+0"
+        $STRmod = "+2"
+        $DEXmod = "+3"
+        $CONmod = "+2"
         $INTmod = "+0"
-        $WISmod = "+0"
-        $CHAmod = "+0"
+        $WISmod = "+1"
+        $CHAmod = "+1"
 
         #Saving Throws
         $ST_STR = "0"
@@ -2053,26 +2051,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenRaceHalfling = $ChosenRaceHalfling.SelectedItem 
         $ChosenRaceHalfling
         $ExportRace = "Halfling"
-        $HP = "0"
+        $HP = "28"
         $SpeedTotal = "25"
         $PlayerSize = "40 Pounds, Small"
         $Playerheight = "3 Feet"
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "14"
+        $DEX = "18"
+        $CON = "12"
+        $INT = "10"
+        $WIS = "13"
+        $CHA = "13"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
-        $CONmod = "+0"
+        $STRmod = "+2"
+        $DEXmod = "+4"
+        $CONmod = "+1"
         $INTmod = "+0"
-        $WISmod = "+0"
-        $CHAmod = "+0"
+        $WISmod = "+1"
+        $CHAmod = "+1"
 
         #Saving Throws
         $ST_STR = "0"
@@ -2095,25 +2093,25 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenRaceHalf_Orc = $ChosenRaceHalf_Orc.SelectedItem 
         $ChosenRaceHalf_Orc
         $ExportRace = "Half-Orc"
-        $HP = "0"
+        $HP = "28"
         $SpeedTotal = "30"
         $PlayerSize = "Larger Than Humans, Medium"
         $Playerheight = "6 Feet"
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "16"
+        $DEX = "18"
+        $CON = "12"
+        $INT = "10"
+        $WIS = "13"
+        $CHA = "11"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
-        $CONmod = "+0"
+        $STRmod = "+3"
+        $DEXmod = "+4"
+        $CONmod = "+1"
         $INTmod = "+0"
-        $WISmod = "+0"
+        $WISmod = "+1"
         $CHAmod = "+0"
 
         #Saving Throws
@@ -2137,25 +2135,25 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenRaceHuman = $ChosenRaceHuman.SelectedItem 
         $ChosenRaceHuman
         $ExportRace = "Human"
-        $HP = "0"
+        $HP = "28"
         $SpeedTotal = "30"
         $PlayerSize = "Varies On Build, Medium"
         $Playerheight = "6 Feet"
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "14"
+        $DEX = "18"
+        $CON = "12"
+        $INT = "10"
+        $WIS = "13"
+        $CHA = "11"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
-        $CONmod = "+0"
+        $STRmod = "+2"
+        $DEXmod = "+4"
+        $CONmod = "+1"
         $INTmod = "+0"
-        $WISmod = "+0"
+        $WISmod = "+1"
         $CHAmod = "+0"
 
         #Saving Throws
@@ -2179,26 +2177,26 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenRaceTiefling = $ChosenRaceTiefling.SelectedItem 
         $ChosenRaceTiefling
         $ExportRace = "Tiefling"
-        $HP = "0"
+        $HP = "28"
         $SpeedTotal = "30"
         $PlayerSize = "Varies On Build, Medium"
         $Playerheight = "6 Feet"
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "14"
+        $DEX = "16"
+        $CON = "12"
+        $INT = "12"
+        $WIS = "13"
+        $CHA = "13"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
-        $CONmod = "+0"
-        $INTmod = "+0"
-        $WISmod = "+0"
-        $CHAmod = "+0"
+        $STRmod = "+2"
+        $DEXmod = "+3"
+        $CONmod = "+1"
+        $INTmod = "+1"
+        $WISmod = "+1"
+        $CHAmod = "+1"
 
         #Saving Throws
         $ST_STR = "0"
@@ -2523,25 +2521,25 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenRaceGoliath = $ChosenRaceGoliath.SelectedItem 
         $ChosenRaceGoliath
         $ExportRace = "Goliath"
-        $HP = "0"
+        $HP = "30"
         $SpeedTotal = "30"
         $PlayerSize = "280-340 Pounds"
         $Playerheight = "8 Feet"
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "16"
+        $DEX = "16"
+        $CON = "14"
+        $INT = "10"
+        $WIS = "13"
+        $CHA = "11"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
-        $CONmod = "+0"
+        $STRmod = "+3"
+        $DEXmod = "+3"
+        $CONmod = "+2"
         $INTmod = "+0"
-        $WISmod = "+0"
+        $WISmod = "+1"
         $CHAmod = "+0"
 
         #Saving Throws
@@ -3204,25 +3202,25 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenRaceShifter = $ChosenRaceShifter.SelectedItem 
         $ChosenRaceShifter
         $ExportRace = "Shifter"
-        $HP = "0"
-        $SpeedTotal = "0"
+        $HP = "28"
+        $SpeedTotal = "6"
         $PlayerSize = "0 Pounds"
         $Playerheight = "0 Feet"
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "16"
+        $DEX = "16"
+        $CON = "12"
+        $INT = "10"
+        $WIS = "15"
+        $CHA = "11"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
-        $CONmod = "+0"
+        $STRmod = "+3"
+        $DEXmod = "+3"
+        $CONmod = "+1"
         $INTmod = "+0"
-        $WISmod = "+0"
+        $WISmod = "+2"
         $CHAmod = "+0"
 
         #Saving Throws
@@ -3246,25 +3244,25 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenRaceWarforged = $ChosenRaceWarforged.SelectedItem 
         $ChosenRaceWarforged
         $ExportRace = "Warforged"
-        $HP = "0"
-        $SpeedTotal = "0"
+        $HP = "30"
+        $SpeedTotal = "6"
         $PlayerSize = "0 Pounds"
         $Playerheight = "0 Feet"
 
         #Attributes
-        $STR = "0"
-        $DEX = "0"
-        $CON = "0"
-        $INT = "0"
-        $WIS = "0"
-        $CHA = "0"
+        $STR = "16"
+        $DEX = "16"
+        $CON = "14"
+        $INT = "10"
+        $WIS = "13"
+        $CHA = "11"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
-        $CONmod = "+0"
+        $STRmod = "+3"
+        $DEXmod = "+3"
+        $CONmod = "+2"
         $INTmod = "+0"
-        $WISmod = "+0"
+        $WISmod = "+1"
         $CHAmod = "+0"
 
         #Saving Throws
@@ -3417,25 +3415,25 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
         $ChosenRaceMinotaur = $ChosenRaceMinotaur.SelectedItem 
         $ChosenRaceMinotaur
         $ExportRace = "Minotaur"
-        $HP = "76"
+        $HP = "35"
         $SpeedTotal = "40"
         $PlayerSize = "0 Pounds"
         $Playerheight = "0 Feet"
 
         #Attributes
         $STR = "18"
-        $DEX = "11"
-        $CON = "16"
-        $INT = "6"
-        $WIS = "16"
-        $CHA = "9"
+        $DEX = "14"
+        $CON = "14"
+        $INT = "10"
+        $WIS = "13"
+        $CHA = "11"
 
         #Attribute Modifiers
-        $STRmod = "+0"
-        $DEXmod = "+0"
-        $CONmod = "+0"
+        $STRmod = "+4"
+        $DEXmod = "+2"
+        $CONmod = "+2"
         $INTmod = "+0"
-        $WISmod = "+0"
+        $WISmod = "+1"
         $CHAmod = "+0"
 
         #Saving Throws
@@ -3990,7 +3988,7 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
     {
         $ExportRace = "Chromatic Dragonborn"
     }
-    if ($ChosenSUbRace.SelectedItem -match 'Gem Dragonborn')
+    if ($ChosenSubRace.SelectedItem -match 'Gem Dragonborn')
     {
         $ExportRace = "Gem Dragonborn"
     }
@@ -4997,7 +4995,7 @@ if ($ChosenRace.SelectedItem -match 'Dragonborn')
 #$selectadventuinggearpanel.Items.Add('**') | Out-Null
 #$ChosenArmour.Items.Add('**') | Out-Null
 
-#Remember DM's! These types of armour are affected with cost, armour class, strength, stealth and weight
+#Remember Dungeon Masters! These types of armour are affected with cost, armour class, strength, stealth and weight
 #There is one type of shield with a base code of 10gp, armour class of +2 and weight of 453g
 #Getting out of armour has times for "DON" and "DOFF" DON = Put on, DOff = Take off
 #Light armour has a don of 1 min and doff of 1 min

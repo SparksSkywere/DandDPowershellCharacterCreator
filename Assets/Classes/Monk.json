@@ -1,0 +1,27 @@
+{
+    "name": "Monk",
+    "HitDice": "1d8",
+    "classLevel": "Monk 1",
+    "spellcastingclass": "",
+    "check11": "enable",
+    "check18": "enable",
+    "check19": "",
+    "check20": "",
+    "check21": "",
+    "check22": "",
+    "cantrip01": "",
+    "Cantrip02": "",
+    "Cantrip03": "",
+    "backpack": "A backpack, a crowbar, a hammer, 10 pitons, 10 torches, a tinderbox, 10 days of rations and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it",
+    "subclasses": [
+        "Way Of The Open Hand",
+        "Way of Shadow",
+        "Way of The Four Elements",
+        "Way of Long Death",
+        "Way of Sun Soul",
+        "Way of Drunken Master",
+        "Way of Kensei",
+        "Way of Mercy",
+        "Way of Astral Self"
+    ]
+}

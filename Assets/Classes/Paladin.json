@@ -1,0 +1,27 @@
+{
+    "name": "Paladin",
+    "HitDice": "1d10",
+    "classLevel": "Paladin 1",
+    "spellcastingclass": "Paladin",
+    "check11": "",
+    "check18": "",
+    "check19": "",
+    "check20": "",
+    "check21": "enable",
+    "check22": "enable",
+    "cantrip01": "Bless",
+    "Cantrip02": "Command",
+    "Cantrip03": "Compelled Duel",
+    "backpack": "A backpack, a blanket, 10 candles, a tinderbox, an alms box, 2 blocks of incense, a censer, vestments, 2 days of rations and a waterskin",
+    "subclasses": [
+        "Oath Of Devotion",
+        "Oath Of The Ancients",
+        "Oath Of Vengeance",
+        "Oathbreaker",
+        "Oath Of The Crown",
+        "Oath Of Conquest",
+        "Oath Of Redemption",
+        "Oath Of Glory",
+        "Oath Of The Watchers"
+    ]
+}

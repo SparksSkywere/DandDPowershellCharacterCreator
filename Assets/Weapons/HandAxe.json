@@ -1,0 +1,18 @@
+{
+    "name": "HandAxe",
+
+    "WPN1ATK_Bonus": "+4",
+    "Weapon1Damage": "1d6 slashing",
+    "Weapon1Weight": "2lb",
+    "Weapon1Properties": "Light, Thrown (range 20/60)",
+
+    "WPN2ATK_Bonus": "+4",
+    "Weapon2Damage": "1d6 slashing",
+    "Weapon2Weight": "2lb",
+    "Weapon2Properties": "Light, Thrown (range 20/60)",
+
+    "WPN3ATK_Bonus": "+4",
+    "Weapon3Damage": "1d6 slashing",
+    "Weapon3Weight": "2lb",
+    "Weapon3Properties": "Light, Thrown (range 20/60)"
+}

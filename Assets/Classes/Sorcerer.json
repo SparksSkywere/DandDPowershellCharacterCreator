@@ -1,0 +1,26 @@
+{
+    "name": "Sorcerer",
+    "HitDice": "1d6",
+    "classLevel": "Sorcerer 1",
+    "spellcastingclass": "Sorcerer",
+    "check11": "",
+    "check18": "",
+    "check19": "enable",
+    "check20": "",
+    "check21": "enable",
+    "check22": "",
+    "cantrip01": "Acid Splash",
+    "Cantrip02": "Blade Ward",
+    "Cantrip03": "Chill Torch",
+    "backpack": "A backpack, a crowbar, a hammer, 10 pitons, 10 torches, a tinderbox, 10 days of rations and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it",
+    "subclasses": [
+        "Draconic Bloodline",
+        "Wild Magic",
+        "Storm Sorcery",
+        "Pyromancer",
+        "Divine Soul",
+        "Shadow Magic",
+        "Aberrant Mind",
+        "Clockwork Soul"
+    ]
+}

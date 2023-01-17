@@ -1,0 +1,27 @@
+{
+    "name": "Rogue",
+    "HitDice": "1d8",
+    "classLevel": "Rogue 1",
+    "spellcastingclass": "",
+    "check11": "",
+    "check18": "enable",
+    "check19": "",
+    "check20": "enable",
+    "check21": "",
+    "check22": "",
+    "cantrip01": "",
+    "Cantrip02": "",
+    "Cantrip03": "",
+    "backpack": "A backpack, a bag of 1,000 ball bearings, 10 feet of string, a bell, 5 candles, a crowbar, a hammer, 10 pitons, a hooded lantern, 2 flasks of oil, 5 days rations, a tinderbox and a waterskin, the backpack has 50 feet of hempen rope strapped to the side of it",
+    "subclasses": [
+        "Theif",
+        "Assassin",
+        "Arcane Trickster",
+        "Mastermind",
+        "Swashbuckler",
+        "Inquisitive",
+        "Scout",
+        "Phantom",
+        "Soulknife"
+    ]
+}

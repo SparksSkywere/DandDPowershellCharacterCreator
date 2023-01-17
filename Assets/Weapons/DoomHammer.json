@@ -1,0 +1,18 @@
+{
+    "name": "DoomHammer",
+
+    "WPN1ATK_Bonus": "+4",
+    "Weapon1Damage": "1d12 Bludgeoning",
+    "Weapon1Weight": "10lb",
+    "Weapon1Properties": "Heavy, Two-Handed",
+
+    "WPN2ATK_Bonus": "+4",
+    "Weapon2Damage": "1d12 Bludgeoning",
+    "Weapon2Weight": "10lb",
+    "Weapon2Properties": "Heavy, Two-Handed",
+
+    "WPN3ATK_Bonus": "+4",
+    "Weapon3Damage": "1d12 Bludgeoning",
+    "Weapon3Weight": "10lb",
+    "Weapon3Properties": "Heavy, Two-Handed"
+}

@@ -1,0 +1,18 @@
+{
+    "name": "Great Sword",
+
+    "WPN1ATK_Bonus": "+4",
+    "Weapon1Damage": "2d6 Slashing",
+    "Weapon1Weight": "6lb",
+    "Weapon1Properties": "Heavy, Two-Handed",
+
+    "WPN2ATK_Bonus": "+4",
+    "Weapon2Damage": "2d6 Slashing",
+    "Weapon2Weight": "6lb",
+    "Weapon2Properties": "Heavy, Two-Handed",
+
+    "WPN3ATK_Bonus": "+4",
+    "Weapon3Damage": "2d6 Slashing",
+    "Weapon3Weight": "6lb",
+    "Weapon3Properties": ""
+}

@@ -1,0 +1,26 @@
+{
+    "name": "Warlock",
+    "HitDice": "1d8",
+    "classLevel": "Warlock 1",
+    "spellcastingclass": "Warlock",
+    "check11": "",
+    "check18": "",
+    "check19": "",
+    "check20": "",
+    "check21": "enable",
+    "check22": "enable",
+    "cantrip01": "Blade Ward",
+    "Cantrip02": "Chill Torch",
+    "Cantrip03": "Eldritch Blast",
+    "backpack": "A backpack, a book of lore, a bottle of ink, an ink pen, 10 sheets of parchment, a little bag of sand and a small knife",
+    "subclasses": [
+        "The Archfey",
+        "The Fiend",
+        "The Great Old One",
+        "The Undying",
+        "The Celestial",
+        "The Hexblade",
+        "The Fathomless",
+        "The Genie"
+    ]
+}

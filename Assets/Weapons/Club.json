@@ -1,0 +1,18 @@
+{
+    "name": "Club",
+
+    "WPN1ATK_Bonus": "+4",
+    "Weapon1Damage": "1d4 Bludgeoning",
+    "Weapon1Weight": "2lb",
+    "Weapon1Properties": "Light",
+
+    "WPN2ATK_Bonus": "+4",
+    "Weapon2Damage": "1d4 Bludgeoning",
+    "Weapon2Weight": "2lb",
+    "Weapon2Properties": "Light",
+
+    "WPN3ATK_Bonus": "+4",
+    "Weapon3Damage": "1d4 Bludgeoning",
+    "Weapon3Weight": "2lb",
+    "Weapon3Properties": "Light"
+}

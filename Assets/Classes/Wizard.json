@@ -1,0 +1,31 @@
+{
+    "name": "Wizard",
+    "HitDice": "1d6",
+    "classLevel": "Wizard 1",
+    "spellcastingclass": "Wizard",
+    "check11": "",
+    "check18": "",
+    "check19": "",
+    "check20": "enable",
+    "check21": "enable",
+    "check22": "",
+    "cantrip01": "Acid Splash",
+    "Cantrip02": "Blade Ward",
+    "Cantrip03": "Chill Touch",
+    "backpack": "A backpack, a book of lore, a bottle of ink, an ink pen, 10 sheets of parchment, a little bag of sand and a small knife",
+    "subclasses": [
+        "School Of Abjuration",
+        "School Of Conjuration",
+        "School Of Divination",
+        "School Of Enchantment",
+        "School Of Evocation",
+        "School Of Illusion",
+        "School Of Necromancy",
+        "School Of Transmutation",
+        "Bladesinging",
+        "War Magic",
+        "Chronurgy Magic",
+        "Gravitygy Magic",
+        "Order Of Scribes"
+    ]
+}

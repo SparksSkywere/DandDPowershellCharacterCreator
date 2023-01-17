@@ -1,0 +1,26 @@
+{
+    "name": "Barbarian",
+    "HitDice": "1d12",
+    "classLevel": "Barbarian 1",
+    "spellcastingclass": "",
+    "check11": "enable",
+    "check18": "",
+    "check19": "enable",
+    "check20": "",
+    "check21": "",
+    "check22": "",
+    "cantrip01": "",
+    "Cantrip02": "",
+    "Cantrip03": "",
+    "backpack": "A backpack, a bedroll, a mess kit, a tinderbox, 10 torches, 10 days of rations and a waterskin, the backpack also has 50 feet of hempen rope strapped to the side of it",
+    "subclasses": [
+        "Berserker",
+        "Totem Warrior",
+        "Battlerager",
+        "Ancestorial Guardian",
+        "Storm Herald",
+        "Zealot",
+        "Beast",
+        "Wild Magic"
+    ]
+}

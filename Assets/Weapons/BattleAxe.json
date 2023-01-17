@@ -1,0 +1,18 @@
+{
+    "name": "BattleAxe",
+
+    "WPN1ATK_Bonus": "+4",
+    "Weapon1Damage": "1d8 Slashing",
+    "Weapon1Weight": "4lb",
+    "Weapon1Properties": "Versatile (1d10)",
+
+    "WPN2ATK_Bonus": "+4",
+    "Weapon2Damage": "1d8 Slashing",
+    "Weapon2Weight": "4lb",
+    "Weapon2Properties": "Versatile (1d10)",
+
+    "WPN3ATK_Bonus": "+4",
+    "Weapon3Damage": "1d8 Slashing",
+    "Weapon3Weight": "4lb",
+    "Weapon3Properties": "Versatile (1d10)"
+}

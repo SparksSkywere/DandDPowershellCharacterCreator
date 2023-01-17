@@ -1,0 +1,18 @@
+{
+    "name": "Javelin",
+
+    "WPN1ATK_Bonus": "+4",
+    "Weapon1Damage": "1d6 piercing",
+    "Weapon1Weight": "2lb",
+    "Weapon1Properties": "Thrown (range 30/120)",
+
+    "WPN2ATK_Bonus": "+4",
+    "Weapon2Damage": "1d6 piercing",
+    "Weapon2Weight": "2lb",
+    "Weapon2Properties": "Thrown (range 30/120)",
+
+    "WPN3ATK_Bonus": "+4",
+    "Weapon3Damage": "1d6 piercing",
+    "Weapon3Weight": "2lb",
+    "Weapon3Properties": "Thrown (range 30/120)"
+}

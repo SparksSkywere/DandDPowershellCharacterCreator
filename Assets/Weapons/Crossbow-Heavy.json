@@ -1,0 +1,18 @@
+{
+    "name": "Crossbow - Hand",
+
+    "WPN1ATK_Bonus": "+4",
+    "Weapon1Damage": "1d6 Piercing",
+    "Weapon1Weight": "3lb",
+    "Weapon1Properties": "Ammunition (range 100/400), Heavy, Loading, Two-Handed",
+
+    "WPN2ATK_Bonus": "+4",
+    "Weapon2Damage": "1d6 Piercing",
+    "Weapon2Weight": "3lb",
+    "Weapon2Properties": "Ammunition (range 100/400), Heavy, Loading, Two-Handed",
+
+    "WPN3ATK_Bonus": "+4",
+    "Weapon3Damage": "1d6 Piercing",
+    "Weapon3Weight": "3lb",
+    "Weapon3Properties": "Ammunition (range 100/400), Heavy, Loading, Two-Handed"
+}

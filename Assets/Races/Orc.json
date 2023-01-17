@@ -1,0 +1,39 @@
+{
+    "name": "Orc",
+    "description": "Orcs are savage raiders and pillagers with stooped postures, low foreheads and piggish faces with prominent lower canines that resemble tusks.",
+    "hp": "15",
+    "speed": "30",
+    "size": "0 Pounds",
+    "height": "0 Feet",
+    "languages": "Common, Orc",
+    "special": "Aggressive. As a bonus action, the orc can move up to its speed toward a hostile creature that it can see.",
+    "image": "",
+
+    "strength": "16",
+    "dexterity": "12",
+    "constitution": "16",
+    "intelligence": "7",
+    "wisdom": "11",
+    "charisma": "10",
+
+    "strengthmod": "+3",
+    "dexteritymod": "+1",
+    "constitutionmod": "+3",
+    "intelligencemod": "-2",
+    "wisdommod": "+0",
+    "charismamod": "+0",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Orc",
+    "Eye of Gruumsh",
+    "Ranging Scavengers",
+    "Orc Crossbreed"
+    ]
+}

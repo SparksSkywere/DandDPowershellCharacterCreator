@@ -1,0 +1,39 @@
+{
+    "name": "Elf",
+    "description": "Elves are a magical people of otherworldly grace, living in the world but not entirely part of it. They live in places of ethereal beauty, in the midst of ancient forests or in silvery spires glittering with faerie light, where soft music drifts through the air and gentle fragrances waft on the breeze. Elves love nature and magic, art and artistry, music and poetry, and the good things of the world.",
+    "hp": "28",
+    "speed": "30",
+    "size": "Slender Builds, Medium",
+    "height": "6 Feet",
+    "languages": "You can speak, read, and write Common and Elvish. Elvish is fluid, with subtle intonations and intricate grammar. Elven literature is rich and varied, and their songs and poems are famous among other races. Many bards learn their language so they can add Elvish ballads to their repertoires.",
+    "special": "Unknown",
+    "image": "",
+
+    "strength": "14",
+    "dexterity": "18",
+    "constitution": "12",
+    "intelligence": "10",
+    "wisdom": "15",
+    "charisma": "11",
+
+    "strengthmod": "+2",
+    "dexteritymod": "+4",
+    "constitutionmod": "+1",
+    "intelligencemod": "+0",
+    "wisdommod": "+2",
+    "charismamod": "+0",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Elf",
+    "Eladrin",
+    "High Elf",
+    "Wood Elf"
+    ]
+}

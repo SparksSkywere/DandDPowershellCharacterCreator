@@ -1,0 +1,38 @@
+{
+    "name": "Hobgoblin",
+    "description": "War horns sound, stones fly from catapults adnt the thunder of thousand booted feet echoes across the land as hobgoblins march to battle. Across the borderlands of civilization, settlements and settlers must contend with these aggressive humanoids, whos thirst for conquest is never satisfied. Hobgoblins have dark orange or red-orange skin and hair ranging from dark red-brown to dark gray. Yellow or dark brown eyes peer out beneath their beetling brows and their wide mouths sport sharp and yellowed teeth. A male hobgoblin might have a large blue or red nose, which symbolizes verility and power among goblinkin. Hobgoblins can live as long as humans, though their love of warfare and battle means that few do.",
+    "hp": "11",
+    "speed": "30",
+    "size": "0 Pounds",
+    "height": "0 Feet",
+    "languages": "Common, Goblin",
+    "special": "Martial Advantage. Once per turn, the hobgoblin can deal an extra 7 (2d6) damage to a creature it hits with a weapon attack if they creature is within 5 feet of an ally of the hobgoblin that isn't incapacitated.",
+    "image": "",
+
+    "strength": "13",
+    "dexterity": "12",
+    "constitution": "12",
+    "intelligence": "10",
+    "wisdom": "10",
+    "charisma": "9",
+
+    "strengthmod": "+1",
+    "dexteritymod": "+1",
+    "constitutionmod": "+1",
+    "intelligencemod": "+0",
+    "wisdommod": "+0",
+    "charismamod": "-1",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Hobgoblin",
+    "Hobgoblin Captain",
+    "Legion of Maglubiyet"
+    ]
+}

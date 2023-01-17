@@ -1,0 +1,42 @@
+{
+    "name": "Lizardfolk",
+    "description": "Lizardfolk are primitive reptilian humanoids that lurk in the swamps and jungles of the world. Their hut villages thrive in forbidding grottos, half-sunken ruins and watery caverns.",
+    "hp": "22",
+    "speed": "30",
+    "size": "0 Pounds",
+    "height": "0 Feet",
+    "languages": "Draconic",
+    "special": "Hold Breath. The lizardfolk can hold its breath for 15 minutes.",
+    "image": "",
+
+    "strength": "15",
+    "dexterity": "10",
+    "constitution": "13",
+    "intelligence": "7",
+    "wisdom": "12",
+    "charisma": "7",
+
+    "strengthmod": "+2",
+    "dexteritymod": "+0",
+    "constitutionmod": "+1",
+    "intelligencemod": "-2",
+    "wisdommod": "+1",
+    "charismamod": "-2",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Lizardfolk",
+    "Lizardfolk Shamen",
+    "Territorial Xenophobes",
+    "Great Feasts and Sacrifices",
+    "Canny Crafters",
+    "Lizardfolk Leaders",
+    "Dragon Worshipers"
+    ]
+}

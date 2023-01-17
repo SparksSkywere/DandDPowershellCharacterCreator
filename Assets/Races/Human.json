@@ -1,0 +1,36 @@
+{
+    "name": "Human",
+    "description": "In the reckonings of most worlds, humans are the youngest of the common races, late to arrive on the world scene and short, lived in comparison to dwarves, elves, and dragons. Perhaps it is because of their shorter lives that they strive to achieve as much as they can in the years they are given. Or maybe they feel they have something to prove to the elder races, and thats why they build their mighty empires on the foundation of conquest and trade. Whatever drives them, humans are the innovators, the achievers, and the pioneers of the worlds.",
+    "hp": "28",
+    "speed": "30",
+    "size": "Varies On Build, Medium",
+    "height": "6 Feet",
+    "languages": "You can speak, read, and write Common and one extra language of your choice. Humans typically learn the languages of other peoples they deal with, including obscure dialects. They are fond of sprinkling their speech with words borrowed from other tongues: Orc curses, Elvish musical expressions, Dwarvish military phrases, and so on.",
+    "special": "Unknown",
+    "image": "",
+
+    "strength": "14",
+    "dexterity": "18",
+    "constitution": "12",
+    "intelligence": "10",
+    "wisdom": "13",
+    "charisma": "11",
+
+    "strengthmod": "+2",
+    "dexteritymod": "+4",
+    "constitutionmod": "+1",
+    "intelligencemod": "+0",
+    "wisdommod": "+1",
+    "charismamod": "+0",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Human"
+    ]
+}

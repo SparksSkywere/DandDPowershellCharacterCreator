@@ -1,0 +1,36 @@
+{
+    "name": "Firbolg",
+    "description": "Firbolgs are the fores-dwelling race native to the Greying Wildlands, particularly the mysterious Savlirwood. Their bodie are covered with thick fur ranging from tones of earthen brown and ruddy red to cool grays and blues , and even to wild hues of pink and green. Their bodies are bovine or camelid in appearance with floppy, pointed ears and broad, pink noses, but they are bipdal and have hands that manipulate weapons and objects Most Firbolgs live in extended family units, and it is unusual to find one living alone. However, they are introverted to the point where they seldom engage with other firbolgs outside the family unit, and firbolgs rarely form their own cities, villages or even large tribes. Despite this, many firbolgs enjoy visiting other nations and settlements for a short time for trade, signseeing, and to visit friends.",
+    "hp": "0",
+    "speed": "30",
+    "size": "240-300 Pounds",
+    "height": "6 Feet",
+    "languages": "You can speak, read and write Common, Elvish and giant",
+    "special": "Unknown",
+    "image": "",
+
+    "strength": "0",
+    "dexterity": "0",
+    "constitution": "0",
+    "intelligence": "0",
+    "wisdom": "0",
+    "charisma": "0",
+
+    "strengthmod": "+0",
+    "dexteritymod": "+0",
+    "constitutionmod": "+0",
+    "intelligencemod": "+0",
+    "wisdommod": "+0",
+    "charismamod": "+0",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Firbolg"
+    ]
+}

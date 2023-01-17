@@ -1,0 +1,37 @@
+{
+    "name": "Satyr",
+    "description": "Satyrs are raucous fey that frolic in the wild forests, driven by curosity and hedonism in equal measure. Satyrs resemble stout male humans with the furry lower bodies and cloven hooves of goats. Horns sprout from their heads, ranging in shape from pair of small nubs to large, curling rams' horns. They typically sport facial hair.",
+    "hp": "31",
+    "speed": "40",
+    "size": "0 Pounds",
+    "height": "0 Feet",
+    "languages": "Common, Elvish, Sylvan",
+    "special": "Magic Resistance. The satyr had advantage on saving throws against spells and other magical effects.",
+    "image": "",
+
+    "strength": "12",
+    "dexterity": "16",
+    "constitution": "11",
+    "intelligence": "12",
+    "wisdom": "10",
+    "charisma": "14",
+
+    "strengthmod": "+1",
+    "dexteritymod": "+3",
+    "constitutionmod": "+0",
+    "intelligencemod": "+1",
+    "wisdommod": "+0",
+    "charismamod": "+2",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Satyr",
+    "Hedonistic Revelers"
+    ]
+}

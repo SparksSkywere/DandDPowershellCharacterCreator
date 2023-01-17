@@ -1,0 +1,39 @@
+{
+    "name": "Wolf",
+    "description": "Unknown",
+    "hp": "15",
+    "speed": "35",
+    "size": "0 Pounds",
+    "height": "0 Feet",
+    "languages": "Unknown",
+    "special": "Keen Hearing and Smell",
+    "image": "",
+
+    "strength": "12",
+    "dexterity": "15",
+    "constitution": "12",
+    "intelligence": "3",
+    "wisdom": "12",
+    "charisma": "6",
+
+    "strengthmod": "+1",
+    "dexteritymod": "+2",
+    "constitutionmod": "+1",
+    "intelligencemod": "-4",
+    "wisdommod": "+1",
+    "charismamod": "-2",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Wolf",
+    "Winter Wolf",
+    "Timber Wolf",
+    "Dire Wolf"
+    ]
+}

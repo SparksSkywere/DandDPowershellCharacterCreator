@@ -1,0 +1,42 @@
+{
+    "name": "Lycanth",
+    "description": "One of the most ancient and feared of all curses, lycanthropy can transform the most civilised humanoid into a ravening beast. In it's natural humanoid form, a creature cursed by lycanthropy appears as it's normal self. Over time, however, many lycanthropes acquire features suggestive of their animal form. In that animal form, a lycanthrope resembles a powerful version of a normal animal. On close inspection, it's eyes show a faint spark of unnatural intelligence and might glow red in the dark. Evil lycanthropes hide among normal folk, emerging in animal form at night to spread terror and bloodshed, especially under a full moon. Good lycanthropes are reclusive and uncomfortable around other civilised creatures, often living alone in wilderness areas far from villages and towns.",
+    "hp": "70",
+    "speed": "30",
+    "size": "0 Pounds",
+    "height": "0 Feet",
+    "languages": "Common (can't speak in form)",
+    "special": "Shapechanger. The lycanth can use it's polymorph to change into it's were form, any equipment it is wearing or carrying is not transformed.",
+    "image": "",
+
+    "strength": "0",
+    "dexterity": "0",
+    "constitution": "0",
+    "intelligence": "0",
+    "wisdom": "0",
+    "charisma": "0",
+
+    "strengthmod": "+2",
+    "dexteritymod": "+1",
+    "constitutionmod": "+2",
+    "intelligencemod": "+0",
+    "wisdommod": "+1",
+    "charismamod": "+0",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Lycanth",
+    "Curse of Lycanthropy",
+    "Werebear",
+    "Wereboar",
+    "Wererat",
+    "Weretiger",
+    "Werewolf"
+    ]
+}

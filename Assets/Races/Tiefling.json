@@ -1,0 +1,36 @@
+{
+    "name": "Tiefling",
+    "description": "To be greeted with stares and whispers, to suffer violence and insult on the street, to see mistrust and fear in every eye: this is the lot of the tiefling. And to twist the knife, tieflings know that this is because a pact struck generations ago infused the essence of Asmodeus overlord of the Nine Hells, into their bloodline. Their appearance and their nature are not their fault but the result of an ancient sin, for which they and their children and their childrens children will always be held accountable.",
+    "hp": "28",
+    "speed": "30",
+    "size": "Varies On Build, Medium",
+    "height": "6 Feet",
+    "languages": "You can speak, read, and write Common and Infernal.",
+    "special": "Unknown",
+    "image": "",
+
+    "strength": "14",
+    "dexterity": "16",
+    "constitution": "12",
+    "intelligence": "12",
+    "wisdom": "13",
+    "charisma": "13",
+
+    "strengthmod": "+2",
+    "dexteritymod": "+3",
+    "constitutionmod": "+1",
+    "intelligencemod": "+1",
+    "wisdommod": "+1",
+    "charismamod": "+1",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Tiefling"
+    ]
+}

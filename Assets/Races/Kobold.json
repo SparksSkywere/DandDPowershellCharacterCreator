@@ -1,0 +1,37 @@
+{
+    "name": "Kobold",
+    "description": "Kobolds are craven reptilian humanoids that worship evil dragons as demigods and serve them as minions and toadies. Kobolds inhabit dragons' lairs when they can but more commonly infest dungeons, gathering trasures and trinkets to add to their own tiny hoards.",
+    "hp": "5",
+    "speed": "30",
+    "size": "0 Pounds",
+    "height": "0 Feet",
+    "languages": "Common, Draconic",
+    "special": "Sunlight Sensitivity. While in sunlight, the kobold has a disadvantage on attack rolls, as on Wisdom (Perception) checks that rely on sight. Pack Tactics. The kobold has advantage on an attack roll against a creature if at least one of the kobold's allies is within 5 feet of the creature and that the ally isn't incapacitated.",
+    "image": "",
+
+    "strength": "7",
+    "dexterity": "15",
+    "constitution": "9",
+    "intelligence": "8",
+    "wisdom": "7",
+    "charisma": "8",
+
+    "strengthmod": "-2",
+    "dexteritymod": "+2",
+    "constitutionmod": "-1",
+    "intelligencemod": "-1",
+    "wisdommod": "-2",
+    "charismamod": "-1",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Kobold",
+    "Winged Kobold"
+    ]
+}

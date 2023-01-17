@@ -1,0 +1,38 @@
+{
+    "name": "Gnome",
+    "description": "A constant hum of busy activity pervades the warrens and neighborhoods where gnomes form their close knit communities. Louder sounds punctuate the hum: a crunch of grinding gears here, a minor explosion there, a yelp of surprise or triumph, and especially bursts of laughter. Gnomes take delight in life, enjoying every moment of invention, exploration, investigation, creation, and play.",
+    "hp": "16",
+    "speed": "25",
+    "size": "40 Pounds, Small",
+    "height": "4 Feet",
+    "languages": "You can speak, read, and write Common and Gnomish. The Gnomish language, which uses the Dwarvish script, is renowned for its technical treatises and its catalogs of knowledge about the natural world.",
+    "special": "Stone Camouflage. The gnome has advantage on Dexterity (stealth) checks made to hide in rocky terrain. Gnome Cunning. The gnome has advantage on Intelligence, Wisdom and Charisma saving throws against magic. Innate Spellcasting. The gnome's innate spellcasting ability is Intelligence (spell save DC 11). It can innately cast the following spells, requiring no material components: At will: nondetection (self only) 1/day each: blindness/deafness, blur, disguise self",
+    "image": "",
+
+    "strength": "15",
+    "dexterity": "14",
+    "constitution": "14",
+    "intelligence": "12",
+    "wisdom": "10",
+    "charisma": "9",
+
+    "strengthmod": "+2",
+    "dexteritymod": "+2",
+    "constitutionmod": "+2",
+    "intelligencemod": "+1",
+    "wisdommod": "+0",
+    "charismamod": "-1",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Gnome",
+    "Deep Gnome",
+    "Rock Gnome"
+    ]
+}

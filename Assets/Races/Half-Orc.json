@@ -1,0 +1,36 @@
+{
+    "name": "Half-Orc",
+    "description": "Whether united under the leadership of a mighty warlock or having fought to a standstill after years of conflict, orc and human tribes sometimes form alliances, joining forces into a larger horde to the terror of civilized lands nearby. When these alliances are sealed by marriages, half orcs are born. Some half orcs rise to become proud chiefs of orc tribes, their human blood giving them an edge over their full blooded orc rivals. Some venture into the world to prove their worth among humans and other more civilized races. Many of these become adventurers, achieving greatness for their mighty deeds and notoriety for their barbaric customs and savage fury.",
+    "hp": "28",
+    "speed": "30",
+    "size": "Larger Than Humans, Medium",
+    "height": "6 Feet",
+    "languages": "You can speak, read, and write Common and Orc. Orc is a harsh, grating language with hard consonants. It has no script of its own but is written in the Dwarvish script.",
+    "special": "Unknown",
+    "image": "",
+
+    "strength": "16",
+    "dexterity": "18",
+    "constitution": "12",
+    "intelligence": "10",
+    "wisdom": "13",
+    "charisma": "11",
+
+    "strengthmod": "+3",
+    "dexteritymod": "+4",
+    "constitutionmod": "+1",
+    "intelligencemod": "+0",
+    "wisdommod": "+1",
+    "charismamod": "+0",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Half-Orc"
+    ]
+}

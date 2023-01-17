@@ -1,0 +1,37 @@
+{
+    "name": "Troll",
+    "description": "Born with horrific appetites, trolls eat anything they can catch and devour. They have no society to speak of, but they do serve as mercenaries to orcs, ogres, ettins, hags and giants. As payment, trolls demand food and treasure. Trolls are difficult to control, however, doing as they please even when working with more powerful creatures.",
+    "hp": "84",
+    "speed": "30",
+    "size": "0 Pounds",
+    "height": "0 Feet",
+    "languages": "Giant",
+    "special": "Keen Smell. The troll has advantage on wisdom (perception) checks that rely on smell. Regeneration. The troll regains 10 hit points at the start of it's turn. If the troll takes acid or fire damage, this trait doesn't function at the start of the troll's next turn. The troll dies only if it sarts it's turn with 0 hit point and doesn't regenerate.",
+    "image": "",
+
+    "strength": "18",
+    "dexterity": "13",
+    "constitution": "20",
+    "intelligence": "7",
+    "wisdom": "9",
+    "charisma": "7",
+
+    "strengthmod": "+0",
+    "dexteritymod": "+0",
+    "constitutionmod": "+0",
+    "intelligencemod": "+0",
+    "wisdommod": "+0",
+    "charismamod": "+0",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Troll",
+    "Troll Freaks"
+    ]
+}

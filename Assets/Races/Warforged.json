@@ -1,0 +1,36 @@
+{
+    "name": "Warforged",
+    "description": "Unknown",
+    "hp": "30",
+    "speed": "6",
+    "size": "0 Pounds",
+    "height": "0 Feet",
+    "languages": "Unknown",
+    "special": "Unknown",
+    "image": "",
+
+    "strength": "16",
+    "dexterity": "16",
+    "constitution": "14",
+    "intelligence": "10",
+    "wisdom": "13",
+    "charisma": "11",
+
+    "strengthmod": "+3",
+    "dexteritymod": "+3",
+    "constitutionmod": "+2",
+    "intelligencemod": "+0",
+    "wisdommod": "+1",
+    "charismamod": "+0",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Warforged"
+    ]
+}

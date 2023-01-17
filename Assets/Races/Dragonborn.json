@@ -1,0 +1,42 @@
+{
+    "name": "Dragonborn",
+    "description": "Dragonborn look very much like dragons standing erect in humanoid form, though they lack wings or a tail. The first dragonborn had scales of vibrant hues matching the colors of their dragon kin, but generations of interbreeding have created a more uniform appearance. Their small, fine scales are usually brass or bronze in color, sometimes ranging to scarlet, rust, gold, or copper-green. They are tall and strongly built, often standing close to 6½ feet tall and weighing 300 pounds or more. Their hands and feet are strong, talonlike claws with three fingers and a thumb on each hand. The blood of a particular type of dragon runs very strong through some dragonborn clans. These dragonborn often boast scales that more closely match those of their dragon ancestor—bright red, green, blue, or white, lustrous black, or gleaming metallic gold, silver, brass, copper, or bronze.",
+    "hp": "20",
+    "speed": "30",
+    "size": "250 Pounds, Medium",
+    "height": "6 Feet",
+    "languages": "You can speak, read, and write Common and Draconic. Draconic is thought to be one of the oldest languages and is often used in the study of magic. The language sounds harsh to most other creatures and includes numerous hard consonants and sibilants.",
+    "special": "Breath Weapon, You can use your action to exhale destructive energy. Your draconic ancestry determines the size, shape, and damage type of the exhalation. When you use your breath weapon, each creature in the area of the exhalation must make a saving throw, the type of which is determined by your draconic ancestry. The DC for this saving throw equals 8 and your Constitution modifier and your proficiency bonus. A creature takes 2d6 damage on a failed save, and half as much damage on a successful one. The damage increases to 3d6 at 6th level, 4d6 at 11th level, and 5d6 at 16th level. After you use your breath weapon, you cant use it again until you complete a short or long rest.",
+    "image": "",
+
+    "strength": "15",
+    "dexterity": "11",
+    "constitution": "12",
+    "intelligence": "10",
+    "wisdom": "15",
+    "charisma": "15",
+
+    "strengthmod": "+3",
+    "dexteritymod": "+2",
+    "constitutionmod": "+3",
+    "intelligencemod": "+0",
+    "wisdommod": "+2",
+    "charismamod": "+4",
+
+    "saving_strength": "0",
+    "saving_dexterity": "0",
+    "saving_constitution": "0",
+    "saving_intelligence": "0",
+    "saving_wisdom": "0",
+    "saving_charisma": "0",
+
+    "subraces": [
+    "Dragonborn",
+    "Draconic Ancestory",
+    "DraconBlood Dragonborn",
+    "Chromatic Dragonborn",
+    "Gem Dragonborn",
+    "Ravenite Dragonborn",
+    "Metallic Dragonborn"
+    ]
+}

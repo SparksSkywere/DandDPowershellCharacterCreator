@@ -1,19 +1,21 @@
-# THIS IS STILL IN DEVELOPMENT
+# THIS IS IN ACTIVE DEVELOPMENT
 
 # D&D Powershell Character Creator
-A Powershell script that is used to make a character in D&amp;D, it uses the windows forms and asks various questions to which by the end will auto-generate a character sheet.
+A Powershell script that is used to make a character in D&D, it uses the windows forms and asks various questions to which by the end will auto-generate a character sheet PDF ready for usage / printing, the post saved file can still be edited accordingly. I will also put in that the JSON files are editable and be altered to fit any story you create, with this you may also edit the powershell script provided from this, there is an EXE available for those who do not wish to edit.
 
-This powershell script follows 5E books, the website to get a better understanding is:
-https://www.dndbeyond.com/sources/basic-rules
+I have purchased a lot of material from D&D to get this script made, I have all the current manuals and majority of the cards to just get the right bits of information to make this all work, I will however do not want to make money off this, so please if you do use this, DO NOT SELL.
 
-If you want to find more help on various bits of the information on this script when you edit it use:
-https://www.dandwiki.com/wiki/Main_Page
+Although you may donate to me as I will be outputting all kinds of powershell scripts, from home to corporate use: https://paypal.me/SparksSkywere?locale.x=en_GB
 
-I have purchased a lot of material from D&D to get this script made, from monster manuals to a lot of cards to just get the right bits of information to make this all work, I will however do not want to make money off this as the D&D property is not owned by me, this is merely a fan project. Images sourced from D&D themselves, though I am missing quite a lot of material.
+# Source Material
+
+5E basic rules: https://www.dndbeyond.com/sources/basic-rules
+
+Main Wiki: https://www.dandwiki.com/wiki/Main_Page
+
+Books: https://www.amazon.com/stores/page/3F17C185-6EB8-4E6A-A886-1571CA58A5E9
 
 # Powershell
-
-Thank you to Microsoft for making this possible as I did not know much in the coding space and working with powershell has opened a lot of doors for me, this is a project of many using powershell but this is my largest and most complex of all scripts.
 
 Powershell documentation: https://docs.microsoft.com/en-us/powershell/
 

@@ -63,6 +63,8 @@ show-console -Show
 #    Write-Host $item.property
 #}
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#The "return" for the retry is a temp if statement as I plan a future feature
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #----------------------------
 #       Script Start
 #----------------------------
@@ -72,9 +74,13 @@ Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 #Type loader, presentation framework
 Add-Type -AssemblyName PresentationCore,PresentationFramework
-#PDF Module + Type
+#Imports Modules + Add Types
 Import-Module -Name $PSScriptRoot\Assets\iText\PDFForm | Out-Null
 Add-Type -Path "$PSScriptRoot\Assets\iText\itextsharp.dll"
+#Import-Module -Name $PSScriptRoot\Assets\Modules\LangTranslate | Out-Null
+#Form images
+$objIcon = New-Object system.drawing.icon ("$PSScriptRoot\Assets\installer.ico")
+$objImage = [system.drawing.image]::FromFile("$PSScriptRoot\Assets\form_background.png")
 #----------------------------
 #         JSON Load
 #----------------------------
@@ -316,10 +322,7 @@ $CharacterAgeHoverText = {"TestAge"}
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(500,350)
     $form.StartPosition = 'CenterScreen'
-    $objIcon = New-Object system.drawing.icon ("$PSScriptRoot\Assets\installer.ico")
     $form.Icon = $objIcon
-    #Call background image
-    $objImage = [system.drawing.image]::FromFile("$PSScriptRoot\Assets\form_background.png")
     $form.BackgroundImage = $objImage
     $form.BackgroundImageLayout = "Center"
     $form.Width = $objImage.Width
@@ -425,10 +428,7 @@ $CharacterAgeHoverText = {"TestAge"}
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(450,350)
     $form.StartPosition = 'CenterScreen'
-    $objIcon = New-Object system.drawing.icon ("$PSScriptRoot\Assets\installer.ico")
     $form.Icon = $objIcon
-    #Call background image
-    $objImage = [system.drawing.image]::FromFile("$PSScriptRoot\Assets\form_background.png")
     $form.BackgroundImage = $objImage
     $form.BackgroundImageLayout = "Center"
     #Ok button for form
@@ -548,11 +548,6 @@ $CharacterAgeHoverText = {"TestAge"}
         {
             Exit
         }
-#Chosen value's Write-Host Testing
-#Write-Host $RacesJSON.name
-#Write-Host "You have chosen: $ExportRace"
-#Write-Host "HP: $HP"
-
 #end of Character race and background
     
     #if ($ -match '**')
@@ -574,10 +569,7 @@ $CharacterAgeHoverText = {"TestAge"}
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(500,350)
     $form.StartPosition = 'CenterScreen'
-    $objIcon = New-Object system.drawing.icon ("$PSScriptRoot\Assets\installer.ico")
     $form.Icon = $objIcon
-    #Call background image
-    $objImage = [system.drawing.image]::FromFile("$PSScriptRoot\Assets\form_background.png")
     $form.BackgroundImage = $objImage
     $form.BackgroundImageLayout = "Center"
     $form.Width = $objImage.Width
@@ -690,10 +682,7 @@ $CharacterAgeHoverText = {"TestAge"}
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(500,350)
     $form.StartPosition = 'CenterScreen'
-    $objIcon = New-Object system.drawing.icon ("$PSScriptRoot\Assets\installer.ico")
     $form.Icon = $objIcon
-    #Call background image
-    $objImage = [system.drawing.image]::FromFile("$PSScriptRoot\Assets\form_background.png")
     $form.BackgroundImage = $objImage
     $form.BackgroundImageLayout = "Center"
     $form.Width = $objImage.Width
@@ -773,10 +762,7 @@ $CharacterAgeHoverText = {"TestAge"}
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(500,350)
     $form.StartPosition = 'CenterScreen'
-    $objIcon = New-Object system.drawing.icon ("$PSScriptRoot\Assets\installer.ico")
     $form.Icon = $objIcon
-    #Call background image
-    $objImage = [system.drawing.image]::FromFile("$PSScriptRoot\Assets\form_background.png")
     $form.BackgroundImage = $objImage
     $form.BackgroundImageLayout = "Center"
     $form.Width = $objImage.Width
@@ -863,8 +849,6 @@ $CharacterAgeHoverText = {"TestAge"}
             #If the console is set to show, this is just for that
             Write-Host "Class is $Class"
             Write-Host "Alignment is $Alignment"
-            #Write Host for Saving throws
-            Write-Host $SelectedClass.Check21
         }
         if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::Ignore)
         {
@@ -888,10 +872,7 @@ $CharacterAgeHoverText = {"TestAge"}
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(500,350)
     $form.StartPosition = 'CenterScreen'
-    $objIcon = New-Object system.drawing.icon ("$PSScriptRoot\Assets\installer.ico")
     $form.Icon = $objIcon
-    #Call background image
-    $objImage = [system.drawing.image]::FromFile("$PSScriptRoot\Assets\form_background.png")
     $form.BackgroundImage = $objImage
     $form.BackgroundImageLayout = "Center"
     $form.Width = $objImage.Width
@@ -970,10 +951,7 @@ $CharacterAgeHoverText = {"TestAge"}
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(500,600)
     $form.StartPosition = 'CenterScreen'
-    $objIcon = New-Object system.drawing.icon ("$PSScriptRoot\Assets\installer.ico")
     $form.Icon = $objIcon
-    #Call background image
-    $objImage = [system.drawing.image]::FromFile("$PSScriptRoot\Assets\form_background.png")
     $form.BackgroundImage = $objImage
     $form.BackgroundImageLayout = "Center"
     #Ok button for form
@@ -1158,10 +1136,7 @@ $TotalEquiptment = $Weapon1 + $Comma + $Weapon2 + $Comma + $Weapon3 + $Comma + $
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(800,605)
     $form.StartPosition = 'CenterScreen'
-    $objIcon = New-Object system.drawing.icon ("$PSScriptRoot\Assets\installer.ico")
     $form.Icon = $objIcon
-    #Call background image
-    $objImage = [system.drawing.image]::FromFile("$PSScriptRoot\Assets\form_background.png")
     $form.BackgroundImage = $objImage
     $form.BackgroundImageLayout = "Center"
     #Ok button for form
@@ -1290,10 +1265,7 @@ $TotalEquiptment = $Weapon1 + $Comma + $Weapon2 + $Comma + $Weapon3 + $Comma + $
     $form.Text = 'Sparks D&D Character Creator'
     $form.Size = New-Object System.Drawing.Size(790,620)
     $form.StartPosition = 'CenterScreen'
-    $objIcon = New-Object system.drawing.icon ("$PSScriptRoot\Assets\installer.ico")
     $form.Icon = $objIcon
-    #Call background image
-    $objImage = [system.drawing.image]::FromFile("$PSScriptRoot\Assets\form_background.png")
     $form.BackgroundImage = $objImage
     $form.BackgroundImageLayout = "Center"
     #Ok button for form

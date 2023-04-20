@@ -27,7 +27,78 @@ function Show-Console
     }
 }
 #To show the console change "-hide" to "-show"
-show-console -Show
+show-console -show
+#Form function
+function New-ProgramForm {
+    param (
+        [Parameter(Mandatory)]
+        [string]$Title,
+
+        [Parameter(Mandatory)]
+        [int]$Width,
+
+        [Parameter(Mandatory)]
+        [int]$Height,
+
+        [Parameter(Mandatory)]
+        [string]$AcceptButtonText,
+
+        [Parameter(Mandatory)]
+        [string]$SkipButtonText,
+
+        [Parameter(Mandatory)]
+        [string]$BackButtonText,
+
+        [Parameter(Mandatory)]
+        [string]$CancelButtonText
+    )
+
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = $Title
+    $form.Size = New-Object System.Drawing.Size($Width,$Height)
+    $form.StartPosition = 'CenterScreen'
+    $objIcon = New-Object system.drawing.icon ("$PSScriptRoot\Assets\installer.ico")
+    $objImage = [system.drawing.image]::FromFile("$PSScriptRoot\Assets\form_background.png")
+    $form.Icon = $objIcon
+    $form.BackgroundImage = $objImage
+    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
+    
+    #Create a panel to hold the buttons
+    $buttonPanel = New-Object System.Windows.Forms.Panel
+    $buttonPanel.Dock = [System.Windows.Forms.DockStyle]::Bottom
+    $buttonPanel.Height = 50
+    $form.Controls.Add($buttonPanel)
+
+    $okButton = New-Object System.Windows.Forms.Button
+    $okButton.Location = New-Object System.Drawing.Point(0,0)
+    $okButton.Size = New-Object System.Drawing.Size(75,23)
+    $okButton.Text = $AcceptButtonText
+    $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
+    $buttonPanel.Controls.Add($okButton)
+
+    $skipButton = New-Object System.Windows.Forms.Button
+    $skipButton.Location = New-Object System.Drawing.Point(75,0)
+    $skipButton.Size = New-Object System.Drawing.Size(75,23)
+    $skipButton.Text = $SkipButtonText
+    $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
+    $buttonPanel.Controls.Add($skipButton)
+
+    $backButton = New-Object System.Windows.Forms.Button
+    $backButton.Location = New-Object System.Drawing.Point(150,0)
+    $backButton.Size = New-Object System.Drawing.Size(75,23)
+    $backButton.Text = $BackButtonText
+    $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
+    $buttonPanel.Controls.Add($backButton)
+
+    $cancelButton = New-Object System.Windows.Forms.Button
+    $cancelButton.Location = New-Object System.Drawing.Point(225,0)
+    $cancelButton.Size = New-Object System.Drawing.Size(75,23)
+    $cancelButton.Text = $CancelButtonText
+    $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
+    $buttonPanel.Controls.Add($cancelButton)
+
+    return $form
+}
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #IF YOU HAVEN'T PLEASE READ THE RULEBOOK FOR D&D AS THIS POWERSHELL SCRIPT JUST SIMPLIFIES MAKING A CHARACTER
 #CURRENTLY INDEV SO EXPECT ISSUES / BUGS OR DESIGN WEIRDNESS
@@ -84,164 +155,32 @@ $objImage = [system.drawing.image]::FromFile("$PSScriptRoot\Assets\form_backgrou
 #----------------------------
 #         JSON Load
 #----------------------------
-#Defaults
-#Get all files from path
-$DefaultFiles = Get-ChildItem -Path "$PSScriptRoot\Assets\Defaults.json"
-#JSON Array
-$DefaultJSON = @()
-#Loop each file
-foreach ($DefaultFile in $DefaultFiles) {
-    #Read the content of the JSON file
-    $DefaultContent = Get-Content -Path $DefaultFile.FullName
-    #Convert the JSON content to a PowerShell object
-    $DefaultjsonObject = $DefaultContent | ConvertFrom-Json
-    #Add the JSON object to the array of processed data
-    $DefaultJSON += $DefaultjsonObject
+# Get the path to the folder containing the default JSON files
+$defaultsPath = Join-Path $PSScriptRoot "Assets"
+# Define a function to process JSON files
+function Get-JsonData($path) {
+    # Get all JSON files in the folder
+    $jsonFiles = Get-ChildItem -Path $path -Filter *.json
+
+    # Loop through each JSON file and process its contents
+    foreach ($file in $jsonFiles) {
+        # Read the contents of the JSON file
+        $content = Get-Content -Path $file.FullName -Raw
+        # Convert the JSON content to a PowerShell object and output it
+        $content | ConvertFrom-Json
+    }
 }
-#Backgrounds
-#Get all files from path
-$CharacterBackgroundFiles = Get-ChildItem -Path "$PSScriptRoot\Assets\Backgrounds" -Filter "*.json"
-#JSON Array
-$CharacterBackgroundJSON = @()
-#Loop each file
-foreach ($CharacterBackgroundFile in $CharacterBackgroundFiles) {
-    #Read the content of the JSON file
-    $backgroundjsonContent = Get-Content -Path $CharacterBackgroundFile.FullName
-    #Convert the JSON content to a PowerShell object
-    $backgroundjsonObject = $backgroundjsonContent | ConvertFrom-Json
-    #Add the JSON object to the array of processed data
-    $CharacterBackgroundJSON += $backgroundjsonObject
-}
-#Races
-#Get all files from path
-$RaceFiles = Get-ChildItem -Path "$PSScriptRoot\Assets\Races" -Filter "*.json"
-#JSON Array
-$RacesJSON = @()
-#Loop each file
-foreach ($RaceFile in $RaceFiles) {
-    #Read the content of the JSON file
-    $racejsonContent = Get-Content -Path $RaceFile.FullName
-    #Convert the JSON content to a PowerShell object
-    $racejsonObject = $racejsonContent | ConvertFrom-Json
-    #Add the JSON object to the array of processed data
-    $RacesJSON += $racejsonObject
-}
-#---- CharacterFeatures -----
-#Eyes
-#Get all files from path
-$EyesFiles = Get-ChildItem -Path "$PSScriptRoot\Assets\Character_Features\Eyes" -Filter "*.json"
-#JSON Array
-$EyesJSON = @()
-#Loop each file
-foreach ($EyesFile in $EyesFiles) {
-    #Read the content of the JSON file
-    $EyesContent = Get-Content -Path $EyesFile.FullName
-    #Convert the JSON content to a PowerShell object
-    $EyesObject = $EyesContent | ConvertFrom-Json
-    #Add the JSON object to the array of processed data
-    $EyesJSON += $EyesObject
-}
-#Hair
-#Get all files from path
-$HairFiles = Get-ChildItem -Path "$PSScriptRoot\Assets\Character_Features\Hair" -Filter "*.json"
-#JSON Array
-$HairJSON = @()
-#Loop each file
-foreach ($HairFile in $HairFiles) {
-    #Read the content of the JSON file
-    $HairContent = Get-Content -Path $HairFile.FullName
-    #Convert the JSON content to a PowerShell object
-    $HairObject = $HairContent | ConvertFrom-Json
-    #Add the JSON object to the array of processed data
-    $HairJSON += $HairObject
-}
-#Skin
-#Get all files from path
-$SkinFiles = Get-ChildItem -Path "$PSScriptRoot\Assets\Character_Features\Skin" -Filter "*.json"
-#JSON Array
-$SkinJSON = @()
-#Loop each file
-foreach ($SkinFile in $SkinFiles) {
-    #Read the content of the JSON file
-    $SkinContent = Get-Content -Path $SkinFile.FullName
-    #Convert the JSON content to a PowerShell object
-    $SkinObject = $SkinContent | ConvertFrom-Json
-    #Add the JSON object to the array of processed data
-    $SkinJSON += $SkinObject
-}
-#---- Character Information -----
-#Alignments
-#Get all files from path
-$AlignmentFiles = Get-ChildItem -Path "$PSScriptRoot\Assets\Alignments" -Filter "*.json"
-#JSON Array
-$AlignmentJSON = @()
-#Loop each file
-foreach ($AlignmentFile in $AlignmentFiles) {
-    #Read the content of the JSON file
-    $AlignmentjsonContent = Get-Content -Path $AlignmentFile.FullName
-    #Convert the JSON content to a PowerShell object
-    $AlignmentjsonObject = $AlignmentjsonContent | ConvertFrom-Json
-    #Add the JSON object to the array of processed data
-    $AlignmentJSON += $AlignmentjsonObject
-}
-#Classes
-#Get all files from path
-$ClassesFiles = Get-ChildItem -Path "$PSScriptRoot\Assets\Classes" -Filter "*.json"
-#JSON Array
-$ClassesJSON = @()
-#Loop each file
-foreach ($ClassesFile in $ClassesFiles) {
-    #Read the content of the JSON file
-    $ClassesjsonContent = Get-Content -Path $ClassesFile.FullName
-    #Convert the JSON content to a PowerShell object
-    $ClassesjsonObject = $ClassesjsonContent | ConvertFrom-Json
-    #Add the JSON object to the array of processed data
-    $ClassesJSON += $ClassesjsonObject
-}
-#Weapons
-#Get all files from path
-$WeaponsFiles = Get-ChildItem -Path "$PSScriptRoot\Assets\Weapons" -Filter "*.json"
-#JSON Array
-$WeaponJSON = @()
-#Loop each file
-foreach ($WeaponsFile in $WeaponsFiles) {
-    #Read the content of the JSON file
-    $WeaponjsonContent = Get-Content -Path $WeaponsFile.FullName
-    #Convert the JSON content to a PowerShell object
-    $WeaponjsonObject = $WeaponjsonContent | ConvertFrom-Json
-    #Add the JSON object to the array of processed data
-    $WeaponJSON += $WeaponjsonObject
-}
-#Gear
-#Get all files from path
-$GearFiles = Get-ChildItem -Path "$PSScriptRoot\Assets\Gear" -Filter "*.json"
-#JSON Array
-$GearJSON = @()
-#Loop each file
-foreach ($GearFile in $GearFiles) {
-    #Read the content of the JSON file
-    $GearjsonContent = Get-Content -Path $GearFile.FullName
-    #Convert the JSON content to a PowerShell object
-    $GearjsonObject = $GearjsonContent | ConvertFrom-Json
-    #Add the JSON object to the array of processed data
-    $GearJSON += $GearjsonObject
-}
-#Armour
-#Get all files from path
-$ArmourFiles = Get-ChildItem -Path "$PSScriptRoot\Assets\Armour" -Filter "*.json"
-#JSON Array
-$ArmourJSON = @()
-#Set ArmourClass to 0
-$ArmourClass = 0
-#Loop each file
-foreach ($ArmourFile in $ArmourFiles) {
-    #Read the content of the JSON file
-    $ArmourjsonContent = Get-Content -Path $ArmourFile.FullName
-    #Convert the JSON content to a PowerShell object
-    $ArmourjsonObject = $ArmourjsonContent | ConvertFrom-Json
-    #Add the JSON object to the array of processed data
-    $ArmourJSON += $ArmourjsonObject
-}
+#Process default JSON files
+$defaultJSON = Get-JsonData -path $defaultsPath
+#Process other JSON files
+$CharacterBackgroundJSON = Get-JsonData -path "$PSScriptRoot\Assets\Backgrounds"
+$RacesJSON = Get-JsonData -path "$PSScriptRoot\Assets\Races"
+$EyesJSON = Get-JsonData -path "$PSScriptRoot\Assets\Character_Features\Eyes"
+$HairJSON = Get-JsonData -path "$PSScriptRoot\Assets\Character_Features\Hair"
+$SkinJSON = Get-JsonData -path "$PSScriptRoot\Assets\Character_Features\Skin"
+$AlignmentJSON = Get-JsonData -path "$PSScriptRoot\Assets\Alignments"
+$ClassesJSON = Get-JsonData -path "$PSScriptRoot\Assets\Classes"
+$WeaponJSON = Get-JsonData -path "$PSScriptRoot\Assets\Weapons"
 #---- Default Value's -----
 $WrittenCharactername = $DefaultJSON.Charactername
 $WrittenPlayername = $DefaultJSON.Playername
@@ -313,115 +252,73 @@ Write-Host "Loaded Defaults"
 #----------------------------
 #        Form Load
 #----------------------------
-#Hovertext (this is to help customisation)
-$CharacternameHoverText = {"TestName"}
-$CharacterAgeHoverText = {"TestAge"}
 #Basic user information gathering - Basic Information
     #Basic form
-    $form = New-Object System.Windows.Forms.Form
-    $form.Text = 'Sparks D&D Character Creator'
-    $form.Size = New-Object System.Drawing.Size(500,350)
-    $form.StartPosition = 'CenterScreen'
-    $form.Icon = $objIcon
-    $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = "Center"
-    $form.Width = $objImage.Width
-    $form.Height = $objImage.Height
-    #Ok button for form
-    $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Location = New-Object System.Drawing.Point(75,270)
-    $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'Next'
-    $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-    $form.AcceptButton = $okButton
-    $form.Controls.Add($okButton)
-    #Skip button for form
-    $skipButton = New-Object System.Windows.Forms.Button
-    $skipButton.Location = New-Object System.Drawing.Point(150,270)
-    $skipButton.Size = New-Object System.Drawing.Size(75,23)
-    $skipButton.Text = 'Skip'
-    $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
-    $form.AcceptButton = $skipButton
-    $form.Controls.Add($skipButton)
-    #Back button for form (still in development)
-    $backButton = New-Object System.Windows.Forms.Button
-    $backButton.Location = New-Object System.Drawing.Point(225,270)
-    $backButton.Size = New-Object System.Drawing.Size(75,23)
-    $backButton.Text = 'Back'
-    $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
-    $form.CancelButton = $backButton
-    $form.Controls.Add($backButton)
-    #Cancel button for form
-    $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Location = New-Object System.Drawing.Point(300,270)
-    $cancelButton.Size = New-Object System.Drawing.Size(75,23)
-    $cancelButton.Text = 'Cancel'
-    $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-    $form.CancelButton = $cancelButton
-    $form.Controls.Add($cancelButton)
-    #Character form
-    $characterlabel = New-Object System.Windows.Forms.Label
-    $characterlabel.Location = New-Object System.Drawing.Point(10,20)
-    $characterlabel.Size = New-Object System.Drawing.Size(100,18)
-    $characterlabel.Text = 'Character Name:'
-    $form.Controls.Add($characterlabel)
-    $charactername = New-Object System.Windows.Forms.TextBox
-    $charactername.Location = New-Object System.Drawing.Point(10,40)
-    $charactername.Size = New-Object System.Drawing.Size(180,20)
-    $charactername.MaxLength = 30
-    $form.Controls.Add($charactername)
-    $form.Topmost = $true
-    #Age form
-    $ageform = New-Object System.Windows.Forms.Label
-    $ageform.Location = New-Object System.Drawing.Point(10,67)
-    $ageform.Size = New-Object System.Drawing.Size(80,18)
-    $ageform.Text = 'Character Age:'
-    $form.Controls.Add($ageform)
-    $age = New-Object System.Windows.Forms.TextBox
-    $age.Location = New-Object System.Drawing.Point(10,85)
-    $age.Size = New-Object System.Drawing.Size(58,20)
-    $age.MaxLength = 5
-    $form.Controls.Add($age)
-    $form.Topmost = $true
-    $age.Add_TextChanged({
-        $age.Text = $age.Text -replace '\D'})
-    #Player form
-    $playerlabel = New-Object System.Windows.Forms.Label
-    $playerlabel.Location = New-Object System.Drawing.Point(10,108)
-    $playerlabel.Size = New-Object System.Drawing.Size(100,18)
-    $playerlabel.Text = 'Player Name:'
-    $form.Controls.Add($playerlabel)
-    $playername = New-Object System.Windows.Forms.TextBox
-    $playername.Location = New-Object System.Drawing.Point(10,127)
-    $playername.Size = New-Object System.Drawing.Size(180,20)
-    $playername.MaxLength = 30
-    $form.Controls.Add($playername)
-    $form.Topmost = $true
-    #Show form
-    $characternameformdialog = $form.ShowDialog()
-        if ($characternameformdialog -eq [System.Windows.Forms.DialogResult]::OK)
-        {
-            #Output the written data from the form
-            $WrittenCharactername = $charactername.Text
-            $WrittenPlayername = $playername.Text
-            $WrittenAge = $Age.Text
-            #If the console is set to show, this is just for that
-            Write-Host "Character Name is $WrittenCharactername"
-            Write-Host "Character Age is $WrittenPlayername"
-            Write-Host "Player Name is $WrittenAge"
-        }
-        if ($characternameformdialog -eq [System.Windows.Forms.DialogResult]::Ignore)
-        {
-            #Defaults will Load
-        }
-        if ($characternameformdialog -eq [System.Windows.Forms.DialogResult]::Retry)
-        {
-            Return
-        }
-        if ($characternameformdialog -eq [System.Windows.Forms.DialogResult]::Cancel)
-        {
-            Exit
-        }
+#Create form for basic information gathering
+$form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -BackButtonText 'Back' -CancelButtonText 'Cancel'
+#Add character name label and textbox to form
+$characterLabel = New-Object System.Windows.Forms.Label
+$characterLabel.Location = New-Object System.Drawing.Point(10, 20)
+$characterLabel.Size = New-Object System.Drawing.Size(118, 18)
+$characterLabel.Text = 'Character Name:'
+$characterLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
+$form.Controls.Add($characterLabel)
+
+$characterName = New-Object System.Windows.Forms.TextBox
+$characterName.Location = New-Object System.Drawing.Point(10, 40)
+$characterName.Size = New-Object System.Drawing.Size(180, 20)
+$characterName.MaxLength = 30
+$form.Controls.Add($characterName)
+
+#Add age label and textbox to form
+$ageLabel = New-Object System.Windows.Forms.Label
+$ageLabel.Location = New-Object System.Drawing.Point(10, 67)
+$ageLabel.Size = New-Object System.Drawing.Size(110, 18)
+$ageLabel.Text = 'Character Age:'
+$ageLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
+$form.Controls.Add($ageLabel)
+
+$age = New-Object System.Windows.Forms.TextBox
+$age.Location = New-Object System.Drawing.Point(10, 85)
+$age.Size = New-Object System.Drawing.Size(58, 20)
+$age.MaxLength = 5
+$age.Add_TextChanged({$age.Text = $age.Text -replace '\D'})
+$form.Controls.Add($age)
+
+# Add player name label and textbox to form
+$playerLabel = New-Object System.Windows.Forms.Label
+$playerLabel.Location = New-Object System.Drawing.Point(10, 108)
+$playerLabel.Size = New-Object System.Drawing.Size(100, 18)
+$playerLabel.Text = 'Player Name:'
+$playerLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
+$form.Controls.Add($playerLabel)
+
+$playerName = New-Object System.Windows.Forms.TextBox
+$playerName.Location = New-Object System.Drawing.Point(10, 127)
+$playerName.Size = New-Object System.Drawing.Size(180, 20)
+$playerName.MaxLength = 30
+$form.Controls.Add($playerName)
+
+# Show the form and wait for a button to be clicked
+$result = $form.ShowDialog()
+# Check which button was clicked and perform the appropriate action
+if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+        #Output the written data from the form
+        $WrittenCharactername = $charactername.Text
+        $WrittenPlayername = $playername.Text
+        $WrittenAge = $Age.Text
+        #If the console is set to show, this is just for that
+        Write-Host "Character Name is $WrittenCharactername"
+        Write-Host "Character Age is $WrittenPlayername"
+        Write-Host "Player Name is $WrittenAge"
+} elseif ($result -eq [System.Windows.Forms.DialogResult]::Ignore) {
+    # Skip button was clicked, do something else
+} elseif ($result -eq [System.Windows.Forms.DialogResult]::Retry) {
+    # Back button was clicked, do something else
+} else {
+    # Cancel button was clicked, exit the script
+    exit
+}
 #Basic user information gathering - Class and race
     #Basic form
     $form = New-Object System.Windows.Forms.Form
@@ -430,7 +327,7 @@ $CharacterAgeHoverText = {"TestAge"}
     $form.StartPosition = 'CenterScreen'
     $form.Icon = $objIcon
     $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = "Center"
+    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
     #Ok button for form
     $okButton = New-Object System.Windows.Forms.Button
     $okButton.Location = New-Object System.Drawing.Point(75,270)
@@ -571,7 +468,7 @@ $CharacterAgeHoverText = {"TestAge"}
     $form.StartPosition = 'CenterScreen'
     $form.Icon = $objIcon
     $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = "Center"
+    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
     $form.Width = $objImage.Width
     $form.Height = $objImage.Height
     #Ok button for form
@@ -684,7 +581,7 @@ $CharacterAgeHoverText = {"TestAge"}
     $form.StartPosition = 'CenterScreen'
     $form.Icon = $objIcon
     $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = "Center"
+    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
     $form.Width = $objImage.Width
     $form.Height = $objImage.Height
     #Ok button for form
@@ -764,7 +661,7 @@ $CharacterAgeHoverText = {"TestAge"}
     $form.StartPosition = 'CenterScreen'
     $form.Icon = $objIcon
     $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = "Center"
+    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
     $form.Width = $objImage.Width
     $form.Height = $objImage.Height
     #Ok button for form
@@ -874,7 +771,7 @@ $CharacterAgeHoverText = {"TestAge"}
     $form.StartPosition = 'CenterScreen'
     $form.Icon = $objIcon
     $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = "Center"
+    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
     $form.Width = $objImage.Width
     $form.Height = $objImage.Height
     #Ok button for form
@@ -953,7 +850,7 @@ $CharacterAgeHoverText = {"TestAge"}
     $form.StartPosition = 'CenterScreen'
     $form.Icon = $objIcon
     $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = "Center"
+    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
     #Ok button for form
     $okButton = New-Object System.Windows.Forms.Button
     $okButton.Location = New-Object System.Drawing.Point(75,530)
@@ -1138,7 +1035,7 @@ $TotalEquiptment = $Weapon1 + $Comma + $Weapon2 + $Comma + $Weapon3 + $Comma + $
     $form.StartPosition = 'CenterScreen'
     $form.Icon = $objIcon
     $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = "Center"
+    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
     #Ok button for form
     $okButton = New-Object System.Windows.Forms.Button
     $okButton.Location = New-Object System.Drawing.Point(420,535)
@@ -1184,6 +1081,9 @@ $TotalEquiptment = $Weapon1 + $Comma + $Weapon2 + $Comma + $Weapon3 + $Comma + $
     $characterbackstory.ScrollBars = 2
     $characterbackstory.AcceptsReturn = 1
     $form.Controls.Add($characterbackstory)
+    #Add hover text to the Character Name
+    $toolTipBackstory = New-Object System.Windows.Forms.ToolTip
+    $toolTipBackstory.SetToolTip($characterbackstory, "Write Character Backstory")
     #Personality form
     $personalitylabel = New-Object System.Windows.Forms.Label
     $personalitylabel.Location = New-Object System.Drawing.Point(420,20)
@@ -1197,6 +1097,9 @@ $TotalEquiptment = $Weapon1 + $Comma + $Weapon2 + $Comma + $Weapon3 + $Comma + $
     $PersonalityTraits.ScrollBars = 2
     $PersonalityTraits.AcceptsReturn = 1
     $form.Controls.Add($PersonalityTraits)
+    #Add hover text to the Character Name
+    $toolTipPlayer = New-Object System.Windows.Forms.ToolTip
+    $toolTipPlayer.SetToolTip($PersonalityTraits, "Write Personality Traits")
     #Ideals form
     $Idealslabel = New-Object System.Windows.Forms.Label
     $Idealslabel.Location = New-Object System.Drawing.Point(420,150)
@@ -1210,6 +1113,9 @@ $TotalEquiptment = $Weapon1 + $Comma + $Weapon2 + $Comma + $Weapon3 + $Comma + $
     $Ideals.ScrollBars = 2
     $Ideals.AcceptsReturn = 1
     $form.Controls.Add($Ideals)
+    #Add hover text to the Character Name
+    $toolTipPlayer = New-Object System.Windows.Forms.ToolTip
+    $toolTipPlayer.SetToolTip($playername, "Write Character Ideals")
     #Bonds form
     $Bondslabel = New-Object System.Windows.Forms.Label
     $Bondslabel.Location = New-Object System.Drawing.Point(420,280)
@@ -1223,6 +1129,9 @@ $TotalEquiptment = $Weapon1 + $Comma + $Weapon2 + $Comma + $Weapon3 + $Comma + $
     $Bonds.ScrollBars = 2
     $Bonds.AcceptsReturn = 1
     $form.Controls.Add($Bonds)
+    #Add hover text to the Character Name
+    $toolTipPlayer = New-Object System.Windows.Forms.ToolTip
+    $toolTipPlayer.SetToolTip($playername, "Write Character Bonds")
     #Flaws form
     $Flawslabel = New-Object System.Windows.Forms.Label
     $Flawslabel.Location = New-Object System.Drawing.Point(420,410)
@@ -1236,6 +1145,9 @@ $TotalEquiptment = $Weapon1 + $Comma + $Weapon2 + $Comma + $Weapon3 + $Comma + $
     $Flaws.ScrollBars = 2
     $Flaws.AcceptsReturn = 1
     $form.Controls.Add($Flaws)
+    #Add hover text to the Character Name
+    $toolTipPlayer = New-Object System.Windows.Forms.ToolTip
+    $toolTipPlayer.SetToolTip($playername, "Write Character Flaws")
     #Show form
     $form.Topmost = $true
         if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::OK)
@@ -1267,7 +1179,7 @@ $TotalEquiptment = $Weapon1 + $Comma + $Weapon2 + $Comma + $Weapon3 + $Comma + $
     $form.StartPosition = 'CenterScreen'
     $form.Icon = $objIcon
     $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = "Center"
+    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
     #Ok button for form
     $okButton = New-Object System.Windows.Forms.Button
     $okButton.Location = New-Object System.Drawing.Point(420,545)

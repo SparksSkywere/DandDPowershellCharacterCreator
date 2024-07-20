@@ -1,0 +1,18 @@
+{
+    "name": "",
+
+    "WPN1ATK_Bonus": "",
+    "Weapon1Damage": "",
+    "Weapon1Weight": "",
+    "Weapon1Properties": "",
+
+    "WPN2ATK_Bonus": "",
+    "Weapon2Damage": "",
+    "Weapon2Weight": "",
+    "Weapon2Properties": "",
+
+    "WPN3ATK_Bonus": "",
+    "Weapon3Damage": "",
+    "Weapon3Weight": "",
+    "Weapon3Properties": ""
+}

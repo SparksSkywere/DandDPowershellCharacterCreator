@@ -1,0 +1,14 @@
+{
+    // Use IntewwiSense to weawn about possibwe attwibutes.
+    // Hovew to view descwiptions of existing attwibutes.
+    // Fow mowe infowmation, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "PowerShell: Attach to PowerShell Host Process",
+            "type": "PowerShell",
+            "request": "attach",
+            "runspaceId": 1
+        },
+    ]
+}

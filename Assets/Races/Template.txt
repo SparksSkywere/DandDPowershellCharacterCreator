@@ -29,9 +29,4 @@
     "saving_intelligence": "0",
     "saving_wisdom": "0",
     "saving_charisma": "0",
-
-    "subraces": [
-    "",
-    ""
-    ]
 }

@@ -1,0 +1,49 @@
+# Define the path to the folder containing the JSON files
+$folderPath = "C:\path\to\folder"
+
+# Get all child items (files) in the folder
+$jsonFiles = Get-ChildItem -Path $folderPath -Filter "*.json"
+
+# Initialize an array to store the processed JSON data
+$jsonData = @()
+
+# Loop through each JSON file
+foreach ($jsonFile in $jsonFiles) {
+    # Read the content of the JSON file
+    $jsonContent = Get-Content -Path $jsonFile.FullName
+
+    # Convert the JSON content to a PowerShell object
+    $jsonObject = ConvertFrom-Json -InputObject $jsonContent
+
+    # Add the JSON object to the array of processed data
+    $jsonData += $jsonObject
+}
+
+# Build form with data
+$form = New-Object System.Windows.Forms.Form
+$form.Text = "Select an Item"
+$form.Size = New-Object System.Drawing.Size(300,200)
+$form.StartPosition = "CenterScreen"
+
+# Add a list box to the form
+$listBox = New-Object System.Windows.Forms.ListBox
+$listBox.Dock = "Fill"
+$listBox.DataSource = $jsonData
+$listBox.DisplayMember = "name" # or any property you want
+$form.Controls.Add($listBox)
+
+# Add an OK button to the form
+$okButton = New-Object System.Windows.Forms.Button
+$okButton.Text = "OK"
+$okButton.Dock = "Bottom"
+$okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
+$form.Controls.Add($okButton)
+
+# Show the form and wait for the user to select an item
+$form.Add_Shown({$form.Activate()})
+$result = $form.ShowDialog()
+
+# If the user clicked OK, display the selected item
+if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+    $listBox.SelectedItem
+}

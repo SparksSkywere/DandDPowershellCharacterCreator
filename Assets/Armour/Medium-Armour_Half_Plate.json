@@ -1,4 +1,8 @@
 {
     "name": "Medium Armour - Half Plate",
-    "ArmourClass": "13"
+    "ArmourClass": 15,
+    "BaseAC": 15,
+    "Type": "Medium",
+    "MaxDexBonus": 2,
+    "DexModifierApplicable": true
 }

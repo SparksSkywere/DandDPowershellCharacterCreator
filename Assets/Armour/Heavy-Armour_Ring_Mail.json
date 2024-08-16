@@ -1,4 +1,8 @@
 {
     "name": "Heavy Armour - Ring Mail",
-    "ArmourClass": "14"
+    "ArmourClass": 14,
+    "BaseAC": 14,
+    "Type": "Heavy",
+    "MaxDexBonus": 0,
+    "DexModifierApplicable": false
 }

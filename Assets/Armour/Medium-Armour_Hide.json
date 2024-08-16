@@ -1,4 +1,8 @@
 {
     "name": "Medium Armour - Hide",
-    "ArmourClass": "12"
+    "ArmourClass": 12,
+    "BaseAC": 12,
+    "Type": "Medium",
+    "MaxDexBonus": 2,
+    "DexModifierApplicable": true
 }

@@ -1,4 +1,8 @@
 {
     "name": "Medium Armour - Chain Shirt",
-    "ArmourClass": "13"
+    "ArmourClass": 13,
+    "BaseAC": 13,
+    "Type": "Medium",
+    "MaxDexBonus": 2,
+    "DexModifierApplicable": true
 }

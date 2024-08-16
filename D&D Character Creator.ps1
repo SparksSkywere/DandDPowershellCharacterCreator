@@ -1,11 +1,12 @@
-clear-host
-#All Functions
-#Hide powershell's console so only the forms show, unhide during development or need to varify output
-function Show-Console
-{
-    param ([Switch]$Show,[Switch]$Hide)
-    if (-not ("Console.Window" -as [type])) { 
+Clear-Host
 
+# Global variable to control logging
+$global:DebugLoggingEnabled = $true
+
+# Function to show or hide the console window
+function Show-Console {
+    param ([Switch]$Show, [Switch]$Hide)
+    if (-not ("Console.Window" -as [type])) {
         Add-Type -Name Window -Namespace Console -MemberDefinition '
         [DllImport("Kernel32.dll")]
         public static extern IntPtr GetConsoleWindow();
@@ -14,165 +15,182 @@ function Show-Console
         public static extern bool ShowWindow(IntPtr hWnd, Int32 nCmdShow);
         '
     }
-    if ($Show)
-    {
-        $consolePtr = [Console.Window]::GetConsoleWindow()
-        $null = [Console.Window]::ShowWindow($consolePtr, 5)
+    $consolePtr = [Console.Window]::GetConsoleWindow()
+    if ($Show) {
+        [Console.Window]::ShowWindow($consolePtr, 5) | Out-Null
+        $global:DebugLoggingEnabled = $true # Enable logging
     }
-    if ($Hide)
-    {
-        $consolePtr = [Console.Window]::GetConsoleWindow()
-        #0 hide
-        $null = [Console.Window]::ShowWindow($consolePtr, 0)
+    if ($Hide) {
+        [Console.Window]::ShowWindow($consolePtr, 0) | Out-Null
+        $global:DebugLoggingEnabled = $false # Disable logging
     }
 }
-#To show the console change "-hide" to "-show"
-show-console -show
-#Form function
+
+# Wrapper function to handle conditional logging
+function Debug-Log {
+    param (
+        [string]$Message
+    )
+    if ($global:DebugLoggingEnabled) {
+        Write-Host $Message
+    }
+}
+# Change the line below to show debugging information
+# "-Show" to show the console "-Hide" to hide the console
+Show-Console -Hide
+Debug-Log "Console shown [Debugging Enabled]"
+
+# Function to create a form with specific buttons and styles
 function New-ProgramForm {
     param (
-        [Parameter(Mandatory)]
         [string]$Title,
-
-        [Parameter(Mandatory)]
         [int]$Width,
-
-        [Parameter(Mandatory)]
         [int]$Height,
-
-        [Parameter(Mandatory)]
         [string]$AcceptButtonText,
-
-        [Parameter(Mandatory)]
         [string]$SkipButtonText,
-
-        [Parameter(Mandatory)]
-        [string]$BackButtonText,
-
-        [Parameter(Mandatory)]
         [string]$CancelButtonText
     )
 
     $form = New-Object System.Windows.Forms.Form
     $form.Text = $Title
-    $form.Size = New-Object System.Drawing.Size($Width,$Height)
+    $form.Size = New-Object System.Drawing.Size($Width, $Height)
     $form.StartPosition = 'CenterScreen'
-    $objIcon = New-Object system.drawing.icon ("$PSScriptRoot\Assets\installer.ico")
-    $objImage = [system.drawing.image]::FromFile("$PSScriptRoot\Assets\form_background.png")
-    $form.Icon = $objIcon
-    $form.BackgroundImage = $objImage
+    $form.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon("$PSScriptRoot\Assets\installer.ico")
+    $form.BackgroundImage = [System.Drawing.Image]::FromFile("$PSScriptRoot\Assets\form_background.png")
     $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
-    
-    #Create a panel to hold the buttons
+
     $buttonPanel = New-Object System.Windows.Forms.Panel
     $buttonPanel.Dock = [System.Windows.Forms.DockStyle]::Bottom
     $buttonPanel.Height = 50
     $form.Controls.Add($buttonPanel)
 
-    $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Location = New-Object System.Drawing.Point(0,0)
-    $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = $AcceptButtonText
-    $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-    $buttonPanel.Controls.Add($okButton)
+    $buttons = @(
+        @{Text = $AcceptButtonText; DialogResult = [System.Windows.Forms.DialogResult]::OK},
+        @{Text = $SkipButtonText; DialogResult = [System.Windows.Forms.DialogResult]::Ignore},
+        @{Text = $CancelButtonText; DialogResult = [System.Windows.Forms.DialogResult]::Cancel}
+    )
 
-    $skipButton = New-Object System.Windows.Forms.Button
-    $skipButton.Location = New-Object System.Drawing.Point(75,0)
-    $skipButton.Size = New-Object System.Drawing.Size(75,23)
-    $skipButton.Text = $SkipButtonText
-    $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
-    $buttonPanel.Controls.Add($skipButton)
-
-    $backButton = New-Object System.Windows.Forms.Button
-    $backButton.Location = New-Object System.Drawing.Point(150,0)
-    $backButton.Size = New-Object System.Drawing.Size(75,23)
-    $backButton.Text = $BackButtonText
-    $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
-    $buttonPanel.Controls.Add($backButton)
-
-    $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Location = New-Object System.Drawing.Point(225,0)
-    $cancelButton.Size = New-Object System.Drawing.Size(75,23)
-    $cancelButton.Text = $CancelButtonText
-    $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-    $buttonPanel.Controls.Add($cancelButton)
+    $i = 0
+    foreach ($button in $buttons) {
+        $btn = New-Object System.Windows.Forms.Button
+        $btn.Location = New-Object System.Drawing.Point([int]($i * 85), 10)
+        $btn.Size = New-Object System.Drawing.Size(75, 30)
+        $btn.Text = $button.Text
+        $btn.DialogResult = $button.DialogResult
+        $buttonPanel.Controls.Add($btn)
+        $i++
+    }
 
     return $form
 }
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#IF YOU HAVEN'T PLEASE READ THE RULEBOOK FOR D&D AS THIS POWERSHELL SCRIPT JUST SIMPLIFIES MAKING A CHARACTER
-#CURRENTLY INDEV SO EXPECT ISSUES / BUGS OR DESIGN WEIRDNESS
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#Sparks's D&D Character Creator powershell script, this is intended for fun and feel free to edit fields for future use but please keep me credited
-#Remember to comment/remove all "Write-Host" statements as this is only for testing purposes
-#This powershell script follows original 5E rules, the website to get the information is:
-#Sources: https://www.dndbeyond.com/sources/basic-rules
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#Further down the script you see $value.statement = New-Object System.Drawing.Size(240,50)
-#The (240,50) means width,height for incase you forget
-#(10,50) 50 = up/down, 10 = left/right - Orientation 
-#Every part of the powershell script is changable, this is for custom games, hence why things aren't grouped together
-#Majority of the stats used came from the cards for D&D
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#When adding $Var together for things like combined numbers or words you need to do:
-#$TotalVar = $Var1 + $Var2 + $Var3 and not have {} in there as that does not work
-#$PSScriptRoot <- Use for rooting to this script location
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#To pull information from a json example:
-#Extract specific information from the JSON object
-#$name = $jsonObject.name
-#$age = $jsonObject.age
-#$size = $jsonObject.size
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#You need to call these files inside the if -eq code! Example:
-#$characterbackgroundselect.SelectedItem
-#$SelectedRace = $ChosenRace.SelectedItem
-#$ExportRace = $SelectedRace.Name
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#Then you can call an array to loop the information
-#foreach ($item in $jsonObject.items) {
-#    Write-Host $item.property
-#}
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#The "return" for the retry is a temp if statement as I plan a future feature
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#----------------------------
-#       Script Start
-#----------------------------
-#Type loader, forms
-Add-Type -AssemblyName System.Windows.Forms
-#Type loader, drawing for forms
-Add-Type -AssemblyName System.Drawing
-#Type loader, presentation framework
-Add-Type -AssemblyName PresentationCore,PresentationFramework
-#Imports Modules + Add Types
-Import-Module -Name $PSScriptRoot\Assets\iText\PDFForm | Out-Null
-Add-Type -Path "$PSScriptRoot\Assets\iText\itextsharp.dll"
-#Import-Module -Name $PSScriptRoot\Assets\Modules\LangTranslate | Out-Null
-#Form images
-$objIcon = New-Object system.drawing.icon ("$PSScriptRoot\Assets\installer.ico")
-$objImage = [system.drawing.image]::FromFile("$PSScriptRoot\Assets\form_background.png")
-#----------------------------
-#         JSON Load
-#----------------------------
-# Get the path to the folder containing the default JSON files
-$defaultsPath = Join-Path $PSScriptRoot "Assets"
-# Define a function to process JSON files
-function Get-JsonData($path) {
-    # Get all JSON files in the folder
-    $jsonFiles = Get-ChildItem -Path $path -Filter *.json
 
-    # Loop through each JSON file and process its contents
-    foreach ($file in $jsonFiles) {
-        # Read the contents of the JSON file
-        $content = Get-Content -Path $file.FullName -Raw
-        # Convert the JSON content to a PowerShell object and output it
-        $content | ConvertFrom-Json
+# Function to create text boxes dynamically
+function Set-TextBox {
+    param (
+        [string]$LabelText,
+        [int]$X,
+        [int]$Y,
+        [int]$Width,
+        [int]$Height,
+        [int]$MaxLength,
+        [string]$TooltipText = ""
+    )
+    $label = New-Object System.Windows.Forms.Label
+    $label.Location = New-Object System.Drawing.Point([int]$X, [int]$Y)
+    $label.Size = New-Object System.Drawing.Size($Width, 18)
+    $label.Text = $LabelText
+    $label.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
+
+    $textBox = New-Object System.Windows.Forms.TextBox
+    $textBox.Location = New-Object System.Drawing.Point([int]$X, [int]($Y + 25))
+    $textBox.Size = New-Object System.Drawing.Size($Width, $Height)
+    $textBox.MaxLength = $MaxLength
+
+    if ($TooltipText) {
+        $toolTip = New-Object System.Windows.Forms.ToolTip
+        $toolTip.SetToolTip($textBox, $TooltipText)
+    }
+
+    return @($label, $textBox)
+}
+
+# Function to create list boxes dynamically
+function Set-ListBox {
+    param (
+        [string]$LabelText,
+        [int]$X,
+        [int]$Y,
+        [int]$Width,
+        [int]$Height,
+        [array]$DataSource,
+        [string]$DisplayMember
+    )
+    $label = New-Object System.Windows.Forms.Label
+    $label.Location = New-Object System.Drawing.Point([int]$X, [int]$Y)
+    $label.Size = New-Object System.Drawing.Size($Width, 18)
+    $label.Text = $LabelText
+    $label.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
+
+    $listBox = New-Object System.Windows.Forms.ListBox
+    $listBox.Location = New-Object System.Drawing.Point([int]$X, [int]($Y + 25))
+    $listBox.Size = New-Object System.Drawing.Size($Width, $Height)
+    $listBox.DataSource = [System.Collections.ArrayList]$DataSource
+    $listBox.DisplayMember = $DisplayMember
+
+    return @($label, $listBox)
+}
+
+# Function to display a form and get user input
+function Show-Form {
+    param (
+        [System.Windows.Forms.Form]$form,
+        [ScriptBlock]$onOK,
+        [ScriptBlock]$onIgnore,
+        [ScriptBlock]$onCancel
+    )
+
+    $form.Topmost = $true
+    $form.Add_Shown({$form.Activate()})
+    $result = $form.ShowDialog()
+
+    switch ($result) {
+        [System.Windows.Forms.DialogResult]::OK {
+            & $onOK
+        }
+        [System.Windows.Forms.DialogResult]::Ignore {
+            & $onIgnore
+        }
+        [System.Windows.Forms.DialogResult]::Cancel {
+            & $onCancel
+        }
     }
 }
-#Process default JSON files
+
+# Type loader, forms
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName PresentationCore,PresentationFramework
+
+# Imports Modules + Add Types
+Import-Module -Name "$PSScriptRoot\Assets\iText\PDFForm" | Out-Null
+Add-Type -Path "$PSScriptRoot\Assets\iText\itextsharp.dll"
+
+# Paths to JSON data
+$defaultsPath = Join-Path $PSScriptRoot "Assets"
+
+# Function to load JSON data
+function Get-JsonData($path) {
+    $jsonFiles = Get-ChildItem -Path $path -Filter *.json
+    $data = @()
+    foreach ($file in $jsonFiles) {
+        $content = Get-Content -Path $file.FullName -Raw
+        $data += $content | ConvertFrom-Json
+    }
+    return $data
+}
+
+# Process JSON D&D information
 $defaultJSON = Get-JsonData -path $defaultsPath
-#Process other JSON files
 $CharacterBackgroundJSON = Get-JsonData -path "$PSScriptRoot\Assets\Backgrounds"
 $RacesJSON = Get-JsonData -path "$PSScriptRoot\Assets\Races"
 $EyesJSON = Get-JsonData -path "$PSScriptRoot\Assets\Character_Features\Eyes"
@@ -181,1157 +199,598 @@ $SkinJSON = Get-JsonData -path "$PSScriptRoot\Assets\Character_Features\Skin"
 $AlignmentJSON = Get-JsonData -path "$PSScriptRoot\Assets\Alignments"
 $ClassesJSON = Get-JsonData -path "$PSScriptRoot\Assets\Classes"
 $WeaponJSON = Get-JsonData -path "$PSScriptRoot\Assets\Weapons"
-#---- Default Value's -----
-$WrittenCharactername = $DefaultJSON.Charactername
-$WrittenPlayername = $DefaultJSON.Playername
-$WrittenAge = $DefaultJSON.Age
-$ExportBackground = $DefaultJSON.Characterbackground
-$Height = $DefaultJSON.Playerheight
-$Size = $DefaultJSON.PlayerSize
-$Eyes = $DefaultJSON.Characterfeatureseyes
-$Hair = $DefaultJSON.characterfeatureshair
-$Skin = $DefaultJSON.characterfeaturesskin
-#$CharacterImage = $DefaultJSON.CharacterImage
-$FactionSymbol = $DefaultJSON.FactionSymbol
-$PersonalityTraits = $DefaultJSON.PersonalityTraits
-$ProficencyBonus = $DefaultJSON.ProficencyBonus
-$Class = $DefaultJSON.ClassLevel
-$HP = $DefaultJSON.HP
-$HD = $DefaultJSON.HD
-$Speed = $DefaultJSON.SpeedTotal
-$DEX = $DefaultJSON.DEX
-$CON = $DefaultJSON.CON
-$INT = $DefaultJSON.INT
-$WIS = $DefaultJSON.WIS
-$CHA = $DefaultJSON.CHA
-$SpokenLanguages = $DefaultJSON.SpokenLanguages
-$InitiativeTotal = $DefaultJSON.InitiativeTotal
-$Characterbackstory = $DefaultJSON.Characterbackstory
-$factionname = $DefaultJSON.factionname
-$Allies = $DefaultJSON.alliesandorganisations
-$AddionalfeatTraits = $DefaultJSON.AddionalfeatTraits
-$Ideals = $DefaultJSON.Ideals
-$Bonds = $DefaultJSON.Bonds
-$Flaws = $DefaultJSON.Flaws
-$CombinedWeaponStats = $DefaultJSON.CombinedWeaponStats
-$ChosenArmour = $DefaultJSON.ChosenArmour
-$ArmourClass = $DefaultJSON.ArmourClass
-$HitDiceTotal = $DefaultJSON.HitDiceTotal
-$XP = $DefaultJSON.XP
-$Inspiration = $DefaultJSON.Inspiration
-$CopperCP = $DefaultJSON.CopperCP
-$SilverSP = $DefaultJSON.SilverSP
-$ElectrumEP = $DefaultJSON.ElectrumEP
-$GoldGP = $DefaultJSON.GoldGP
-$PlatinumPP = $DefaultJSON.PlatinumPP
-$SpellCastingClass = $DefaultJSON.SpellCastingClass
-$SpellCastingAbility = $DefaultJSON.SpellCastingAbility
-$SpellCastingSaveDC = $DefaultJSON.SpellCastingSaveDC
-$SpellCastingAttackBonus = $DefaultJSON.SpellCastingAttackBonus
-$Acrobatics = $DefaultJSON.Acrobatics
-$AnimalHandling = $DefaultJSON.AnimalHandling
-$Arcana = $DefaultJSON.Arcana
-$Athletics = $DefaultJSON.Athletics
-$Deception = $DefaultJSON.Deception
-$History = $DefaultJSON.History
-$Insight = $DefaultJSON.Insight
-$Intimidation = $DefaultJSON.Intimidation
-$Investigation = $DefaultJSON.Investigation
-$Medicine = $DefaultJSON.Medicine
-$Nature = $DefaultJSON.Nature
-$Perception = $DefaultJSON.Perception
-$Performance = $DefaultJSON.Performance
-$Persuation = $DefaultJSON.Persuation
-$Religion = $DefaultJSON.Religion
-$SleightOfHand = $DefaultJSON.SleightOfHand
-$Stealth = $DefaultJSON.Stealth
-$Survival = $DefaultJSON.Survival
-$Passive = $DefaultJSON.Passive
-$Comma = ", "
-Write-Host "Loaded Defaults"
-#----------------------------
-#        Form Load
-#----------------------------
-#Basic user information gathering - Basic Information
-    #Basic form
-#Create form for basic information gathering
-$form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -BackButtonText 'Back' -CancelButtonText 'Cancel'
-#Add character name label and textbox to form
-$characterLabel = New-Object System.Windows.Forms.Label
-$characterLabel.Location = New-Object System.Drawing.Point(10, 20)
-$characterLabel.Size = New-Object System.Drawing.Size(118, 18)
-$characterLabel.Text = 'Character Name:'
-$characterLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
-$form.Controls.Add($characterLabel)
+$GearJSON = Get-JsonData -path "$PSScriptRoot\Assets\Gear"
+$ArmourJSON = Get-JsonData -path "$PSScriptRoot\Assets\Armour"
 
-$characterName = New-Object System.Windows.Forms.TextBox
-$characterName.Location = New-Object System.Drawing.Point(10, 40)
-$characterName.Size = New-Object System.Drawing.Size(180, 20)
-$characterName.MaxLength = 30
-$form.Controls.Add($characterName)
+# ---- Default Values -----
+$global:WrittenCharactername = $defaultJSON.Charactername
+$global:WrittenPlayername = $defaultJSON.Playername
+$global:WrittenAge = $defaultJSON.Age
+$global:ExportBackground = $defaultJSON.Characterbackground
+$global:Height = $defaultJSON.Playerheight
+$global:Size = $defaultJSON.PlayerSize
+$global:Eyes = $defaultJSON.Characterfeatureseyes
+$global:Hair = $defaultJSON.characterfeatureshair
+$global:Skin = $defaultJSON.characterfeaturesskin
+#$global:CharacterImage = $defaultJSON.CharacterImage
+$global:FactionSymbol = $defaultJSON.FactionSymbol
+$global:PersonalityTraits = $defaultJSON.PersonalityTraits
+$global:ProficencyBonus = $defaultJSON.ProficencyBonus
+$global:Class = $defaultJSON.ClassLevel
+$global:HP = $defaultJSON.HP
+$global:HD = $defaultJSON.HD
+$global:Speed = $defaultJSON.SpeedTotal
+$global:DEX = $defaultJSON.DEX
+$global:CON = $defaultJSON.CON
+$global:INT = $defaultJSON.INT
+$global:WIS = $defaultJSON.WIS
+$global:CHA = $defaultJSON.CHA
+$global:SpokenLanguages = $defaultJSON.SpokenLanguages
+$global:InitiativeTotal = $defaultJSON.InitiativeTotal
+$global:Characterbackstory = $defaultJSON.Characterbackstory
+$global:factionname = $defaultJSON.factionname
+$global:Allies = $defaultJSON.alliesandorganisations
+$global:AddionalfeatTraits = $defaultJSON.AddionalfeatTraits
+$global:Ideals = $defaultJSON.Ideals
+$global:Bonds = $defaultJSON.Bonds
+$global:Flaws = $defaultJSON.Flaws
+$global:CombinedWeaponStats = $defaultJSON.CombinedWeaponStats
+$global:Armour = $defaultJSON.ChosenArmour
+$global:ArmourClass = $defaultJSON.ArmourClass
+$global:HitDiceTotal = $defaultJSON.HitDiceTotal
+$global:XP = $defaultJSON.XP
+$global:Inspiration = $defaultJSON.Inspiration
+$global:CopperCP = $defaultJSON.CopperCP
+$global:SilverSP = $defaultJSON.SilverSP
+$global:ElectrumEP = $defaultJSON.ElectrumEP
+$global:GoldGP = $defaultJSON.GoldGP
+$global:PlatinumPP = $defaultJSON.PlatinumPP
+$global:SpellCastingClass = $defaultJSON.SpellCastingClass
+$global:SpellCastingAbility = $defaultJSON.SpellCastingAbility
+$global:SpellCastingSaveDC = $defaultJSON.SpellCastingSaveDC
+$global:SpellCastingAttackBonus = $defaultJSON.SpellCastingAttackBonus
+$global:Acrobatics = $defaultJSON.Acrobatics
+$global:AnimalHandling = $defaultJSON.AnimalHandling
+$global:Arcana = $defaultJSON.Arcana
+$global:Athletics = $defaultJSON.Athletics
+$global:Deception = $defaultJSON.Deception
+$global:History = $defaultJSON.History
+$global:Insight = $defaultJSON.Insight
+$global:Intimidation = $defaultJSON.Intimidation
+$global:Investigation = $defaultJSON.Investigation
+$global:Medicine = $defaultJSON.Medicine
+$global:Nature = $defaultJSON.Nature
+$global:Perception = $defaultJSON.Perception
+$global:Performance = $defaultJSON.Performance
+$global:Persuation = $defaultJSON.Persuation
+$global:Religion = $defaultJSON.Religion
+$global:SleightOfHand = $defaultJSON.SleightOfHand
+$global:Stealth = $defaultJSON.Stealth
+$global:Survival = $defaultJSON.Survival
+$global:Passive = $defaultJSON.Passive
+$global:Comma = ", "
+Debug-Log "Loaded Defaults"
 
-#Add age label and textbox to form
-$ageLabel = New-Object System.Windows.Forms.Label
-$ageLabel.Location = New-Object System.Drawing.Point(10, 67)
-$ageLabel.Size = New-Object System.Drawing.Size(110, 18)
-$ageLabel.Text = 'Character Age:'
-$ageLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
-$form.Controls.Add($ageLabel)
+# Function to calculate ability modifiers and other derived stats
+function Calculate-CharacterStats {
+    # Calculate ability modifiers
+    $global:STRMod = [math]::Floor(($global:STR - 10) / 2)
+    $global:DEXMod = [math]::Floor(($global:DEX - 10) / 2)
+    $global:CONMod = [math]::Floor(($global:CON - 10) / 2)
+    $global:INTMod = [math]::Floor(($global:INT - 10) / 2)
+    $global:WISMod = [math]::Floor(($global:WIS - 10) / 2)
+    $global:CHAMod = [math]::Floor(($global:CHA - 10) / 2)
+    
+    # Calculate proficiency bonus based on character level
+    if ($global:Class -match 'Level (\d+)') {
+        $level = [int]($matches[1])
+        if ($level -le 4) { $global:ProficiencyBonus = 2 }
+        elseif ($level -le 8) { $global:ProficiencyBonus = 3 }
+        elseif ($level -le 12) { $global:ProficiencyBonus = 4 }
+        elseif ($level -le 16) { $global:ProficiencyBonus = 5 }
+        else { $global:ProficiencyBonus = 6 }
+    } else {
+        $global:ProficiencyBonus = 2  # Default to 2 if level is not detected
+    }
 
-$age = New-Object System.Windows.Forms.TextBox
-$age.Location = New-Object System.Drawing.Point(10, 85)
-$age.Size = New-Object System.Drawing.Size(58, 20)
-$age.MaxLength = 5
-$age.Add_TextChanged({$age.Text = $age.Text -replace '\D'})
-$form.Controls.Add($age)
+    # Calculate saving throws
+    $global:ST_STR = $global:STRMod
+    if ($global:SelectedClass.SavingThrows -contains 'Strength') {
+        $global:ST_STR += $global:ProficiencyBonus
+    }
 
-# Add player name label and textbox to form
-$playerLabel = New-Object System.Windows.Forms.Label
-$playerLabel.Location = New-Object System.Drawing.Point(10, 108)
-$playerLabel.Size = New-Object System.Drawing.Size(100, 18)
-$playerLabel.Text = 'Player Name:'
-$playerLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
-$form.Controls.Add($playerLabel)
+    $global:ST_DEX = $global:DEXMod
+    if ($global:SelectedClass.SavingThrows -contains 'Dexterity') {
+        $global:ST_DEX += $global:ProficiencyBonus
+    }
 
-$playerName = New-Object System.Windows.Forms.TextBox
-$playerName.Location = New-Object System.Drawing.Point(10, 127)
-$playerName.Size = New-Object System.Drawing.Size(180, 20)
-$playerName.MaxLength = 30
-$form.Controls.Add($playerName)
+    $global:ST_CON = $global:CONMod
+    if ($global:SelectedClass.SavingThrows -contains 'Constitution') {
+        $global:ST_CON += $global:ProficiencyBonus
+    }
 
-# Show the form and wait for a button to be clicked
-$result = $form.ShowDialog()
-# Check which button was clicked and perform the appropriate action
-if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
-        #Output the written data from the form
-        $WrittenCharactername = $charactername.Text
-        $WrittenPlayername = $playername.Text
-        $WrittenAge = $Age.Text
-        #If the console is set to show, this is just for that
-        Write-Host "Character Name is $WrittenCharactername"
-        Write-Host "Character Age is $WrittenPlayername"
-        Write-Host "Player Name is $WrittenAge"
-} elseif ($result -eq [System.Windows.Forms.DialogResult]::Ignore) {
-    # Skip button was clicked, do something else
-} elseif ($result -eq [System.Windows.Forms.DialogResult]::Retry) {
-    # Back button was clicked, do something else
-} else {
-    # Cancel button was clicked, exit the script
+    $global:ST_INT = $global:INTMod
+    if ($global:SelectedClass.SavingThrows -contains 'Intelligence') {
+        $global:ST_INT += $global:ProficiencyBonus
+    }
+
+    $global:ST_WIS = $global:WISMod
+    if ($global:SelectedClass.SavingThrows -contains 'Wisdom') {
+        $global:ST_WIS += $global:ProficiencyBonus
+    }
+
+    $global:ST_CHA = $global:CHAMod
+    if ($global:SelectedClass.SavingThrows -contains 'Charisma') {
+        $global:ST_CHA += $global:ProficiencyBonus
+    }
+    
+    # Calculate initiative
+    $global:InitiativeTotal = $global:DEXMod
+
+    # Calculate passive perception
+    $global:Passive = 10 + $global:WISMod
+    if ($global:SelectedClass.SkillProficiencies -contains 'Perception') {
+        $global:Passive += $global:ProficiencyBonus
+    }
+}
+
+# Function to display the basic information form
+function Show-BasicInfoForm {
+    Debug-Log "Displaying Basic Info Form"
+
+    # Create a new form
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+
+    # Create controls for Character Name, Age, and Player Name
+    $characterNameControls = Set-TextBox -LabelText 'Character Name:' -X 10 -Y 20 -Width 118 -Height 20 -MaxLength 30
+
+    # Create the Age textbox and restrict input to numeric values only
+    $ageLabel = New-Object System.Windows.Forms.Label
+    $ageLabel.Location = New-Object System.Drawing.Point(10, 67)
+    $ageLabel.Size = New-Object System.Drawing.Size(110, 18)
+    $ageLabel.Text = 'Character Age:'
+    $ageLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
+    $form.Controls.Add($ageLabel)
+
+    $age = New-Object System.Windows.Forms.TextBox
+    $age.Location = New-Object System.Drawing.Point(10, 85)
+    $age.Size = New-Object System.Drawing.Size(58, 20)
+    $age.MaxLength = 5
+
+    # Restrict input to numeric values only
+    $age.Add_TextChanged({
+        if ($age.Text -match '\D') {
+            $age.Text = $age.Text -replace '\D', ''
+            $age.SelectionStart = $age.Text.Length
+        }
+    })
+
+    $playerNameControls = Set-TextBox -LabelText 'Player Name:' -X 10 -Y 114 -Width 100 -Height 20 -MaxLength 30
+
+    # Add the controls to the form
+    $form.Controls.AddRange($characterNameControls)
+    $form.Controls.Add($age)
+    $form.Controls.AddRange($playerNameControls)
+
+    # Display the form
+    $form.Topmost = $true
+    $form.Add_Shown({$form.Activate()})
+    $result = $form.ShowDialog()
+
+    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+        # Capture the values from the form controls
+        $global:WrittenCharactername = $characterNameControls[1].Text
+        $global:WrittenAge = $age.Text
+        $global:WrittenPlayername = $playerNameControls[1].Text
+
+        Debug-Log "`n[Debug] Character Name Captured: $($global:WrittenCharactername)"
+        Debug-Log "[Debug] Age Captured: $($global:WrittenAge)"
+        Debug-Log "[Debug] Player Name Captured: $($global:WrittenPlayername)"
+    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
+        Debug-Log "Form was canceled by the user."
+        exit
+    }
+}
+Debug-Log "Passed Show-BasicInfoForm"
+Show-BasicInfoForm
+
+# Function to display the class and race selection form
+function Show-ClassAndRaceForm {
+    Debug-Log "Displaying Class and Race Form"
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 450 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+
+    $backgroundControls = Set-ListBox -LabelText 'Please Select a Background:' -X 10 -Y 20 -Width 200 -Height 170 -DataSource $CharacterBackgroundJSON -DisplayMember 'name'
+    $raceControls = Set-ListBox -LabelText 'Please select a Race:' -X 220 -Y 20 -Width 150 -Height 170 -DataSource $RacesJSON -DisplayMember 'name'
+
+    $form.Controls.AddRange($backgroundControls)
+    $form.Controls.AddRange($raceControls)
+
+    $form.Topmost = $true
+    $form.Add_Shown({$form.Activate()})
+    $result = $form.ShowDialog()
+
+    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+        $global:ExportBackground = $backgroundControls[1].SelectedItem.Name
+        $global:SelectedRace = $raceControls[1].SelectedItem
+        $global:ExportRace = $global:SelectedRace.Name
+        $global:Feature1TTraits1 = $global:SelectedRace.Description
+        $global:HP = $global:SelectedRace.HP
+        $global:Speed = $global:SelectedRace.Speed
+        $global:Size = $global:SelectedRace.Size
+        $global:Height = $global:SelectedRace.Height
+        $global:SpokenLanguages = $global:SelectedRace.Languages
+        $global:Special = $global:SelectedRace.Special
+        $global:STR = [int]$global:SelectedRace.Strength
+        $global:DEX = [int]$global:SelectedRace.Dexterity
+        $global:CON = [int]$global:SelectedRace.Constitution
+        $global:INT = [int]$global:SelectedRace.Intelligence
+        $global:WIS = [int]$global:SelectedRace.Wisdom
+        $global:CHA = [int]$global:SelectedRace.Charisma
+        $global:STRMod = $global:SelectedRace.StrengthMod
+        $global:DEXMod = $global:SelectedRace.DexterityMod
+        $global:CONMod = $global:SelectedRace.ConstitutionMod
+        $global:INTMod = $global:SelectedRace.IntelligenceMod
+        $global:WISMod = $global:SelectedRace.WisdomMod
+        $global:CHAMod = $global:SelectedRace.CharismaMod
+        $global:ST_STR = $global:SelectedRace.Saving_Strength
+        $global:ST_DEX = $global:SelectedRace.Saving_Dexterity
+        $global:ST_CON = $global:SelectedRace.Saving_Constitution
+        $global:ST_INT = $global:SelectedRace.Saving_Intelligence
+        $global:ST_WIS = $global:SelectedRace.Saving_Wisdom
+        $global:ST_CHA = $global:SelectedRace.Saving_Charisma
+
+        # Debugging: Output the ability scores
+        Debug-Log "`n[Debug] Ability Scores:"
+        Debug-Log "STR: $global:STR, DEX: $global:DEX, CON: $global:CON, INT: $global:INT, WIS: $global:WIS, CHA: $global:CHA"
+        
+        # Calculate derived stats immediately after race selection
+        Debug-Log "Calculating Character Stats"
+        Calculate-CharacterStats
+    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
+        Debug-Log "Form was canceled by the user."
+        exit
+    }
+}
+Debug-Log "Passed Show-ClassAndRaceForm"
+Show-ClassAndRaceForm
+
+# Function to display the subrace form
+function Show-SubRaceForm {
+    Debug-Log "Displaying SubRace Form"
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+
+    if ($global:SelectedRace.subraces -and $global:SelectedRace.subraces.Count -gt 0) {
+        $subRaceControls = Set-ListBox -LabelText 'Please select a SubRace:' -X 10 -Y 20 -Width 260 -Height 200 -DataSource $global:SelectedRace.subraces -DisplayMember 'name'
+        $form.Controls.AddRange($subRaceControls)
+
+        $form.Topmost = $true
+        $form.Add_Shown({$form.Activate()})
+        $result = $form.ShowDialog()
+
+        if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+            $global:SelectedSubRace = $subRaceControls[1].SelectedItem
+            $global:ExportSubrace = $global:SelectedSubRace.Name
+
+            Debug-Log "SelectedSubRace: $($global:SelectedSubRace)"
+            Debug-Log "ExportSubrace: $($global:ExportSubrace)"
+        } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
+            Debug-Log "Form was canceled by the user."
+            exit
+        }
+    } else {
+        Debug-Log "No subraces available for the selected race."
+    }
+}
+Debug-Log "Passed Show-SubRaceForm"
+Show-SubRaceForm
+
+# Function to display the character features form
+function Show-CharacterFeaturesForm {
+    Debug-Log "Displaying Character Features Form"
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+
+    $eyesControls = Set-ListBox -LabelText 'Select Eyes:' -X 10 -Y 20 -Width 110 -Height 170 -DataSource $EyesJSON -DisplayMember 'name'
+    $hairControls = Set-ListBox -LabelText 'Select Hair:' -X 125 -Y 20 -Width 110 -Height 170 -DataSource $HairJSON -DisplayMember 'name'
+    $skinControls = Set-ListBox -LabelText 'Select Skin:' -X 240 -Y 20 -Width 110 -Height 170 -DataSource $SkinJSON -DisplayMember 'name'
+
+    $form.Controls.AddRange($eyesControls)
+    $form.Controls.AddRange($hairControls)
+    $form.Controls.AddRange($skinControls)
+
+    $form.Topmost = $true
+    $form.Add_Shown({$form.Activate()})
+    $result = $form.ShowDialog()
+
+    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+        $global:Eyes = $eyesControls[1].SelectedItem.Name
+        $global:Hair = $hairControls[1].SelectedItem.Name
+        $global:Skin = $skinControls[1].SelectedItem.Name
+
+        Debug-Log "Eyes: $($global:Eyes)"
+        Debug-Log "Hair: $($global:Hair)"
+        Debug-Log "Skin: $($global:Skin)"
+    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
+        Debug-Log "Form was canceled by the user."
+        exit
+    }
+}
+Debug-Log "Passed Show-CharacterFeaturesForm"
+Show-CharacterFeaturesForm
+
+# Function to display the class and alignment selection form
+function Show-ClassAndAlignmentForm {
+    Debug-Log "Displaying Class and Alignment Form"
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+
+    $classControls = Set-ListBox -LabelText 'Please select a Primary Class:' -X 10 -Y 20 -Width 160 -Height 200 -DataSource $ClassesJSON -DisplayMember 'name'
+    $alignmentControls = Set-ListBox -LabelText 'Please select an Alignment:' -X 200 -Y 20 -Width 160 -Height 200 -DataSource $AlignmentJSON -DisplayMember 'name'
+
+    $form.Controls.AddRange($classControls)
+    $form.Controls.AddRange($alignmentControls)
+
+    $form.Topmost = $true
+    $form.Add_Shown({$form.Activate()})
+    $result = $form.ShowDialog()
+
+    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+        $global:SelectedClass = $classControls[1].SelectedItem
+        $global:Class = $global:SelectedClass.Name
+        $global:HD = $global:SelectedClass.HitDice
+        $global:SpellCastingClass = $global:SelectedClass.SpellCastingClass
+        $global:SpellCastingAbility = $global:SelectedClass.SpellcastingAbility
+        $global:SelectedPack = $global:SelectedClass.Backpack
+        $global:Alignment = $alignmentControls[1].SelectedItem.Name
+
+        Debug-Log "SelectedClass: $($global:SelectedClass)"
+        Debug-Log "Class: $($global:Class)"
+        Debug-Log "Alignment: $($global:Alignment)"
+
+        # Calculate the derived stats based on race and class
+        Debug-Log "Calculating Character Stats"
+        Calculate-CharacterStats
+    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
+        Debug-Log "Form was canceled by the user."
+        exit
+    }
+}
+Debug-Log "Passed Show-ClassAndAlignmentForm"
+Show-ClassAndAlignmentForm
+
+# Function to display the subclass selection form
+function Show-SubClassForm {
+    Debug-Log "Displaying SubClass Form"
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+
+    if ($global:SelectedClass.Subclasses -and $global:SelectedClass.Subclasses.Count -gt 0) {
+        $subClassControls = Set-ListBox -LabelText 'Please select a SubClass:' -X 10 -Y 20 -Width 260 -Height 200 -DataSource $global:SelectedClass.Subclasses
+        $form.Controls.AddRange($subClassControls)
+
+        $form.Topmost = $true
+        $form.Add_Shown({$form.Activate()})
+        $result = $form.ShowDialog()
+
+        if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+            if ($subClassControls[1].SelectedItem) {
+                $global:SubClass = $subClassControls[1].SelectedItem
+                $global:ClassAndSubClass = "$($global:Class) - $($global:SubClass)"
+                Debug-Log "SubClass Selected: $($global:SubClass)"
+            }
+        } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
+            Debug-Log "Form was canceled by the user."
+            exit
+        }
+    } else {
+        Debug-Log "No subclasses available for the selected class."
+    }
+}
+Debug-Log "Passed Show-SubClassForm"
+Show-SubClassForm
+
+# Function to display the weapon and armor selection form
+function Show-WeaponAndArmorForm {
+    Debug-Log "Displaying Weapon and Armor Form"
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 600 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+
+    $weapon1Controls = Set-ListBox -LabelText 'Select Weapon 1:' -X 15 -Y 20 -Width 140 -Height 230 -DataSource $WeaponJSON -DisplayMember 'name'
+    $weapon2Controls = Set-ListBox -LabelText 'Select Weapon 2:' -X 165 -Y 20 -Width 140 -Height 230 -DataSource $WeaponJSON -DisplayMember 'name'
+    $weapon3Controls = Set-ListBox -LabelText 'Select Weapon 3:' -X 315 -Y 20 -Width 140 -Height 230 -DataSource $WeaponJSON -DisplayMember 'name'
+    $gearControls = Set-ListBox -LabelText 'Select 1 extra Adventuring Gear:' -X 240 -Y 275 -Width 220 -Height 230 -DataSource $GearJSON -DisplayMember 'name'
+    $armorControls = Set-ListBox -LabelText 'Please select Armour you wish to wear:' -X 10 -Y 275 -Width 220 -Height 200 -DataSource $ArmourJSON -DisplayMember 'name'
+
+    $checkboxShield = New-Object System.Windows.Forms.CheckBox
+    $checkboxShield.Location = New-Object System.Drawing.Point(25, 490)
+    $checkboxShield.Size = New-Object System.Drawing.Size(120, 40)
+    $checkboxShield.Text = "Shield?"
+    $checkboxShield.Checked = $false
+
+    $form.Controls.AddRange($weapon1Controls)
+    $form.Controls.AddRange($weapon2Controls)
+    $form.Controls.AddRange($weapon3Controls)
+    $form.Controls.AddRange($gearControls)
+    $form.Controls.AddRange($armorControls)
+    $form.Controls.Add($checkboxShield)
+
+    $form.Topmost = $true
+    $form.Add_Shown({$form.Activate()})
+    $result = $form.ShowDialog()
+
+    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+        # Weapon Selections
+        $global:Weapon1 = $weapon1Controls[1].SelectedItem.Name
+        $global:Weapon2 = $weapon2Controls[1].SelectedItem.Name
+        $global:Weapon3 = $weapon3Controls[1].SelectedItem.Name
+        $global:Gear = $gearControls[1].SelectedItem.Name
+
+        # Extract properties for the first weapon
+        $weapon1 = $weapon1Controls[1].SelectedItem
+        $global:WPN1ATK_Bonus = $weapon1.WPN1ATK_Bonus
+        $global:Weapon1Damage = $weapon1.Weapon1Damage
+        $global:Weapon1Weight = $weapon1.Weapon1Weight
+        $global:Weapon1Properties = $weapon1.Weapon1Properties
+
+        # Extract properties for the second weapon
+        $weapon2 = $weapon2Controls[1].SelectedItem
+        $global:WPN2ATK_Bonus = $weapon2.WPN2ATK_Bonus
+        $global:Weapon2Damage = $weapon2.Weapon2Damage
+        $global:Weapon2Weight = $weapon2.Weapon2Weight
+        $global:Weapon2Properties = $weapon2.Weapon2Properties
+
+        # Extract properties for the third weapon
+        $weapon3 = $weapon3Controls[1].SelectedItem
+        $global:WPN3ATK_Bonus = $weapon3.WPN3ATK_Bonus
+        $global:Weapon3Damage = $weapon3.Weapon3Damage
+        $global:Weapon3Weight = $weapon3.Weapon3Weight
+        $global:Weapon3Properties = $weapon3.Weapon3Properties
+
+        $selectedArmor = $armorControls[1].SelectedItem
+        $baseAC = [int]$selectedArmor.BaseAC   # Now correctly mapped to the JSON structure
+        $armorType = $selectedArmor.Type       
+        $maxDexBonus = [int]$selectedArmor.MaxDexBonus  
+        $dexModifier = [int]$global:DEXMod
+        
+        # Apply Dex Modifier if applicable
+        if ($selectedArmor.DexModifierApplicable -and $armorType -eq 'Medium') {
+            $dexModifier = [math]::Min($dexModifier, $maxDexBonus)
+        }
+        
+        $global:ArmourClass = $baseAC + $dexModifier
+        
+        # Apply shield bonus if selected
+        if ($checkboxShield.Checked) {
+            $global:ArmourClass += 2
+        }
+
+        # Debugging Outputs
+        Debug-Log "Weapon1: $($global:Weapon1)"
+        Debug-Log "Weapon1Damage: $($global:Weapon1Damage)"
+        Debug-Log "Weapon2: $($global:Weapon2)"
+        Debug-Log "Weapon2Damage: $($global:Weapon2Damage)"
+        Debug-Log "Weapon3: $($global:Weapon3)"
+        Debug-Log "Weapon3Damage: $($global:Weapon3Damage)"
+        Debug-Log "Gear: $($global:Gear)"
+        Debug-Log "Armour: $($global:Armour)"
+        Debug-Log "Calculated ArmourClass: $($global:ArmourClass)"
+        Debug-Log "Selected Armor: $($armorControls[1].SelectedItem)"
+        Debug-Log "Base AC: $baseAC"
+        Debug-Log "Armor Type: $armorType"
+        Debug-Log "Dexterity Modifier: $dexModifier"
+    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
+        Debug-Log "Form was canceled by the user."
+        exit
+    }
+}
+Debug-Log "Passed Show-WeaponAndArmorForm"
+Show-WeaponAndArmorForm
+
+# Function to display the character backstory form
+function Show-BackstoryForm {
+    Debug-Log "Displaying Backstory Form"
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 800 -Height 605 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+
+    $backstoryControls = Set-TextBox -LabelText 'Write your backstory:' -X 10 -Y 20 -Width 400 -Height 500 -MaxLength 0
+    $backstoryControls[1].Multiline = $true
+    $backstoryControls[1].ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
+
+    $personalityControls = Set-TextBox -LabelText 'Write your Personality Traits:' -X 420 -Y 20 -Width 300 -Height 100 -MaxLength 0
+    $personalityControls[1].Multiline = $true
+    $personalityControls[1].ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
+
+    $idealsControls = Set-TextBox -LabelText 'Write your Ideals:' -X 420 -Y 150 -Width 300 -Height 100 -MaxLength 0
+    $idealsControls[1].Multiline = $true
+    $idealsControls[1].ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
+
+    $bondsControls = Set-TextBox -LabelText 'Write About your Bonds:' -X 420 -Y 280 -Width 300 -Height 100 -MaxLength 0
+    $bondsControls[1].Multiline = $true
+    $bondsControls[1].ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
+
+    $flawsControls = Set-TextBox -LabelText 'Write your Flaws:' -X 420 -Y 410 -Width 300 -Height 100 -MaxLength 0
+    $flawsControls[1].Multiline = $true
+    $flawsControls[1].ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
+
+    $form.Controls.AddRange($backstoryControls)
+    $form.Controls.AddRange($personalityControls)
+    $form.Controls.AddRange($idealsControls)
+    $form.Controls.AddRange($bondsControls)
+    $form.Controls.AddRange($flawsControls)
+
+    $form.Topmost = $true
+    $form.Add_Shown({$form.Activate()})
+    $result = $form.ShowDialog()
+
+    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+        $global:Characterbackstory = $backstoryControls[1].Text
+        $global:PersonalityTraits = $personalityControls[1].Text
+        $global:Ideals = $idealsControls[1].Text
+        $global:Bonds = $bondsControls[1].Text
+        $global:Flaws = $flawsControls[1].Text
+
+        Debug-Log "Characterbackstory: $($global:Characterbackstory)"
+        Debug-Log "PersonalityTraits: $($global:PersonalityTraits)"
+        Debug-Log "Ideals: $($global:Ideals)"
+        Debug-Log "Bonds: $($global:Bonds)"
+        Debug-Log "Flaws: $($global:Flaws)"
+    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
+        Debug-Log "Form was canceled by the user."
+        exit
+    }
+}
+Debug-Log "Passed Show-BackstoryForm"
+Show-BackstoryForm
+
+# Function to display the additional details form
+function Show-AdditionalDetailsForm {
+    Debug-Log "Displaying Additional Details Form"
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 790 -Height 620 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+
+    $alliesControls = Set-TextBox -LabelText 'Write about your Allies and Organisations:' -X 10 -Y 20 -Width 360 -Height 480 -MaxLength 0
+    $alliesControls[1].Multiline = $true
+    $alliesControls[1].ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
+
+    $featTraitsControls = Set-TextBox -LabelText 'Write your Additional features and traits:' -X 400 -Y 20 -Width 360 -Height 480 -MaxLength 0
+    $featTraitsControls[1].Multiline = $true
+    $featTraitsControls[1].ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
+
+    $factionNameControls = Set-TextBox -LabelText 'Faction Name:' -X 10 -Y 530 -Width 360 -Height 20 -MaxLength 0
+
+    $form.Controls.AddRange($alliesControls)
+    $form.Controls.AddRange($featTraitsControls)
+    $form.Controls.AddRange($factionNameControls)
+
+    $form.Topmost = $true
+    $form.Add_Shown({$form.Activate()})
+    $result = $form.ShowDialog()
+
+    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+        $global:Allies = $alliesControls[1].Text
+        $global:AddionalfeatTraits = $featTraitsControls[1].Text
+        $global:factionname = $factionNameControls[1].Text
+
+        Debug-Log "Allies: $($global:Allies)"
+        Debug-Log "AddionalfeatTraits: $($global:AddionalfeatTraits)"
+        Debug-Log "FactionName: $($global:factionname)"
+    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
+        Debug-Log "Form was canceled by the user."
+        exit
+    }
+}
+Debug-Log "Passed Show-AdditionalDetailsForm"
+Show-AdditionalDetailsForm
+Debug-Log "All forms have been displayed, proceeding with Save"
+
+# Save Form As
+$SaveChooser = New-Object -Typename System.Windows.Forms.SaveFileDialog
+$SaveChooser.Title = "Save as"
+$SaveChooser.FileName = "D&D Avatar - ChangeMe"
+$SaveChooser.DefaultExt = ".pdf"
+$SaveChooser.Filter = 'PDF File (*.pdf)|*.pdf'
+$SaveResult = $SaveChooser.ShowDialog((New-Object System.Windows.Forms.Form -Property @{TopMost = $true }))
+if ($SaveResult -eq [System.Windows.Forms.DialogResult]::OK) {
+    $PathSelected = $SaveChooser.FileName
+} elseif ($SaveResult -eq [System.Windows.Forms.DialogResult]::Cancel) {
     exit
 }
-#Basic user information gathering - Class and race
-    #Basic form
-    $form = New-Object System.Windows.Forms.Form
-    $form.Text = 'Sparks D&D Character Creator'
-    $form.Size = New-Object System.Drawing.Size(450,350)
-    $form.StartPosition = 'CenterScreen'
-    $form.Icon = $objIcon
-    $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
-    #Ok button for form
-    $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Location = New-Object System.Drawing.Point(75,270)
-    $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'Next'
-    $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-    $form.AcceptButton = $okButton
-    $form.Controls.Add($okButton)
-    #Skip button for form
-    $skipButton = New-Object System.Windows.Forms.Button
-    $skipButton.Location = New-Object System.Drawing.Point(150,270)
-    $skipButton.Size = New-Object System.Drawing.Size(75,23)
-    $skipButton.Text = 'Skip'
-    $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
-    $form.AcceptButton = $skipButton
-    $form.Controls.Add($skipButton)
-    #Back button for form (still in development)
-    $backButton = New-Object System.Windows.Forms.Button
-    $backButton.Location = New-Object System.Drawing.Point(225,270)
-    $backButton.Size = New-Object System.Drawing.Size(75,23)
-    $backButton.Text = 'Back'
-    $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
-    $form.CancelButton = $backButton
-    $form.Controls.Add($backButton)
-    #Cancel button for form
-    $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Location = New-Object System.Drawing.Point(300,270)
-    $cancelButton.Size = New-Object System.Drawing.Size(75,23)
-    $cancelButton.Text = 'Cancel'
-    $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-    $form.CancelButton = $cancelButton
-    $form.Controls.Add($cancelButton)
-    #CharacterBackround form
-    $characterbackground = New-Object System.Windows.Forms.Label
-    $characterbackground.Location = New-Object System.Drawing.Point(10,20)
-    $characterbackground.Size = New-Object System.Drawing.Size(160,18)
-    $characterbackground.Text = 'Please Select a Background:'
-    $form.Controls.Add($characterbackground)
-    $characterbackgroundselect = New-Object System.Windows.Forms.ListBox
-    $characterbackgroundselect.Location = New-Object System.Drawing.Point(10,40)
-    $characterbackgroundselect.Size = New-Object System.Drawing.Size(160,68)
-    $characterbackgroundselect.DataSource = [system.collections.arraylist]$CharacterBackgroundJSON
-    $characterbackgroundselect.DisplayMember = "name"
-    $characterbackgroundselect.Height = 170
-    $form.Controls.Add($characterbackgroundselect)
-    #Race form
-    $racelabel = New-Object System.Windows.Forms.Label
-    $racelabel.Location = New-Object System.Drawing.Point(220,20)
-    $racelabel.Size = New-Object System.Drawing.Size(118,18)
-    $racelabel.Text = 'Please select a Race:'
-    $form.Controls.Add($racelabel)
-    $ChosenRace = New-Object System.Windows.Forms.ListBox
-    $ChosenRace.Location = New-Object System.Drawing.Point(220,40)
-    $ChosenRace.Size = New-Object System.Drawing.Size(200,20)
-    $ChosenRace.DataSource = [system.collections.arraylist]$RacesJSON
-    $ChosenRace.DisplayMember = "name"
-    $ChosenRace.Height = 170
-    $form.Controls.Add($ChosenRace)
-#(To add a custom race go to $PSScriptRoot\Assets\Races to add a JSON file)
-#(A template.txt will show what you need to add)
-    #Show form
-    $form.Topmost = $true
-    $Form.Add_Shown({$Form.Activate()})
-    $characterbackgroundtextbox = $form.ShowDialog()
-        if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::OK)
-        {
-            #Background Selection fillout
-            $SelectedBackground = $characterbackgroundselect.SelectedItem
-            $SelectedRace = $ChosenRace.SelectedItem
-            #Background
-            $ExportBackground = $SelectedBackground.Name
-            #Race Selection
-            $ExportRace = $SelectedRace.Name
-            #Other Character Properties
-            $Feature1TTraits1 = $SelectedRace.Description
-            $HP = $SelectedRace.HP
-            $Speed = $SelectedRace.Speed
-            $Size = $SelectedRace.Size
-            $Height = $SelectedRace.Height
-            $SpokenLanguages = $SelectedRace.Languages
-            $Special = $SelectedRace.Special
-            #Image (for later)
-            #Stats
-            $STR = $SelectedRace.Strength
-            $DEX = $SelectedRace.Dexterity
-            $CON = $SelectedRace.Constitution
-            $INT = $SelectedRace.Intelligence
-            $WIS = $SelectedRace.Wisdom
-            $CHA = $SelectedRace.Charisma
-            $STRMod = $SelectedRace.StrengthMod
-            $DEXMod = $SelectedRace.DexterityMod
-            $CONMod = $SelectedRace.ConstitutionMod
-            $INTMod = $SelectedRace.IntelligenceMod
-            $WISMod = $SelectedRace.WisdomMod
-            $CHAMod = $SelectedRace.CharismaMod
-            $ST_STR = $SelectedRace.Saving_Strength
-            $ST_DEX = $SelectedRace.Saving_Dexterity
-            $ST_CON = $SelectedRace.Saving_Constitution
-            $ST_INT = $SelectedRace.Saving_Intelligence
-            $ST_WIS = $SelectedRace.Saving_Wisdom
-            $ST_CHA = $SelectedRace.Saving_Charisma
-            #If the console is set to show, this is just for that
-            Write-Host "Race is $ExportRace"
-            Write-Host "Background is $ExportBackground"
-        }
-        if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::Ignore)
-        {
-            #Defaults will load
-        }
-        if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::Retry)
-        {
-            return
-        }
-        if ($characterbackgroundtextbox -eq [System.Windows.Forms.DialogResult]::Cancel)
-        {
-            Exit
-        }
-#end of Character race and background
-    
-    #if ($ -match '**')
-    #{
-    #    $img = [System.Drawing.Image]::Fromfile('$PSScriptRoot\Assets\Race_Pictures\**.png')
-    #    Add-Content -path "$PSScriptRoot\Assets\Race_Descriptions\**.txt"
-    #}
 
-    #Add this feature above, where you select from the list and an image + text loads
-    #The race index can be fitted with selection data such as gold or speed
-    #Please add all speed bonuses to match either class and race
-
-#Make sure to fill out ALL required subrace data as there is a lot of subraces per primary
-#race, this allows a waaay bigger pool of characters
-
-#Small race choices like skin and hair
-    #Basic form
-    $form = New-Object System.Windows.Forms.Form
-    $form.Text = 'Sparks D&D Character Creator'
-    $form.Size = New-Object System.Drawing.Size(500,350)
-    $form.StartPosition = 'CenterScreen'
-    $form.Icon = $objIcon
-    $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
-    $form.Width = $objImage.Width
-    $form.Height = $objImage.Height
-    #Ok button for form
-    $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Location = New-Object System.Drawing.Point(75,270)
-    $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'Next'
-    $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-    $form.AcceptButton = $okButton
-    $form.Controls.Add($okButton)
-    #Skip button for form
-    $skipButton = New-Object System.Windows.Forms.Button
-    $skipButton.Location = New-Object System.Drawing.Point(150,270)
-    $skipButton.Size = New-Object System.Drawing.Size(75,23)
-    $skipButton.Text = 'Skip'
-    $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
-    $form.AcceptButton = $skipButton
-    $form.Controls.Add($skipButton)
-    #Back button for form (still in development)
-    $backButton = New-Object System.Windows.Forms.Button
-    $backButton.Location = New-Object System.Drawing.Point(225,270)
-    $backButton.Size = New-Object System.Drawing.Size(75,23)
-    $backButton.Text = 'Back'
-    $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
-    $form.CancelButton = $backButton
-    $form.Controls.Add($backButton)
-    #Cancel button for form
-    $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Location = New-Object System.Drawing.Point(300,270)
-    $cancelButton.Size = New-Object System.Drawing.Size(75,23)
-    $cancelButton.Text = 'Cancel'
-    $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-    $form.CancelButton = $cancelButton
-    $form.Controls.Add($cancelButton)
-    #Character features - Eyes
-    $characterfeatureseyes = New-Object System.Windows.Forms.Label
-    $characterfeatureseyes.Location = New-Object System.Drawing.Point(10,20)
-    $characterfeatureseyes.Size = New-Object System.Drawing.Size(110,18)
-    $characterfeatureseyes.Text = 'Select Eyes:'
-    $form.Controls.Add($characterfeatureseyes)
-    $characterfeaturesselecteyes = New-Object System.Windows.Forms.ListBox
-    $characterfeaturesselecteyes.Location = New-Object System.Drawing.Point(10,50)
-    $characterfeaturesselecteyes.Size = New-Object System.Drawing.Size(110,65)
-    $characterfeaturesselecteyes.DataSource = [system.collections.arraylist]$EyesJSON
-    $characterfeaturesselecteyes.DisplayMember = "name"
-    $characterfeaturesselecteyes.Height = 170
-    $form.Controls.Add($characterfeaturesselecteyes)
-    #Character features - Hair
-    $characterfeatureshair = New-Object System.Windows.Forms.Label
-    $characterfeatureshair.Location = New-Object System.Drawing.Point(125,20)
-    $characterfeatureshair.Size = New-Object System.Drawing.Size(110,18)
-    $characterfeatureshair.Text = 'Select Hair:'
-    $form.Controls.Add($characterfeatureshair)
-    $characterfeaturesselecthair = New-Object System.Windows.Forms.ListBox
-    $characterfeaturesselecthair.Location = New-Object System.Drawing.Point(125,50)
-    $characterfeaturesselecthair.Size = New-Object System.Drawing.Size(110,65)
-    $characterfeaturesselecthair.DataSource = [system.collections.arraylist]$HairJSON
-    $characterfeaturesselecthair.DisplayMember = "name"
-    $characterfeaturesselecthair.Height = 170
-    $form.Controls.Add($characterfeaturesselecthair)
-    #Character features - Skin
-    $characterfeaturesskin = New-Object System.Windows.Forms.Label
-    $characterfeaturesskin.Location = New-Object System.Drawing.Point(240,20)
-    $characterfeaturesskin.Size = New-Object System.Drawing.Size(110,18)
-    $characterfeaturesskin.Text = 'Select Skin:'
-    $form.Controls.Add($characterfeaturesskin)
-    $characterfeaturesselectskin = New-Object System.Windows.Forms.ListBox
-    $characterfeaturesselectskin.Location = New-Object System.Drawing.Point(240,50)
-    $characterfeaturesselectskin.Size = New-Object System.Drawing.Size(110,65)
-    $characterfeaturesselectskin.DataSource = [system.collections.arraylist]$SkinJSON
-    $characterfeaturesselectskin.DisplayMember = "name"
-    $characterfeaturesselectskin.Height = 170
-    $form.Controls.Add($characterfeaturesselectskin)
-    #Show form
-    $form.Topmost = $true
-    $Form.Add_Shown({$Form.Activate()})
-    $characterfeaturestextbox = $form.ShowDialog()
-        if ($characterfeaturestextbox -eq [System.Windows.Forms.DialogResult]::OK)
-        {
-            $SelectedEyes = $characterfeaturesselecteyes.SelectedItem
-            $SelectedHair = $characterfeaturesselecthair.SelectedItem
-            $SelectedSkin = $characterfeaturesselectskin.SelectedItem
-            $Eyes = $SelectedEyes.Name
-            $Skin = $SelectedSkin.Name
-            $Hair = $SelectedHair.Name
-            #If the console is set to show, this is just for that
-            Write-Host "Eyes: $Eyes"
-            Write-Host "Skin: $Skin"
-            Write-Host "Hair: $Hair"
-        }
-        if ($characterfeaturestextbox -eq [System.Windows.Forms.DialogResult]::Ignore)
-        {
-            #Defaults will load
-        }
-        if ($characterfeaturestextbox -eq [System.Windows.Forms.DialogResult]::Retry)
-        {
-            return
-        }
-        if ($characterfeaturestextbox -eq [System.Windows.Forms.DialogResult]::Cancel)
-        {
-            Exit
-        }
-#End of race additions
-#Source: https://www.dandwiki.com/wiki/Random_Hair_and_Eye_Color_(DnD_Other)
-#Basic user information gathering - SubRace
-    #Basic form
-    $form = New-Object System.Windows.Forms.Form
-    $form.Text = 'Sparks D&D Character Creator'
-    $form.Size = New-Object System.Drawing.Size(500,350)
-    $form.StartPosition = 'CenterScreen'
-    $form.Icon = $objIcon
-    $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
-    $form.Width = $objImage.Width
-    $form.Height = $objImage.Height
-    #Ok button for form
-    $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Location = New-Object System.Drawing.Point(75,270)
-    $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'Next'
-    $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-    $form.AcceptButton = $okButton
-    $form.Controls.Add($okButton)
-    #Skip button for form
-    $skipButton = New-Object System.Windows.Forms.Button
-    $skipButton.Location = New-Object System.Drawing.Point(150,270)
-    $skipButton.Size = New-Object System.Drawing.Size(75,23)
-    $skipButton.Text = 'Skip'
-    $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
-    $form.AcceptButton = $skipButton
-    $form.Controls.Add($skipButton)
-    #Back button for form (still in development)
-    $backButton = New-Object System.Windows.Forms.Button
-    $backButton.Location = New-Object System.Drawing.Point(225,270)
-    $backButton.Size = New-Object System.Drawing.Size(75,23)
-    $backButton.Text = 'Back'
-    $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
-    $form.CancelButton = $backButton
-    $form.Controls.Add($backButton)
-    #Cancel button for form
-    $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Location = New-Object System.Drawing.Point(300,270)
-    $cancelButton.Size = New-Object System.Drawing.Size(75,23)
-    $cancelButton.Text = 'Cancel'
-    $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-    $form.CancelButton = $cancelButton
-    $form.Controls.Add($cancelButton)
-    #Subrace form
-    $subracelabel = New-Object System.Windows.Forms.Label
-    $subracelabel.Location = New-Object System.Drawing.Point(10,20)
-    $subracelabel.Size = New-Object System.Drawing.Size(145,18)
-    $subracelabel.Text = 'Please select a SubRace:'
-    $form.Controls.Add($subracelabel)
-    #Set chosen subrace into name value's
-    $Chosensubrace = New-Object System.Windows.Forms.ListBox
-    $Chosensubrace.Location = New-Object System.Drawing.Point(10,40)
-    $Chosensubrace.Size = New-Object System.Drawing.Size(260,20)
-    $Chosensubrace.DataSource = [system.collections.arraylist]($SelectedRace.subraces)
-    $Chosensubrace.DisplayMember = "subraces"
-    $Chosensubrace.Height = 200
-    $form.Controls.Add($ChosenSubRace)
-    #Show form
-    Write-Host $Subraces
-    $form.Topmost = $true
-    $subracetype = $form.ShowDialog()
-        if ($subracetype -eq [System.Windows.Forms.DialogResult]::OK)
-        {
-            $SelectedSubRace = $ChosenSubRace.SelectedItem
-            $ExportRace = $SelectedSubRace
-            Write-Host "SubRace is: $SelectedSubRace"
-        }
-        if ($subracetype -eq [System.Windows.Forms.DialogResult]::Ignore)
-        {
-            #Defaults will load / chosen from the first race selection
-        }
-        if ($subracetype -eq [System.Windows.Forms.DialogResult]::Retry)
-        {
-            return
-        }
-        if ($subracetype -eq [System.Windows.Forms.DialogResult]::Cancel)
-        {
-            Exit
-        }
-#End of SubRace Selection
-#Basic user information gathering - Primary Class + Alignment
-    #Basic form
-    $form = New-Object System.Windows.Forms.Form
-    $form.Text = 'Sparks D&D Character Creator'
-    $form.Size = New-Object System.Drawing.Size(500,350)
-    $form.StartPosition = 'CenterScreen'
-    $form.Icon = $objIcon
-    $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
-    $form.Width = $objImage.Width
-    $form.Height = $objImage.Height
-    #Ok button for form
-    $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Location = New-Object System.Drawing.Point(75,270)
-    $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'Next'
-    $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-    $form.AcceptButton = $okButton
-    $form.Controls.Add($okButton)
-    #Skip button for form
-    $skipButton = New-Object System.Windows.Forms.Button
-    $skipButton.Location = New-Object System.Drawing.Point(150,270)
-    $skipButton.Size = New-Object System.Drawing.Size(75,23)
-    $skipButton.Text = 'Skip'
-    $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
-    $form.AcceptButton = $skipButton
-    $form.Controls.Add($skipButton)
-    #Back button for form (still in development)
-    $backButton = New-Object System.Windows.Forms.Button
-    $backButton.Location = New-Object System.Drawing.Point(225,270)
-    $backButton.Size = New-Object System.Drawing.Size(75,23)
-    $backButton.Text = 'Back'
-    $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
-    $form.CancelButton = $backButton
-    $form.Controls.Add($backButton)
-    #Cancel button for form
-    $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Location = New-Object System.Drawing.Point(300,270)
-    $cancelButton.Size = New-Object System.Drawing.Size(75,23)
-    $cancelButton.Text = 'Cancel'
-    $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-    $form.CancelButton = $cancelButton
-    $form.Controls.Add($cancelButton)
-    #Class Form
-    $classlabel = New-Object System.Windows.Forms.Label
-    $classlabel.Location = New-Object System.Drawing.Point(10,20)
-    $classlabel.Size = New-Object System.Drawing.Size(160,18)
-    $classlabel.Text = 'Please select a Primary Class:'
-    $form.Controls.Add($classlabel)
-    #Class Form
-    $ChosenClass = New-Object System.Windows.Forms.ListBox
-    $ChosenClass.Location = New-Object System.Drawing.Point(10,40)
-    $ChosenClass.Size = New-Object System.Drawing.Size(160,20)
-    $ChosenClass.DataSource = [system.collections.arraylist]$ClassesJSON
-    $ChosenClass.DisplayMember = "name"
-    $ChosenClass.Height = 200
-    $form.Controls.Add($ChosenClass)
-    #Alignment Form
-    $alignmentlabel = New-Object System.Windows.Forms.Label
-    $alignmentlabel.Location = New-Object System.Drawing.Point(200,20)
-    $alignmentlabel.Size = New-Object System.Drawing.Size(160,18)
-    $alignmentlabel.Text = 'Please select an Alignment:'
-    $form.Controls.Add($alignmentlabel)
-    $ChosenAlignment = New-Object System.Windows.Forms.ListBox
-    $ChosenAlignment.Location = New-Object System.Drawing.Point(200,40)
-    $ChosenAlignment.Size = New-Object System.Drawing.Size(160,20)
-    $ChosenAlignment.DataSource = [system.collections.arraylist]$AlignmentJSON
-    $ChosenAlignment.DisplayMember = "name"
-    $ChosenAlignment.Height = 200
-    $form.Controls.Add($ChosenAlignment)
-    #Show form
-    $form.Topmost = $true
-    $chosencharacter = $form.ShowDialog()
-        if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::OK)
-        {
-            #Class
-            $SelectedClass = $ChosenClass.SelectedItem
-            $SelectedAlignment = $ChosenAlignment.SelectedItem
-            #Alignment
-            $Alignment = $SelectedAlignment.Name
-            #Set Class Stats
-            $Class = $SelectedClass.Name
-            $HD = $SelectedClass.HitDice
-            $SpellCastingClass = $SelectedClass.SpellCastingClass
-            $SpellCastingAbility = $SelectedClass.SpellcastingAbility
-            $SelectedPack = $SelectedClass.Backpack
-            #Cantrips
-            $Cantrip01 = $SelectedClass.Cantrip01
-            $Cantrip02 = $SelectedClass.Cantrip02
-            $Cantrip03 = $SelectedClass.Cantrip03
-            #If the console is set to show, this is just for that
-            Write-Host "Class is $Class"
-            Write-Host "Alignment is $Alignment"
-        }
-        if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::Ignore)
-        {
-            #Defaults Will load
-        }
-        if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::Retry)
-        {
-            return
-        }
-        if ($chosencharacter -eq [System.Windows.Forms.DialogResult]::Cancel)
-        {
-            Exit
-        }
-#end of class + alignment selection
-#For future reference, setup the chosen class then tells the rest of the document what you can and cant select with IF statements
-#This will mean that this powershell script is going to get BIG, but worth it!
-#Make sure whaterver you set needs to be followed to the characterarray
-#Basic user information gathering - SubClass
-    #Basic form
-    $form = New-Object System.Windows.Forms.Form
-    $form.Text = 'Sparks D&D Character Creator'
-    $form.Size = New-Object System.Drawing.Size(500,350)
-    $form.StartPosition = 'CenterScreen'
-    $form.Icon = $objIcon
-    $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
-    $form.Width = $objImage.Width
-    $form.Height = $objImage.Height
-    #Ok button for form
-    $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Location = New-Object System.Drawing.Point(75,270)
-    $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'Next'
-    $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-    $form.AcceptButton = $okButton
-    $form.Controls.Add($okButton)
-    #Skip button for form
-    $skipButton = New-Object System.Windows.Forms.Button
-    $skipButton.Location = New-Object System.Drawing.Point(150,270)
-    $skipButton.Size = New-Object System.Drawing.Size(75,23)
-    $skipButton.Text = 'Skip'
-    $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
-    $form.AcceptButton = $skipButton
-    $form.Controls.Add($skipButton)
-    #Back button for form (still in development)
-    $backButton = New-Object System.Windows.Forms.Button
-    $backButton.Location = New-Object System.Drawing.Point(225,270)
-    $backButton.Size = New-Object System.Drawing.Size(75,23)
-    $backButton.Text = 'Back'
-    $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
-    $form.CancelButton = $backButton
-    $form.Controls.Add($backButton)
-    #Cancel button for form
-    $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Location = New-Object System.Drawing.Point(300,270)
-    $cancelButton.Size = New-Object System.Drawing.Size(75,23)
-    $cancelButton.Text = 'Cancel'
-    $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-    $form.CancelButton = $cancelButton
-    $form.Controls.Add($cancelButton)
-    #Subclass form
-    $subclasslabel = New-Object System.Windows.Forms.Label
-    $subclasslabel.Location = New-Object System.Drawing.Point(10,20)
-    $subclasslabel.Size = New-Object System.Drawing.Size(145,18)
-    $subclasslabel.Text = 'Please select a SubClass:'
-    $form.Controls.Add($subclasslabel)
-    $Chosensubclass = New-Object System.Windows.Forms.ListBox
-    $Chosensubclass.Location = New-Object System.Drawing.Point(10,40)
-    $Chosensubclass.Size = New-Object System.Drawing.Size(260,20)
-    $Chosensubclass.DataSource = [system.collections.arraylist]($SelectedClass.Subclasses)
-    $Chosensubclass.DisplayMember = "subclasses"
-    $Chosensubclass.Height = 200
-    $form.Controls.Add($Chosensubclass)
-    #Show form
-    $form.Topmost = $true
-    $SubClassformdialog = $form.ShowDialog()
-    if ($SubClassformdialog -eq [System.Windows.Forms.DialogResult]::OK)
-    {
-        $SelectedSubClass = $Chosensubclass.SelectedItem
-        $Class = $SelectedSubClass
-        #If the console is set to show, this is just for that
-        Write-Host "Subclass is $Class"
-    }
-    if ($SubClassformdialog -eq [System.Windows.Forms.DialogResult]::Ignore)
-    {
-        #Defaults will load
-    }
-    if ($SubClassformdialog -eq [System.Windows.Forms.DialogResult]::Retry)
-    {
-        Return
-    }
-    if ($SubClassformdialog -eq [System.Windows.Forms.DialogResult]::Cancel)
-    {
-        Exit
-    }
-#To add custom sub classes, you need to add the information into the json files in ./Assets/Classes
-#When Chosen a subrace it will override the default class accordingly
-#Weapon selection
-    $form = New-Object System.Windows.Forms.Form
-    $form.Text = 'Sparks D&D Character Creator'
-    $form.Size = New-Object System.Drawing.Size(500,600)
-    $form.StartPosition = 'CenterScreen'
-    $form.Icon = $objIcon
-    $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
-    #Ok button for form
-    $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Location = New-Object System.Drawing.Point(75,530)
-    $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'Next'
-    $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-    $form.AcceptButton = $okButton
-    $form.Controls.Add($okButton)
-    #Skip button for form
-    $skipButton = New-Object System.Windows.Forms.Button
-    $skipButton.Location = New-Object System.Drawing.Point(150,530)
-    $skipButton.Size = New-Object System.Drawing.Size(75,23)
-    $skipButton.Text = 'Skip'
-    $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
-    $form.AcceptButton = $skipButton
-    $form.Controls.Add($skipButton)
-    #Back button for form (still in development)
-    $backButton = New-Object System.Windows.Forms.Button
-    $backButton.Location = New-Object System.Drawing.Point(225,530)
-    $backButton.Size = New-Object System.Drawing.Size(75,23)
-    $backButton.Text = 'Back'
-    $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
-    $form.CancelButton = $backButton
-    $form.Controls.Add($backButton)
-    #Cancel button for form
-    $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Location = New-Object System.Drawing.Point(300,530)
-    $cancelButton.Size = New-Object System.Drawing.Size(75,23)
-    $cancelButton.Text = 'Cancel'
-    $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-    $form.CancelButton = $cancelButton
-    $form.Controls.Add($cancelButton)
-    #Weapon 1 form
-    $selectweapon1label = New-Object System.Windows.Forms.Label
-    $selectweapon1label.Location = New-Object System.Drawing.Point(15,20)
-    $selectweapon1label.Size = New-Object System.Drawing.Size(140,18)
-    $selectweapon1label.Text = 'Select Weapon 1:'
-    $form.Controls.Add($selectweapon1label)
-    $selectweapon1panel = New-Object System.Windows.Forms.ListBox
-    $selectweapon1panel.Location = New-Object System.Drawing.Point(15,40)
-    $selectweapon1panel.Size = New-Object System.Drawing.Size(140,18)
-    $selectweapon1panel.DataSource = [system.collections.arraylist]$WeaponJSON
-    $selectweapon1panel.DisplayMember = "name"
-    $selectweapon1panel.Height = 230
-    $form.Controls.Add($selectweapon1panel)
-    #Weapon 2 form
-    $selectweapon2label = New-Object System.Windows.Forms.Label
-    $selectweapon2label.Location = New-Object System.Drawing.Point(165,20)
-    $selectweapon2label.Size = New-Object System.Drawing.Size(140,18)
-    $selectweapon2label.Text = 'Select Weapon 2:'
-    $form.Controls.Add($selectweapon2label)
-    $selectweapon2panel = New-Object System.Windows.Forms.ListBox
-    $selectweapon2panel.Location = New-Object System.Drawing.Point(165,40)
-    $selectweapon2panel.Size = New-Object System.Drawing.Size(140,18)
-    $selectweapon2panel.DataSource = [system.collections.arraylist]$WeaponJSON
-    $selectweapon2panel.DisplayMember = "name"
-    $selectweapon2panel.Height = 230
-    $form.Controls.Add($selectweapon2panel)
-    #Weapon 3 form
-    $selectweapon3label = New-Object System.Windows.Forms.Label
-    $selectweapon3label.Location = New-Object System.Drawing.Point(315,20)
-    $selectweapon3label.Size = New-Object System.Drawing.Size(140,18)
-    $selectweapon3label.Text = 'Select Weapon 3:'
-    $form.Controls.Add($selectweapon3label)
-    $selectweapon3panel = New-Object System.Windows.Forms.ListBox
-    $selectweapon3panel.Location = New-Object System.Drawing.Point(315,40)
-    $selectweapon3panel.Size = New-Object System.Drawing.Size(140,18)
-    $selectweapon3panel.DataSource = [system.collections.arraylist]$WeaponJSON
-    $selectweapon3panel.DisplayMember = "name"
-    $selectweapon3panel.Height = 230
-    $form.Controls.Add($selectweapon3panel)
-    #Gear form
-    $selectadventuregearlabel = New-Object System.Windows.Forms.Label
-    $selectadventuregearlabel.Location = New-Object System.Drawing.Point(240,270)
-    $selectadventuregearlabel.Size = New-Object System.Drawing.Size(170,18)
-    $selectadventuregearlabel.Text = 'Select 1 extra Adventuring Gear:'
-    $form.Controls.Add($selectadventuregearlabel)
-    $selectadventuinggearpanel = New-Object System.Windows.Forms.ListBox
-    $selectadventuinggearpanel.Location = New-Object System.Drawing.Point(240,290)
-    $selectadventuinggearpanel.Size = New-Object System.Drawing.Size(220,20)
-    $selectadventuinggearpanel.DataSource = [system.collections.arraylist]$GearJSON
-    $selectadventuinggearpanel.DisplayMember = "name"
-    $selectadventuinggearpanel.Height = 230
-    $form.Controls.Add($selectadventuinggearpanel)
-    #Armour form
-    $armourlabel = New-Object System.Windows.Forms.Label
-    $armourlabel.Location = New-Object System.Drawing.Point(10,270)
-    $armourlabel.Size = New-Object System.Drawing.Size(220,18)
-    $armourlabel.Text = 'Please select Armour you wish to wear:'
-    $form.Controls.Add($armourlabel)
-    $ChosenArmour = New-Object System.Windows.Forms.ListBox
-    $ChosenArmour.Location = New-Object System.Drawing.Point(10,290)
-    $ChosenArmour.Size = New-Object System.Drawing.Size(220,20)
-    $ChosenArmour.DataSource = [system.collections.arraylist]$ArmourJSON
-    $ChosenArmour.DisplayMember = "name"
-    $ChosenArmour.Height = 200
-    $form.Controls.Add($ChosenArmour)
-    #Shield form
-    $checkboxshield = new-object System.Windows.Forms.checkbox
-    $checkboxshield.Location = new-object System.Drawing.Size(25,490)
-    $checkboxshield.Size = new-object System.Drawing.Size(120,40)
-    $checkboxshield.Text = "Do you want a shield?"
-    $checkboxshield.Checked = $false
-    $Form.controls.AddRange(@($checkboxshield))
-    #Shield as an option with tickbox, completely optional to a player
-    $checkboxshield.Add_CheckStateChanged({
-        $checkboxshield.Enabled = $checkboxshield.Checked 
-    })
-#Weapons are all in the /assets/weapons in json files, follow the template.txt
-#Gear List from: https://www.dndbeyond.com/sources/basic-rules/equipment#AdventuringGear
-#Each class needs to be limited to armour types to stop OP characters
-    #Show form
-    $form.Topmost = $true    
-    $Form.Add_Shown({$Form.Activate()})
-    $selectedweapons = $form.ShowDialog()
-    if ($selectedweapons -eq [System.Windows.Forms.DialogResult]::OK)
-    {
-        #Weapon Panel Selection
-        $ChosenWeapon1 = $selectweapon1panel.SelectedItem
-        $ChosenWeapon2 = $selectweapon2panel.SelectedItem
-        $ChosenWeapon3 = $selectweapon3panel.SelectedItem
-        $ChosenGear = $selectadventuinggearpanel.SelectedItem
-        $SelectedArmour = $ChosenArmour.SelectedItem
-        #Weapon Stats
-        $Weapon1 = $ChosenWeapon1.Name
-        $Weapon2 = $ChosenWeapon2.Name
-        $Weapon3 = $ChosenWeapon3.Name
-        $Gear = $ChosenGear.Name
-        $Armour = $SelectedArmour.Name
-        $ArmourClass = $SelectedArmour.ArmourClass
-        $WPN1ATK_Bonus = $ChosenWeapon1.WPN1ATK_Bonus
-        $WPN2ATK_Bonus = $ChosenWeapon2.WPN2ATK_Bonus
-        $WPN3ATK_Bonus = $ChosenWeapon3.WPN3ATK_Bonus
-        $Weapon1Damage = $ChosenWeapon1.Weapon1Damage
-        $Weapon2Damage = $ChosenWeapon2.Weapon2Damage
-        $Weapon3Damage = $ChosenWeapon3.Weapon3Damage
-        $Weapon1Weight = $ChosenWeapon1.Weapon1Weight
-        $Weapon2Weight = $ChosenWeapon2.Weapon2Weight
-        $Weapon3Weight = $ChosenWeapon3.Weapon3Weight
-        $Weapon1Properties = $ChosenWeapon1.Weapon1Properties
-        $Weapon2Properties = $ChosenWeapon2.Weapon1Properties
-        $Weapon3Properties = $ChosenWeapon3.Weapon1Properties
-        #If the console is set to show, this is just for that
-        Write-Host "Weapon 1: $Weapon1"
-        Write-Host "Weapon 2: $Weapon2"
-        Write-Host "Weapon 3: $Weapon3"
-        Write-Host "Gear: $Gear"
-    }
-    if ($selectedweapons -eq [System.Windows.Forms.DialogResult]::Ignore)
-    {
-        #Defaults will load
-    }
-    if ($selectedweapons -eq [System.Windows.Forms.DialogResult]::Retry)
-    {
-        return
-    }
-    if ($selectedweapons -eq [System.Windows.Forms.DialogResult]::Cancel)
-    {
-        Exit
-    }
-    if ($checkboxshield.Checked)
-    {   
-        $ArmourClassWithShield = "+2"
-    }
-#End of Equiptment choice
-#Remember Dungeon Masters! These types of armour are affected with cost, armour class, strength, stealth and weight
-#There is one type of shield with a base code of 10gp, armour class of +2 and weight of 453g
-#Getting out of armour has times for "DON" and "DOFF" DON = Put on, DOff = Take off
-#Light armour has a don of 1 min and doff of 1 min
-#Medium armour has a don of 5 mins and doff of 1 min
-#Heavy armour has a don of 10 mins and a doff off 5mins
-#shield has a don of 1 action and doff of 1 action
-#Weight calculations
-$CombinedWeaponStats = $Weapon1Properties + $Weapon2Properties + $Weapon3Properties
-$TotalWeight = $Weapon1Weight + $Weapon2Weight + $Weapon3Weight + $ArmourWeight + $AdventuringGearWeight
-$TotalEquiptment = $Weapon1 + $Comma + $Weapon2 + $Comma + $Weapon3 + $Comma + $Gear + $Comma + $SelectedPack
-#Custom Backstory
-    #Basic form
-    $form = New-Object System.Windows.Forms.Form
-    $form.Text = 'Sparks D&D Character Creator'
-    $form.Size = New-Object System.Drawing.Size(800,605)
-    $form.StartPosition = 'CenterScreen'
-    $form.Icon = $objIcon
-    $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
-    #Ok button for form
-    $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Location = New-Object System.Drawing.Point(420,535)
-    $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'Next'
-    $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-    $form.AcceptButton = $okButton
-    $form.Controls.Add($okButton)
-    #Skip button for form
-    $skipButton = New-Object System.Windows.Forms.Button
-    $skipButton.Location = New-Object System.Drawing.Point(495,535)
-    $skipButton.Size = New-Object System.Drawing.Size(75,23)
-    $skipButton.Text = 'Skip'
-    $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
-    $form.AcceptButton = $skipButton
-    $form.Controls.Add($skipButton)
-    #Back button for form (still in development)
-    $backButton = New-Object System.Windows.Forms.Button
-    $backButton.Location = New-Object System.Drawing.Point(570,535)
-    $backButton.Size = New-Object System.Drawing.Size(75,23)
-    $backButton.Text = 'Back'
-    $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
-    $form.CancelButton = $backButton
-    $form.Controls.Add($backButton)
-    #Cancel button for form
-    $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Location = New-Object System.Drawing.Point(645,535)
-    $cancelButton.Size = New-Object System.Drawing.Size(75,23)
-    $cancelButton.Text = 'Cancel'
-    $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-    $form.CancelButton = $cancelButton
-    $form.Controls.Add($cancelButton)
-    #Backstory form
-    $backstorylabel = New-Object System.Windows.Forms.Label
-    $backstorylabel.Location = New-Object System.Drawing.Point(10,20)
-    $backstorylabel.Size = New-Object System.Drawing.Size(120,18)
-    $backstorylabel.Text = 'Write your backstory:'
-    $form.Controls.Add($backstorylabel)
-    $characterbackstory = New-Object System.Windows.Forms.TextBox
-    $characterbackstory.Location = New-Object System.Drawing.Point(10,40)
-    $characterbackstory.Size = New-Object System.Drawing.Size(400,500)
-    $characterbackstory.Multiline = 1
-    $characterbackstory.ScrollBars = 2
-    $characterbackstory.AcceptsReturn = 1
-    $form.Controls.Add($characterbackstory)
-    #Add hover text to the Character Name
-    $toolTipBackstory = New-Object System.Windows.Forms.ToolTip
-    $toolTipBackstory.SetToolTip($characterbackstory, "Write Character Backstory")
-    #Personality form
-    $personalitylabel = New-Object System.Windows.Forms.Label
-    $personalitylabel.Location = New-Object System.Drawing.Point(420,20)
-    $personalitylabel.Size = New-Object System.Drawing.Size(160,18)
-    $personalitylabel.Text = 'Write your Personality Traits:'
-    $form.Controls.Add($personalitylabel)
-    $PersonalityTraits = New-Object System.Windows.Forms.TextBox
-    $PersonalityTraits.Location = New-Object System.Drawing.Point(420,40)
-    $PersonalityTraits.Size = New-Object System.Drawing.Size(300,100)
-    $PersonalityTraits.Multiline = 1
-    $PersonalityTraits.ScrollBars = 2
-    $PersonalityTraits.AcceptsReturn = 1
-    $form.Controls.Add($PersonalityTraits)
-    #Add hover text to the Character Name
-    $toolTipPlayer = New-Object System.Windows.Forms.ToolTip
-    $toolTipPlayer.SetToolTip($PersonalityTraits, "Write Personality Traits")
-    #Ideals form
-    $Idealslabel = New-Object System.Windows.Forms.Label
-    $Idealslabel.Location = New-Object System.Drawing.Point(420,150)
-    $Idealslabel.Size = New-Object System.Drawing.Size(160,18)
-    $Idealslabel.Text = 'Write your Ideals:'
-    $form.Controls.Add($Idealslabel)
-    $Ideals = New-Object System.Windows.Forms.TextBox
-    $Ideals.Location = New-Object System.Drawing.Point(420,170)
-    $Ideals.Size = New-Object System.Drawing.Size(300,100)
-    $Ideals.Multiline = 1
-    $Ideals.ScrollBars = 2
-    $Ideals.AcceptsReturn = 1
-    $form.Controls.Add($Ideals)
-    #Add hover text to the Character Name
-    $toolTipPlayer = New-Object System.Windows.Forms.ToolTip
-    $toolTipPlayer.SetToolTip($playername, "Write Character Ideals")
-    #Bonds form
-    $Bondslabel = New-Object System.Windows.Forms.Label
-    $Bondslabel.Location = New-Object System.Drawing.Point(420,280)
-    $Bondslabel.Size = New-Object System.Drawing.Size(160,18)
-    $Bondslabel.Text = 'Write About your Bonds:'
-    $form.Controls.Add($Bondslabel)
-    $Bonds = New-Object System.Windows.Forms.TextBox
-    $Bonds.Location = New-Object System.Drawing.Point(420,300)
-    $Bonds.Size = New-Object System.Drawing.Size(300,100)
-    $Bonds.Multiline = 1
-    $Bonds.ScrollBars = 2
-    $Bonds.AcceptsReturn = 1
-    $form.Controls.Add($Bonds)
-    #Add hover text to the Character Name
-    $toolTipPlayer = New-Object System.Windows.Forms.ToolTip
-    $toolTipPlayer.SetToolTip($playername, "Write Character Bonds")
-    #Flaws form
-    $Flawslabel = New-Object System.Windows.Forms.Label
-    $Flawslabel.Location = New-Object System.Drawing.Point(420,410)
-    $Flawslabel.Size = New-Object System.Drawing.Size(160,18)
-    $Flawslabel.Text = 'Write your Flaws:'
-    $form.Controls.Add($Flawslabel)
-    $Flaws = New-Object System.Windows.Forms.TextBox
-    $Flaws.Location = New-Object System.Drawing.Point(420,430)
-    $Flaws.Size = New-Object System.Drawing.Size(300,100)
-    $Flaws.Multiline = 1
-    $Flaws.ScrollBars = 2
-    $Flaws.AcceptsReturn = 1
-    $form.Controls.Add($Flaws)
-    #Add hover text to the Character Name
-    $toolTipPlayer = New-Object System.Windows.Forms.ToolTip
-    $toolTipPlayer.SetToolTip($playername, "Write Character Flaws")
-    #Show form
-    $form.Topmost = $true
-        if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::OK)
-        {
-            $characterbackstory.Text
-            $PersonalityTraits.Text
-            $Ideals.Text
-            $Bonds.Text
-            $Flaws.Text
-        }
-        if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::Ignore)
-        {
-            #Defaults will load
-        }
-        $characterbackstoryformdialog = $form.ShowDialog()
-        if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::Retry)
-        {
-            Return
-        }
-        if ($characterbackstoryformdialog -eq [System.Windows.Forms.DialogResult]::Cancel)
-        {
-            Exit
-        }
-#More Background details
-    #Basic form
-    $form = New-Object System.Windows.Forms.Form
-    $form.Text = 'Sparks D&D Character Creator'
-    $form.Size = New-Object System.Drawing.Size(790,620)
-    $form.StartPosition = 'CenterScreen'
-    $form.Icon = $objIcon
-    $form.BackgroundImage = $objImage
-    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
-    #Ok button for form
-    $okButton = New-Object System.Windows.Forms.Button
-    $okButton.Location = New-Object System.Drawing.Point(420,545)
-    $okButton.Size = New-Object System.Drawing.Size(75,23)
-    $okButton.Text = 'Next'
-    $okButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
-    $form.AcceptButton = $okButton
-    $form.Controls.Add($okButton)
-    #Skip button for form
-    $skipButton = New-Object System.Windows.Forms.Button
-    $skipButton.Location = New-Object System.Drawing.Point(495,545)
-    $skipButton.Size = New-Object System.Drawing.Size(75,23)
-    $skipButton.Text = 'Skip'
-    $skipButton.DialogResult = [System.Windows.Forms.DialogResult]::Ignore
-    $form.AcceptButton = $skipButton
-    $form.Controls.Add($skipButton)
-    #Back button for form (still in development)
-    $backButton = New-Object System.Windows.Forms.Button
-    $backButton.Location = New-Object System.Drawing.Point(570,545)
-    $backButton.Size = New-Object System.Drawing.Size(75,23)
-    $backButton.Text = 'Back'
-    $backButton.DialogResult = [System.Windows.Forms.DialogResult]::Retry
-    $form.CancelButton = $backButton
-    $form.Controls.Add($backButton)
-    #Cancel button for form
-    $cancelButton = New-Object System.Windows.Forms.Button
-    $cancelButton.Location = New-Object System.Drawing.Point(645,545)
-    $cancelButton.Size = New-Object System.Drawing.Size(75,23)
-    $cancelButton.Text = 'Cancel'
-    $cancelButton.DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-    $form.CancelButton = $cancelButton
-    $form.Controls.Add($cancelButton)
-    #Allies form
-    $Allieslabel = New-Object System.Windows.Forms.Label
-    $Allieslabel.Location = New-Object System.Drawing.Point(10,20)
-    $Allieslabel.Size = New-Object System.Drawing.Size(220,18)
-    $Allieslabel.Text = 'Write about your Allies and Organisations:'
-    $form.Controls.Add($Allieslabel)
-    $Allies = New-Object System.Windows.Forms.TextBox
-    $Allies.Location = New-Object System.Drawing.Point(10,40)
-    $Allies.Size = New-Object System.Drawing.Size(360,480)
-    $Allies.Multiline = 1
-    $Allies.ScrollBars = 2
-    $Allies.AcceptsReturn = 1
-    $form.Controls.Add($Allies)
-    #Additional Feats and Traits form
-    $addionalfeattraitslabel = New-Object System.Windows.Forms.Label
-    $addionalfeattraitslabel.Location = New-Object System.Drawing.Point(420,20)
-    $addionalfeattraitslabel.Size = New-Object System.Drawing.Size(220,18)
-    $addionalfeattraitslabel.Text = 'Write your Additional features and traits:'
-    $form.Controls.Add($addionalfeattraitslabel)
-    $AddionalfeatTraits = New-Object System.Windows.Forms.TextBox
-    $AddionalfeatTraits.Location = New-Object System.Drawing.Point(400,40)
-    $AddionalfeatTraits.Size = New-Object System.Drawing.Size(360,480)
-    $AddionalfeatTraits.Multiline = 1
-    $AddionalfeatTraits.ScrollBars = 2
-    $AddionalfeatTraits.AcceptsReturn = 1
-    $form.Controls.Add($AddionalfeatTraits)
-    #Factions form
-    $factionslabel = New-Object System.Windows.Forms.Label
-    $factionslabel.Location = New-Object System.Drawing.Point(10,530)
-    $factionslabel.Size = New-Object System.Drawing.Size(220,18)
-    $factionslabel.Text = 'Faction Name:'
-    $form.Controls.Add($factionslabel)
-    #Faction form
-    $factionname = New-Object System.Windows.Forms.TextBox
-    $factionname.Location = New-Object System.Drawing.Point(10,550)
-    $factionname.Size = New-Object System.Drawing.Size(360,20)
-    $factionname.AcceptsReturn = 1
-    $form.Controls.Add($factionname)
-    #Show form
-    $form.Topmost = $true
-        if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::OK)
-        {
-            $Allies.Text
-            $AddionalfeatTraits.Text
-            $Factionname.Text
-        }
-        if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::Ignore)
-        {
-            #Defaults will load
-        }
-        $characterextraformdialog = $form.ShowDialog()
-        if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::Retry)
-        {
-            Return
-        }
-        if ($characterextraformdialog -eq [System.Windows.Forms.DialogResult]::Cancel)
-        {
-            Exit
-        }
-#End of extra details
-#----------------------------
-#  If Statements for checks
-#----------------------------
-if ($SelectedClass.check11 -eq "enable")
-{
-    $Check11 = 'yes'
-    Write-Host $SelectedClass.check11
-}
-if ($SelectedClass.check18 -eq "enable")
-{
-    $Check18 = 'yes'
-    Write-Host $SelectedClass.check18
-}
-if ($SelectedClass.check19 -eq "enable")
-{
-    $Check19 = 'yes'
-    Write-Host $SelectedClass.check19
-}
-if ($SelectedClass.check20 -eq "enable")
-{
-    $Check20 = 'yes'
-    Write-Host $SelectedClass.check20
-}
-if ($SelectedClass.check21 -eq "enable")
-{
-    $Check21 = 'yes'
-    Write-Host $SelectedClass.check21
-}
-if ($SelectedClass.check22 -eq "enable")
-{
-    $Check22 = 'yes'
-    Write-Host $SelectedClass.check22
-}
-#Filter the JSON object to select only the properties whose values are "enable"
-#$SavingthrowsFilteredJSON = $ChosenClass.SelectedItem | Select-Object -Property * -ExcludeProperty * | Where-Object { $_.Value -eq "enable" }
-#Iterate through the properties of the filtered JSON object and convert the values to "yes"
-#$SavingthrowsFilteredJSON | ForEach-Object {
-#$_.Value = 'yes'
-#}
-#----------------------------
-#      Save Form As
-#----------------------------
-#Select Path for export
-$SaveChooser = New-Object -Typename System.Windows.Forms.SaveFileDialog
-    $SaveChooser.Title = "Save as"
-    $SaveChooser.FileName = "D&D Avatar - ChangeMe"
-    $SaveChooser.DefaultExt = ".pdf"
-    $SaveChooser.Filter = 'PDF File (*.pdf)|*.pdf'
-    $SaveResult = $SaveChooser.ShowDialog((New-Object System.Windows.Forms.Form -Property @{TopMost = $true }))
-if($SaveResult -eq [System.Windows.Forms.DialogResult]::OK ){
-    $PathSelected = $SaveChooser.FileName
-    $PathSelected
-}
-if ($SaveResult -eq [System.Windows.Forms.DialogResult]::Cancel){
-    Exit
-}
-#End of path selection
-#PDF Values Import before save
-#PLEASE LEAVE ALL "NULL" STATEMENTS ALONE AS THEY ARE MEANT TO BE LEFT NULL
-#Do not un-comment unless you know what you are writing in
+# PDF Values Import before save
 $characterparameters = @{
     Fields = @{
         'ClassLevel' = $Class;
@@ -1669,21 +1128,17 @@ $characterparameters = @{
         #'Spells 101013' =  ;
         #'Check Box 3083' =  ;
     }
-    #Most of the above comments are to stop needing to add null statements to all.
-    #If you want to add custom additions you will need to add all the code in
     InputPdfFilePath = "$PSScriptRoot\Assets\Empty_PDF\DnD_5E_CharacterSheet - Form Fillable.pdf"
     ITextSharpLibrary = "$PSScriptRoot\Assets\iText\itextsharp.dll"
     OutputPdfFilePath = $PathSelected
 }
 Save-PdfField @characterparameters
-#End of character Creation Dialog box
-    $ButtonType = [System.Windows.MessageBoxButton]::Ok
-    $MessageIcon = [System.Windows.MessageBoxImage]::Information
-    $MessageBody = "Dungeons And Dragons Character Successfully Created!"
-    $MessageTitle = "Spark's D&D Character Creator"
-[System.Windows.MessageBox]::Show($MessageBody,$MessageTitle,$ButtonType,$MessageIcon)
+
+# End of character Creation Dialog box
+$ButtonType = [System.Windows.MessageBoxButton]::Ok
+$MessageIcon = [System.Windows.MessageBoxImage]::Information
+$MessageBody = "Dungeons And Dragons Character Successfully Created!"
+$MessageTitle = "Spark's D&D Character Creator"
+[System.Windows.MessageBox]::Show($MessageBody, $MessageTitle, $ButtonType, $MessageIcon)
+Debug-Log "Character successfully created message displayed."
 Exit
-#----------------------------
-#       Script End
-#----------------------------
-#Script Created By (Sparks Skywere) - Christopher Masters

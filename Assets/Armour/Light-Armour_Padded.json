@@ -1,4 +1,8 @@
 {
     "name": "Light Armour - Padded",
-    "ArmourClass": "11"
+    "ArmourClass": 11,
+    "BaseAC": 11,
+    "Type": "Light",
+    "MaxDexBonus": null,
+    "DexModifierApplicable": true
 }

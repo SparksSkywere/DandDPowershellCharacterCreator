@@ -1,0 +1,8 @@
+{
+    "name": "Heavy Armour - Plate",
+    "ArmourClass": 18,
+    "BaseAC": 18,
+    "Type": "Heavy",
+    "MaxDexBonus": 0,
+    "DexModifierApplicable": false
+}

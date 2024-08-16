@@ -1,4 +1,8 @@
 {
     "name": "Medium Armour - Breastplate",
-    "ArmourClass": "14"
+    "ArmourClass": 14,
+    "BaseAC": 14,
+    "Type": "Medium",
+    "MaxDexBonus": 2,
+    "DexModifierApplicable": true
 }

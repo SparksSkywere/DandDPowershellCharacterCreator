@@ -1,4 +1,8 @@
 {
     "name": "Heavy Armour - Chain Mail",
-    "ArmourClass": "16"
+    "ArmourClass": 16,
+    "BaseAC": 16,
+    "Type": "Heavy",
+    "MaxDexBonus": 0,
+    "DexModifierApplicable": false
 }

@@ -1,4 +1,8 @@
 {
     "name": "Light Armour - Studded Leather",
-    "ArmourClass": "12"
+    "ArmourClass": 12,
+    "BaseAC": 12,
+    "Type": "Light",
+    "MaxDexBonus": null,
+    "DexModifierApplicable": true
 }

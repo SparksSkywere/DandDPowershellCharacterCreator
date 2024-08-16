@@ -1,4 +1,8 @@
 {
     "name": "Heavy Armour - Splint",
-    "ArmourClass": "17"
+    "ArmourClass": 17,
+    "BaseAC": 17,
+    "Type": "Heavy",
+    "MaxDexBonus": 0,
+    "DexModifierApplicable": false
 }

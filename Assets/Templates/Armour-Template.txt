@@ -1,0 +1,8 @@
+{
+    "name": "",
+    "ArmourClass": ,
+    "BaseAC": ,
+    "Type": "",
+    "MaxDexBonus": ,
+    "DexModifierApplicable": 
+}

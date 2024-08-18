@@ -19,6 +19,7 @@ function Show-Console {
     if ($Show) {
         [Console.Window]::ShowWindow($consolePtr, 5) | Out-Null
         $global:DebugLoggingEnabled = $true # Enable logging
+        Debug-Log "$DebugLoggingEnabled"
     }
     if ($Hide) {
         [Console.Window]::ShowWindow($consolePtr, 0) | Out-Null
@@ -37,7 +38,7 @@ function Debug-Log {
 }
 # Change the line below to show debugging information
 # "-Show" to show the console "-Hide" to hide the console
-Show-Console -Hide
+Show-Console -Show
 Debug-Log "Console shown [Debugging Enabled]"
 
 # Function to create a form with specific buttons and styles
@@ -178,29 +179,36 @@ Add-Type -Path "$PSScriptRoot\Assets\iText\itextsharp.dll"
 # Paths to JSON data
 $defaultsPath = Join-Path $PSScriptRoot "Assets"
 
-# Function to load JSON data
+# Function to load JSON data from a given path
 function Get-JsonData($path) {
-    $jsonFiles = Get-ChildItem -Path $path -Filter *.json
+    $jsonFiles = Get-ChildItem -Path $path -Filter *.json -ErrorAction Stop
     $data = @()
+
     foreach ($file in $jsonFiles) {
-        $content = Get-Content -Path $file.FullName -Raw
-        $data += $content | ConvertFrom-Json
+        try {
+            $content = Get-Content -Path $file.FullName -Raw -ErrorAction Stop
+            $jsonData = $content | ConvertFrom-Json -ErrorAction Stop
+            $data += $jsonData
+        } catch {
+            Write-Warning "Failed to load JSON from file: $($file.FullName). Error: $($_.Exception.Message)"
+        }
     }
+
     return $data
 }
 
-# Process JSON D&D information
-$defaultJSON = Get-JsonData -path $defaultsPath
-$CharacterBackgroundJSON = Get-JsonData -path "$PSScriptRoot\Assets\Backgrounds"
-$RacesJSON = Get-JsonData -path "$PSScriptRoot\Assets\Races"
-$EyesJSON = Get-JsonData -path "$PSScriptRoot\Assets\Character_Features\Eyes"
-$HairJSON = Get-JsonData -path "$PSScriptRoot\Assets\Character_Features\Hair"
-$SkinJSON = Get-JsonData -path "$PSScriptRoot\Assets\Character_Features\Skin"
-$AlignmentJSON = Get-JsonData -path "$PSScriptRoot\Assets\Alignments"
-$ClassesJSON = Get-JsonData -path "$PSScriptRoot\Assets\Classes"
-$WeaponJSON = Get-JsonData -path "$PSScriptRoot\Assets\Weapons"
-$GearJSON = Get-JsonData -path "$PSScriptRoot\Assets\Gear"
-$ArmourJSON = Get-JsonData -path "$PSScriptRoot\Assets\Armour"
+# Load JSON data from various directories
+$defaultJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Defaults")
+$CharacterBackgroundJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Backgrounds")
+$RacesJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Races")
+$EyesJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Character_Features\Eyes")
+$HairJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Character_Features\Hair")
+$SkinJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Character_Features\Skin")
+$AlignmentJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Alignments")
+$ClassesJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Classes")
+$WeaponJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Weapons")
+$GearJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Gear")
+$ArmourJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Armour")
 
 # ---- Default Values -----
 $global:WrittenCharactername = $defaultJSON.Charactername
@@ -268,6 +276,24 @@ $global:SleightOfHand = $defaultJSON.SleightOfHand
 $global:Stealth = $defaultJSON.Stealth
 $global:Survival = $defaultJSON.Survival
 $global:Passive = $defaultJSON.Passive
+$global:ST_Strength = $defaultJSON.ST_Strength
+$global:ST_Dexterity = $defaultJSON.ST_Dexterity
+$global:ST_Constitution = $defaultJSON.ST_Constitution
+$global:ST_Intelligence = $defaultJSON.ST_Intelligence
+$global:ST_Wisdom = $defaultJSON.ST_Wisdom
+$global:ST_Charisma = $defaultJSON.ST_Charisma
+$global:WpnName = $defaultJSON.WpnName
+$global:Wpn1AtkBonus = $defaultJSON.Wpn1AtkBonus
+$global:Wpn1Damage = $defaultJSON.Wpn1Damage
+$global:WpnName2 = $defaultJSON.WpnName2
+$global:Wpn2AtkBonus = $defaultJSON.Wpn2AtkBonus
+$global:Wpn2Damage = $defaultJSON.Wpn2Damage
+$global:WpnName3 = $defaultJSON.WpnName3
+$global:Wpn3AtkBonus = $defaultJSON.Wpn3AtkBonus
+$global:Wpn3Damage = $defaultJSON.Wpn3Damage
+$global:Backstory = $defaultJSON.Backstory
+$global:Equipment = $defaultJSON.Equipment
+$global:FeaturesAndTraits = $defaultJSON.'Features and Traits'
 $global:Comma = ", "
 Debug-Log "Loaded Defaults"
 
@@ -325,7 +351,7 @@ function Calculate-CharacterStats {
     }
     
     # Calculate initiative
-    $global:InitiativeTotal = $global:DEXMod
+    #$global:InitiativeTotal = $global:DEXMod
 
     # Calculate passive perception
     $global:Passive = 10 + $global:WISMod
@@ -339,25 +365,24 @@ function Show-BasicInfoForm {
     Debug-Log "Displaying Basic Info Form"
 
     # Create a new form
-    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 600 -Height 450 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
-    # Create controls for Character Name, Age, and Player Name
-    $characterNameControls = Set-TextBox -LabelText 'Character Name:' -X 10 -Y 20 -Width 118 -Height 20 -MaxLength 30
+    # Create controls for Character Name
+    $characterNameControls = Set-TextBox -LabelText 'Character Name:' -X 10 -Y 20 -Width 200 -Height 20 -MaxLength 30
 
-    # Create the Age textbox and restrict input to numeric values only
-    $ageLabel = New-Object System.Windows.Forms.Label
-    $ageLabel.Location = New-Object System.Drawing.Point(10, 67)
-    $ageLabel.Size = New-Object System.Drawing.Size(110, 18)
-    $ageLabel.Text = 'Character Age:'
-    $ageLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
-    $form.Controls.Add($ageLabel)
+    # Create the Age controls
+    $PlayerImageLabel = New-Object System.Windows.Forms.Label
+    $PlayerImageLabel.Location = New-Object System.Drawing.Point(10, 75)
+    $PlayerImageLabel.Size = New-Object System.Drawing.Size(110, 18)
+    $PlayerImageLabel.Text = 'Character Age:'
+    $PlayerImageLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
+    $form.Controls.Add($PlayerImageLabel)
 
     $age = New-Object System.Windows.Forms.TextBox
-    $age.Location = New-Object System.Drawing.Point(10, 85)
+    $age.Location = New-Object System.Drawing.Point(10, 95)
     $age.Size = New-Object System.Drawing.Size(58, 20)
     $age.MaxLength = 5
 
-    # Restrict input to numeric values only
     $age.Add_TextChanged({
         if ($age.Text -match '\D') {
             $age.Text = $age.Text -replace '\D', ''
@@ -365,12 +390,49 @@ function Show-BasicInfoForm {
         }
     })
 
-    $playerNameControls = Set-TextBox -LabelText 'Player Name:' -X 10 -Y 114 -Width 100 -Height 20 -MaxLength 30
+    # Create controls for the Player Name
+    $playerNameControls = Set-TextBox -LabelText 'Player Name:' -X 10 -Y 125 -Width 200 -Height 20 -MaxLength 30
 
-    # Add the controls to the form
+    # Create the Browse Image controls
+    $ageLabel = New-Object System.Windows.Forms.Label
+    $ageLabel.Location = New-Object System.Drawing.Point(300, 275)
+    $ageLabel.Size = New-Object System.Drawing.Size(180, 18)
+    $ageLabel.Text = 'Select Character Image'
+    $ageLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
+    $form.Controls.Add($ageLabel)
+
+    # Create the "Browse" button to select an image
+    $browseButton = New-Object System.Windows.Forms.Button
+    $browseButton.Location = New-Object System.Drawing.Point(300, 300)
+    $browseButton.Size = New-Object System.Drawing.Size(80, 30)
+    $browseButton.Text = "Browse"
+
+    # PictureBox to display the selected image
+    $pictureBox = New-Object System.Windows.Forms.PictureBox
+    $pictureBox.Location = New-Object System.Drawing.Point(300, 20)
+    $pictureBox.Size = New-Object System.Drawing.Size(250, 250)
+    $pictureBox.BorderStyle = [System.Windows.Forms.BorderStyle]::Fixed3D
+    $pictureBox.SizeMode = [System.Windows.Forms.PictureBoxSizeMode]::StretchImage
+
+    # Event handler for the Browse button click
+    $browseButton.Add_Click({
+        $openFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+        $openFileDialog.Title = "Select Character Image"
+        $openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp"
+
+        if ($openFileDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+            $global:CharacterImage = $openFileDialog.FileName
+            $pictureBox.Image = [System.Drawing.Image]::FromFile($global:CharacterImage)
+        }
+    })
+
+    # Add controls to the form
     $form.Controls.AddRange($characterNameControls)
     $form.Controls.Add($age)
+    $form.Controls.Add($PlayerImageLabel)
     $form.Controls.AddRange($playerNameControls)
+    $form.Controls.Add($browseButton)
+    $form.Controls.Add($pictureBox)
 
     # Display the form
     $form.Topmost = $true
@@ -386,11 +448,13 @@ function Show-BasicInfoForm {
         Debug-Log "`n[Debug] Character Name Captured: $($global:WrittenCharactername)"
         Debug-Log "[Debug] Age Captured: $($global:WrittenAge)"
         Debug-Log "[Debug] Player Name Captured: $($global:WrittenPlayername)"
+        Debug-Log "[Debug] Character Image Selected: $($global:CharacterImage)"
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
         Debug-Log "Form was canceled by the user."
         exit
     }
 }
+
 Debug-Log "Passed Show-BasicInfoForm"
 Show-BasicInfoForm
 
@@ -439,9 +503,23 @@ function Show-ClassAndRaceForm {
         $global:ST_WIS = $global:SelectedRace.Saving_Wisdom
         $global:ST_CHA = $global:SelectedRace.Saving_Charisma
 
+        # Debugging Character
+        Debug-Log "$global:ExportBackground"
+        Debug-Log "$global:SelectedRace"
+        Debug-Log "$global:ExportRace"
+        Debug-Log "$global:Feature1TTraits1"
+        Debug-Log "$global:HP"
+        Debug-Log "$global:Speed"
+        Debug-Log "$global:Size"
+        Debug-Log "$global:Height"
+        Debug-Log "$global:SpokenLanguages"
+        Debug-Log "$global:Special"
+
         # Debugging: Output the ability scores
         Debug-Log "`n[Debug] Ability Scores:"
         Debug-Log "STR: $global:STR, DEX: $global:DEX, CON: $global:CON, INT: $global:INT, WIS: $global:WIS, CHA: $global:CHA"
+        Debug-Log "STRMod: $global:STRMod, DEXMod: $global:DEXMod, CONMod: $global:CONMod, INTMod: $global:INTMod, WISMod: $global:WISMod, CHAMod: $global:CHAMod"
+        Debug-Log "ST_STR: $global:ST_STR, ST_DEX: $global:ST_DEX, ST_CON: $global:ST_CON, ST_INT: $global:ST_INT, ST_WIS: $global:ST_WIS, ST_CHA: $global:ST_CHA"
         
         # Calculate derived stats immediately after race selection
         Debug-Log "Calculating Character Stats"
@@ -544,6 +622,10 @@ function Show-ClassAndAlignmentForm {
         Debug-Log "SelectedClass: $($global:SelectedClass)"
         Debug-Log "Class: $($global:Class)"
         Debug-Log "Alignment: $($global:Alignment)"
+        Debug-Log "HD: $($global:HD)"
+        Debug-Log "HD: $($global:SpellCastingClass)"
+        Debug-Log "HD: $($global:SpellCastingAbility)"
+        Debug-Log "HD: $($global:SelectedPack)"
 
         # Calculate the derived stats based on race and class
         Debug-Log "Calculating Character Stats"
@@ -574,6 +656,7 @@ function Show-SubClassForm {
                 $global:SubClass = $subClassControls[1].SelectedItem
                 $global:ClassAndSubClass = "$($global:Class) - $($global:SubClass)"
                 Debug-Log "SubClass Selected: $($global:SubClass)"
+                Debug-Log "Final Selection: $($global:ClassAndSubClass)"
             }
         } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
             Debug-Log "Form was canceled by the user."
@@ -594,11 +677,11 @@ function Show-WeaponAndArmorForm {
     $weapon1Controls = Set-ListBox -LabelText 'Select Weapon 1:' -X 15 -Y 20 -Width 140 -Height 230 -DataSource $WeaponJSON -DisplayMember 'name'
     $weapon2Controls = Set-ListBox -LabelText 'Select Weapon 2:' -X 165 -Y 20 -Width 140 -Height 230 -DataSource $WeaponJSON -DisplayMember 'name'
     $weapon3Controls = Set-ListBox -LabelText 'Select Weapon 3:' -X 315 -Y 20 -Width 140 -Height 230 -DataSource $WeaponJSON -DisplayMember 'name'
-    $gearControls = Set-ListBox -LabelText 'Select 1 extra Adventuring Gear:' -X 240 -Y 275 -Width 220 -Height 230 -DataSource $GearJSON -DisplayMember 'name'
-    $armorControls = Set-ListBox -LabelText 'Please select Armour you wish to wear:' -X 10 -Y 275 -Width 220 -Height 200 -DataSource $ArmourJSON -DisplayMember 'name'
+    $gearControls = Set-ListBox -LabelText 'Select extra Adventuring Gear:' -X 240 -Y 275 -Width 220 -Height 200 -DataSource $GearJSON -DisplayMember 'name'
+    $armorControls = Set-ListBox -LabelText 'Select Armour:' -X 10 -Y 275 -Width 220 -Height 200 -DataSource $ArmourJSON -DisplayMember 'name'
 
     $checkboxShield = New-Object System.Windows.Forms.CheckBox
-    $checkboxShield.Location = New-Object System.Drawing.Point(25, 490)
+    $checkboxShield.Location = New-Object System.Drawing.Point(25, 487)
     $checkboxShield.Size = New-Object System.Drawing.Size(120, 40)
     $checkboxShield.Text = "Shield?"
     $checkboxShield.Checked = $false
@@ -663,10 +746,19 @@ function Show-WeaponAndArmorForm {
         # Debugging Outputs
         Debug-Log "Weapon1: $($global:Weapon1)"
         Debug-Log "Weapon1Damage: $($global:Weapon1Damage)"
+        Debug-Log "Weapon1ATK_Bonus: $($global:WPN1ATK_Bonus)"
+        Debug-Log "Weapon1Weight: $($global:Weapon1Weight)"
+        Debug-Log "Weapon1Properties: $($global:Weapon1Properties)"
         Debug-Log "Weapon2: $($global:Weapon2)"
         Debug-Log "Weapon2Damage: $($global:Weapon2Damage)"
+        Debug-Log "Weapon2ATK_Bonus: $($global:WPN2ATK_Bonus)"
+        Debug-Log "Weapon1Weight: $($global:Weapon2Weight)"
+        Debug-Log "Weapon1Properties: $($global:Weapon2Properties)"
         Debug-Log "Weapon3: $($global:Weapon3)"
         Debug-Log "Weapon3Damage: $($global:Weapon3Damage)"
+        Debug-Log "Weapon3ATK_Bonus: $($global:WPN3ATK_Bonus)"
+        Debug-Log "Weapon1Weight: $($global:Weapon3Weight)"
+        Debug-Log "Weapon1Properties: $($global:Weapon3Properties)"
         Debug-Log "Gear: $($global:Gear)"
         Debug-Log "Armour: $($global:Armour)"
         Debug-Log "Calculated ArmourClass: $($global:ArmourClass)"
@@ -776,6 +868,10 @@ function Show-AdditionalDetailsForm {
 Debug-Log "Passed Show-AdditionalDetailsForm"
 Show-AdditionalDetailsForm
 Debug-Log "All forms have been displayed, proceeding with Save"
+
+# Addvanced Debug purposes only for the PDF File inspect, not for normal debug
+$fieldNames = Get-PdfFieldNames -FilePath "$PSScriptRoot\Assets\Empty_PDF\DnD_5E_CharacterSheet - Form Fillable.pdf"
+$fieldNames
 
 # Save Form As
 $SaveChooser = New-Object -Typename System.Windows.Forms.SaveFileDialog
@@ -906,7 +1002,7 @@ $characterparameters = @{
         'Eyes' = $Eyes;
         'Skin' = $Skin;
         'Hair' = $Hair;
-        'CHARACTER IMAGE' = $CharacterImage;
+        #'CHARACTER IMAGE' = $CharacterImage; # Do not uncomment this line
         'Faction Symbol Image' = $FactionSymbol;
         'Allies' = $Allies.Text;
         'FactionName' = $Factionname.Text;
@@ -1131,7 +1227,33 @@ $characterparameters = @{
     InputPdfFilePath = "$PSScriptRoot\Assets\Empty_PDF\DnD_5E_CharacterSheet - Form Fillable.pdf"
     ITextSharpLibrary = "$PSScriptRoot\Assets\iText\itextsharp.dll"
     OutputPdfFilePath = $PathSelected
+    ImageField = @{
+        'CHARACTER IMAGE' = $CharacterImage
+    }
 }
+
+# Debug output for all fields before saving
+Debug-Log "Saving PDF with the following fields:"
+foreach ($key in $characterparameters.Fields.Keys) {
+    if ($null -eq $characterparameters.Fields[$key]) {
+        Debug-Log "WARNING: $key has a null value."
+    } else {
+        Debug-Log "$key = $($characterparameters.Fields[$key])"
+    }
+}
+
+# Debug output for image fields
+if ($characterparameters.ImageField) {
+    foreach ($imageField in $characterparameters.ImageField.Keys) {
+        if ($null -eq $characterparameters.ImageField[$imageField]) {
+            Debug-Log "WARNING: $imageField image path is null."
+        } else {
+            Debug-Log "$imageField image path = $($characterparameters.ImageField[$imageField])"
+        }
+    }
+}
+
+# Execute the PDF save function
 Save-PdfField @characterparameters
 
 # End of character Creation Dialog box

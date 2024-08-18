@@ -1,5 +1,4 @@
 Clear-Host
-
 # Global variable to control logging
 $global:DebugLoggingEnabled = $true
 
@@ -38,7 +37,7 @@ function Debug-Log {
 }
 # Change the line below to show debugging information
 # "-Show" to show the console "-Hide" to hide the console
-Show-Console -Hide
+Show-Console -Show
 Debug-Log "Console shown [Debugging Enabled]"
 
 # Function to create a form with specific buttons and styles
@@ -176,9 +175,6 @@ Add-Type -AssemblyName PresentationCore,PresentationFramework
 Import-Module -Name "$PSScriptRoot\Assets\iText\PDFForm" | Out-Null
 Add-Type -Path "$PSScriptRoot\Assets\iText\itextsharp.dll"
 
-# Paths to JSON data
-$defaultsPath = Join-Path $PSScriptRoot "Assets"
-
 # Function to load JSON data from a given path
 function Get-JsonData($path) {
     $jsonFiles = Get-ChildItem -Path $path -Filter *.json -ErrorAction Stop
@@ -193,7 +189,6 @@ function Get-JsonData($path) {
             Write-Warning "Failed to load JSON from file: $($file.FullName). Error: $($_.Exception.Message)"
         }
     }
-
     return $data
 }
 
@@ -220,7 +215,6 @@ $global:Size = $defaultJSON.PlayerSize
 $global:Eyes = $defaultJSON.Characterfeatureseyes
 $global:Hair = $defaultJSON.characterfeatureshair
 $global:Skin = $defaultJSON.characterfeaturesskin
-#$global:CharacterImage = $defaultJSON.CharacterImage
 $global:FactionSymbol = $defaultJSON.FactionSymbol
 $global:PersonalityTraits = $defaultJSON.PersonalityTraits
 $global:ProficencyBonus = $defaultJSON.ProficencyBonus
@@ -295,7 +289,7 @@ $global:Backstory = $defaultJSON.Backstory
 $global:Equipment = $defaultJSON.Equipment
 $global:FeaturesAndTraits = $defaultJSON.'Features and Traits'
 $global:Comma = ", "
-Debug-Log "Loaded Defaults"
+Debug-Log "[Debug] Loaded Defaults"
 
 # Function to calculate ability modifiers and other derived stats
 function Calculate-CharacterStats {
@@ -362,7 +356,7 @@ function Calculate-CharacterStats {
 
 # Function to display the basic information form
 function Show-BasicInfoForm {
-    Debug-Log "Displaying Basic Info Form"
+    Debug-Log "[Debug] Displaying Basic Info Form"
 
     # Create a new form
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 600 -Height 450 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
@@ -371,12 +365,12 @@ function Show-BasicInfoForm {
     $characterNameControls = Set-TextBox -LabelText 'Character Name:' -X 10 -Y 20 -Width 200 -Height 20 -MaxLength 30
 
     # Create the Age controls
-    $PlayerImageLabel = New-Object System.Windows.Forms.Label
-    $PlayerImageLabel.Location = New-Object System.Drawing.Point(10, 75)
-    $PlayerImageLabel.Size = New-Object System.Drawing.Size(110, 18)
-    $PlayerImageLabel.Text = 'Character Age:'
-    $PlayerImageLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
-    $form.Controls.Add($PlayerImageLabel)
+    $ageLabel = New-Object System.Windows.Forms.Label
+    $ageLabel.Location = New-Object System.Drawing.Point(10, 75)
+    $ageLabel.Size = New-Object System.Drawing.Size(110, 18)
+    $ageLabel.Text = 'Character Age:'
+    $ageLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
+    $form.Controls.Add($ageLabel)
 
     $age = New-Object System.Windows.Forms.TextBox
     $age.Location = New-Object System.Drawing.Point(10, 95)
@@ -394,12 +388,12 @@ function Show-BasicInfoForm {
     $playerNameControls = Set-TextBox -LabelText 'Player Name:' -X 10 -Y 125 -Width 200 -Height 20 -MaxLength 30
 
     # Create the Browse Image controls
-    $ageLabel = New-Object System.Windows.Forms.Label
-    $ageLabel.Location = New-Object System.Drawing.Point(300, 275)
-    $ageLabel.Size = New-Object System.Drawing.Size(180, 18)
-    $ageLabel.Text = 'Select Character Image'
-    $ageLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
-    $form.Controls.Add($ageLabel)
+    $PlayerImageLabel = New-Object System.Windows.Forms.Label
+    $PlayerImageLabel.Location = New-Object System.Drawing.Point(300, 275)
+    $PlayerImageLabel.Size = New-Object System.Drawing.Size(180, 18)
+    $PlayerImageLabel.Text = 'Select Character Image'
+    $PlayerImageLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
+    $form.Controls.Add($PlayerImageLabel)
 
     # Create the "Browse" button to select an image
     $browseButton = New-Object System.Windows.Forms.Button
@@ -414,6 +408,9 @@ function Show-BasicInfoForm {
     $pictureBox.BorderStyle = [System.Windows.Forms.BorderStyle]::Fixed3D
     $pictureBox.SizeMode = [System.Windows.Forms.PictureBoxSizeMode]::StretchImage
 
+    # Global flag to track if the user selected an image
+    $global:ImageSelected = $false
+
     # Event handler for the Browse button click
     $browseButton.Add_Click({
         $openFileDialog = New-Object System.Windows.Forms.OpenFileDialog
@@ -423,6 +420,7 @@ function Show-BasicInfoForm {
         if ($openFileDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
             $global:CharacterImage = $openFileDialog.FileName
             $pictureBox.Image = [System.Drawing.Image]::FromFile($global:CharacterImage)
+            $global:ImageSelected = $true
         }
     })
 
@@ -454,13 +452,11 @@ function Show-BasicInfoForm {
         exit
     }
 }
-
-Debug-Log "Passed Show-BasicInfoForm"
 Show-BasicInfoForm
 
 # Function to display the class and race selection form
 function Show-ClassAndRaceForm {
-    Debug-Log "Displaying Class and Race Form"
+    Debug-Log "[Debug] Displaying Class and Race Form"
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 450 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     $backgroundControls = Set-ListBox -LabelText 'Please Select a Background:' -X 10 -Y 20 -Width 200 -Height 170 -DataSource $CharacterBackgroundJSON -DisplayMember 'name'
@@ -503,6 +499,12 @@ function Show-ClassAndRaceForm {
         $global:ST_WIS = $global:SelectedRace.Saving_Wisdom
         $global:ST_CHA = $global:SelectedRace.Saving_Charisma
 
+        # Assign default image if no image was selected by the user
+        if (-not $global:ImageSelected) {
+            $global:CharacterImage = Join-Path $PSScriptRoot "Assets\Races\Images\$($global:SelectedRace.image)"
+            Debug-Log "No image selected, setting default race image: $($global:CharacterImage)"
+        }
+
         # Debugging Character
         Debug-Log "$global:ExportBackground"
         Debug-Log "$global:SelectedRace"
@@ -529,12 +531,11 @@ function Show-ClassAndRaceForm {
         exit
     }
 }
-Debug-Log "Passed Show-ClassAndRaceForm"
 Show-ClassAndRaceForm
 
 # Function to display the subrace form
 function Show-SubRaceForm {
-    Debug-Log "Displaying SubRace Form"
+    Debug-Log "[Debug] Displaying SubRace Form"
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     if ($global:SelectedRace.subraces -and $global:SelectedRace.subraces.Count -gt 0) {
@@ -556,15 +557,14 @@ function Show-SubRaceForm {
             exit
         }
     } else {
-        Debug-Log "No subraces available for the selected race."
+        Debug-Log "[Debug] No subraces available for the selected race."
     }
 }
-Debug-Log "Passed Show-SubRaceForm"
 Show-SubRaceForm
 
 # Function to display the character features form
 function Show-CharacterFeaturesForm {
-    Debug-Log "Displaying Character Features Form"
+    Debug-Log "[Debug] Displaying Character Features Form"
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     $eyesControls = Set-ListBox -LabelText 'Select Eyes:' -X 10 -Y 20 -Width 110 -Height 170 -DataSource $EyesJSON -DisplayMember 'name'
@@ -592,12 +592,11 @@ function Show-CharacterFeaturesForm {
         exit
     }
 }
-Debug-Log "Passed Show-CharacterFeaturesForm"
 Show-CharacterFeaturesForm
 
 # Function to display the class and alignment selection form
 function Show-ClassAndAlignmentForm {
-    Debug-Log "Displaying Class and Alignment Form"
+    Debug-Log "[Debug] Displaying Class and Alignment Form"
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     $classControls = Set-ListBox -LabelText 'Please select a Primary Class:' -X 10 -Y 20 -Width 160 -Height 200 -DataSource $ClassesJSON -DisplayMember 'name'
@@ -635,12 +634,11 @@ function Show-ClassAndAlignmentForm {
         exit
     }
 }
-Debug-Log "Passed Show-ClassAndAlignmentForm"
 Show-ClassAndAlignmentForm
 
 # Function to display the subclass selection form
 function Show-SubClassForm {
-    Debug-Log "Displaying SubClass Form"
+    Debug-Log "[Debug] Displaying SubClass Form"
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     if ($global:SelectedClass.Subclasses -and $global:SelectedClass.Subclasses.Count -gt 0) {
@@ -663,15 +661,14 @@ function Show-SubClassForm {
             exit
         }
     } else {
-        Debug-Log "No subclasses available for the selected class."
+        Debug-Log "[Debug] No subclasses available for the selected class."
     }
 }
-Debug-Log "Passed Show-SubClassForm"
 Show-SubClassForm
 
 # Function to display the weapon and armor selection form
 function Show-WeaponAndArmorForm {
-    Debug-Log "Displaying Weapon and Armor Form"
+    Debug-Log "[Debug] Displaying Weapon and Armor Form"
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 600 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     $weapon1Controls = Set-ListBox -LabelText 'Select Weapon 1:' -X 15 -Y 20 -Width 140 -Height 230 -DataSource $WeaponJSON -DisplayMember 'name'
@@ -771,12 +768,11 @@ function Show-WeaponAndArmorForm {
         exit
     }
 }
-Debug-Log "Passed Show-WeaponAndArmorForm"
 Show-WeaponAndArmorForm
 
 # Function to display the character backstory form
 function Show-BackstoryForm {
-    Debug-Log "Displaying Backstory Form"
+    Debug-Log "[Debug] Displaying Backstory Form"
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 800 -Height 605 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     $backstoryControls = Set-TextBox -LabelText 'Write your backstory:' -X 10 -Y 20 -Width 400 -Height 500 -MaxLength 0
@@ -826,12 +822,11 @@ function Show-BackstoryForm {
         exit
     }
 }
-Debug-Log "Passed Show-BackstoryForm"
 Show-BackstoryForm
 
 # Function to display the additional details form
 function Show-AdditionalDetailsForm {
-    Debug-Log "Displaying Additional Details Form"
+    Debug-Log "[Debug] Displaying Additional Details Form"
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 790 -Height 620 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     $alliesControls = Set-TextBox -LabelText 'Write about your Allies and Organisations:' -X 10 -Y 20 -Width 360 -Height 480 -MaxLength 0
@@ -865,13 +860,12 @@ function Show-AdditionalDetailsForm {
         exit
     }
 }
-Debug-Log "Passed Show-AdditionalDetailsForm"
 Show-AdditionalDetailsForm
-Debug-Log "All forms have been displayed, proceeding with Save"
+Debug-Log "[Debug] All forms have been displayed, proceeding with Save"
 
 # Addvanced Debug purposes only for the PDF File inspect, not for normal debug
-$fieldNames = Get-PdfFieldNames -FilePath "$PSScriptRoot\Assets\Empty_PDF\DnD_5E_CharacterSheet - Form Fillable.pdf"
-$fieldNames | ForEach-Object { Write-Host $_ }
+#$fieldNames = Get-PdfFieldNames -FilePath "$PSScriptRoot\Assets\Empty_PDF\DnD_5E_CharacterSheet - Form Fillable.pdf"
+#$fieldNames | ForEach-Object { Write-Host $_ }
 
 # Save Form As
 $SaveChooser = New-Object -Typename System.Windows.Forms.SaveFileDialog

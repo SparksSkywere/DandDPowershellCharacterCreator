@@ -1,4 +1,5 @@
-#Requires -Version 4
+# PDFForm.psm1
+# This module contains functions for working with PDF forms using the iTextSharp library.
 
 # Function to locate or download the iTextSharp library.
 function Find-ITextSharpLibrary {
@@ -21,37 +22,7 @@ function Find-ITextSharpLibrary {
                 return Get-Item -Path $localLibraryPath
             }
             else {
-                Write-Verbose -Message "iTextSharp library not found locally. Downloading..."
-
-                # Download the iTextSharp library from SourceForge.
-                $tempFile = [System.IO.Path]::GetTempFileName()
-                $params = @{
-                    'Uri'       = 'https://sourceforge.net/projects/itextsharp/files/latest/download'
-                    'OutFile'   = $tempFile
-                    'UserAgent' = [Microsoft.PowerShell.Commands.PSUserAgent]::Firefox
-                }
-                Invoke-WebRequest @params
-
-                # Verify the download was successful by checking the file size.
-                if ((Get-Item -Path $tempFile).Length -lt 54000) {
-                    throw 'ITextLibrary download failed. Go to https://sourceforge.net/projects/itextsharp to download manually.'
-                }
-                else {
-                    Write-Verbose -Message "Extracting iTextSharp library..."
-                    
-                    # Extract the downloaded ZIP file to the temporary directory.
-                    Add-Type -AssemblyName 'System.IO.Compression.FileSystem'
-                    [System.IO.Compression.ZipFile]::ExtractToDirectory($tempFile, $env:TEMP)
-
-                    # Attempt to locate the extracted DLL.
-                    $extractedDllPath = Join-Path -Path $env:TEMP -ChildPath 'itextsharp.dll'
-                    if (Test-Path -Path $extractedDllPath) {
-                        return Get-Item -Path $extractedDllPath
-                    }
-                    else {
-                        throw 'Failed to find iTextSharp DLL after extraction.'
-                    }
-                }
+                throw "iTextSharp library not found at [$localLibraryPath]. Please ensure itextsharp.dll is present in the script directory."
             }
         }
         catch {
@@ -145,32 +116,50 @@ function Save-PdfField {
 
             # Fill out text fields in the PDF with provided values.
             foreach ($field in $Fields.GetEnumerator()) {
-                if (-not [string]::IsNullOrEmpty($field.Value)) {
-                    $acroFields.SetField($field.Key, $field.Value) | Out-Null
-                } else {
-                    Write-Verbose "Skipping empty or null field: $($field.Key)"
-                }
+                $acroFields.SetField($field.Key, $field.Value) | Out-Null
             }
 
             # Insert images into specified fields in the PDF.
             foreach ($imageField in $ImageFields.GetEnumerator()) {
                 $imagePath = $imageField.Value
+                Write-Verbose "Processing image for field: $($imageField.Key) with path: $imagePath"
+            
                 if (Test-Path -Path $imagePath -PathType Leaf) {
-                    $image = [iTextSharp.text.Image]::GetInstance($imagePath)
-                    $fieldPositions = $acroFields.GetFieldPositions($imageField.Key)
-                    if ($fieldPositions.Count -gt 0) {
-                        $rect = $fieldPositions[0].position
-                        $image.SetAbsolutePosition($rect.Left, $rect.Bottom)
-                        $image.ScaleToFit($rect.Width, $rect.Height)
-                        $content = $stamper.GetOverContent($rect.Page)
-                        $content.AddImage($image)
-                    } else {
-                        Write-Warning "Field position for '$($imageField.Key)' not found in the PDF."
-                    }
+                    try {
+                        Write-Host "Attempting to insert image at path: $imagePath into field: $($imageField.Key)"
+                        $image = [iTextSharp.text.Image]::GetInstance($imagePath)
+                        $fieldPositions = $acroFields.GetFieldPositions($imageField.Key)
+                        
+                        if ($fieldPositions -and $fieldPositions.Count -gt 0) {
+                            $rect = $fieldPositions[0].position
+                            Write-Host "Field position details: Page=$($fieldPositions[0].Page), Left=$($rect.Left), Bottom=$($rect.Bottom)"
+                    
+                            $pageNumber = $fieldPositions[0].Page
+                    
+                            if ($null -eq $pageNumber -or $pageNumber -eq 0) {
+                                throw "Invalid or missing page number for field '$($imageField.Key)'."
+                            }
+                    
+                            $content = $stamper.GetOverContent($pageNumber)
+                            
+                            if ($null -eq $content) {
+                                throw "Unable to get content layer for page $pageNumber."
+                            }
+                            
+                            $image.SetAbsolutePosition($rect.Left, $rect.Bottom)
+                            $image.ScaleToFit($rect.Width, $rect.Height)
+                            $content.AddImage($image)
+                        } else {
+                            throw "Field positions for image field '$($imageField.Key)' not found in the PDF."
+                        }
+                    } catch {
+                        Write-Host "Error encountered while processing image field '$($imageField.Key)': $($_.Exception.Message)"
+                        throw "Error while processing image field '$($imageField.Key)': $($_.Exception.Message)"
+                    }                                     
                 } else {
-                    Write-Warning "Image path '$imagePath' is invalid or does not exist."
+                    throw "Image file not found: $imagePath"
                 }
-            }
+            }            
         }
         catch {
             # Handle any errors by throwing a terminating error.
@@ -183,3 +172,6 @@ function Save-PdfField {
         }
     }
 }
+
+# Export functions to make them available when the module is imported.
+Export-ModuleMember -Function Find-ITextSharpLibrary, Get-PdfFieldNames, Save-PdfField

@@ -10,5 +10,12 @@
             "request": "attach",
             "runspaceId": 1
         },
+        {
+            "name": "PowerShell Launch Current File",
+            "type": "PowerShell",
+            "request": "launch",
+            "script": "${file}",
+            "cwd": "${cwd}"
+        }
     ]
 }

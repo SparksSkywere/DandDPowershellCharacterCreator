@@ -871,7 +871,7 @@ Debug-Log "All forms have been displayed, proceeding with Save"
 
 # Addvanced Debug purposes only for the PDF File inspect, not for normal debug
 $fieldNames = Get-PdfFieldNames -FilePath "$PSScriptRoot\Assets\Empty_PDF\DnD_5E_CharacterSheet - Form Fillable.pdf"
-$fieldNames
+$fieldNames | ForEach-Object { Write-Host $_ }
 
 # Save Form As
 $SaveChooser = New-Object -Typename System.Windows.Forms.SaveFileDialog
@@ -1227,31 +1227,14 @@ $characterparameters = @{
     InputPdfFilePath = "$PSScriptRoot\Assets\Empty_PDF\DnD_5E_CharacterSheet - Form Fillable.pdf"
     ITextSharpLibrary = "$PSScriptRoot\Assets\iText\itextsharp.dll"
     OutputPdfFilePath = $PathSelected
-    ImageField = @{
+    ImageFields = @{
         'CHARACTER IMAGE' = $CharacterImage
     }
 }
 
-# Debug output for all fields before saving
-Debug-Log "Saving PDF with the following fields:"
-foreach ($key in $characterparameters.Fields.Keys) {
-    if ($null -eq $characterparameters.Fields[$key]) {
-        Debug-Log "WARNING: $key has a null value."
-    } else {
-        Debug-Log "$key = $($characterparameters.Fields[$key])"
-    }
-}
-
-# Debug output for image fields
-if ($characterparameters.ImageField) {
-    foreach ($imageField in $characterparameters.ImageField.Keys) {
-        if ($null -eq $characterparameters.ImageField[$imageField]) {
-            Debug-Log "WARNING: $imageField image path is null."
-        } else {
-            Debug-Log "$imageField image path = $($characterparameters.ImageField[$imageField])"
-        }
-    }
-}
+# Validate that the Fields and ImageField are correctly cast to Hashtable
+$characterparameters.Fields = [hashtable]$characterparameters.Fields
+$characterparameters.ImageFields = [hashtable]$characterparameters.ImageFields
 
 # Execute the PDF save function
 Save-PdfField @characterparameters

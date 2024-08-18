@@ -38,7 +38,7 @@ function Debug-Log {
 }
 # Change the line below to show debugging information
 # "-Show" to show the console "-Hide" to hide the console
-Show-Console -Show
+Show-Console -Hide
 Debug-Log "Console shown [Debugging Enabled]"
 
 # Function to create a form with specific buttons and styles

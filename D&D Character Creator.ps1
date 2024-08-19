@@ -495,6 +495,7 @@ function Show-BasicInfoForm {
             $global:CharacterImage = $openFileDialog.FileName
             $pictureBox.Image = [System.Drawing.Image]::FromFile($global:CharacterImage)
             $global:ImageSelected = $true
+            Debug-Log "[Debug] Internal-Path = $global:ImageSelected"
         }
     })
 

@@ -52,11 +52,11 @@ function Set-Localisation {
             $global:Localisation = Get-Content -Path $localisationPath | ConvertFrom-Json
             Debug-Log "[Debug] Loaded localisation for language: $languageCode"
         } catch {
-            Write-Warning "Failed to load localisation file for language '$languageCode'. Error: $_"
+            Write-Warning "[Debug] Failed to load localisation file for language '$languageCode'. Error: $_"
             Set-DefaultLocalisation
         }
     } else {
-        Write-Warning "Localisation file not found for language '$languageCode'. Falling back to default (English)."
+        Write-Warning "[Debug] Localisation file not found for language '$languageCode'. Falling back to default (English)."
         Set-DefaultLocalisation
     }
 }
@@ -68,7 +68,7 @@ function Set-DefaultLocalisation {
         $global:Localisation = Get-Content -Path $defaultLocalisationPath | ConvertFrom-Json
         Debug-Log "[Debug] Loaded default localisation (English)"
     } catch {
-        throw "Failed to load the default localisation file."
+        throw "[Debug] Failed to load the default localisation file."
     }
 }
 

@@ -1,0 +1,12 @@
+{
+    "FormTitle": "مبدع الشخصيات D&D من سبراكس",
+    "AcceptButtonText": "التالي",
+    "SkipButtonText": "تخطي",
+    "CancelButtonText": "إلغاء",
+    "CharacterNameLabel": "اسم الشخصية:",
+    "PlayerNameLabel": "اسم اللاعب:",
+    "AgeLabel": "عمر الشخصية:",
+    "SelectImageLabel": "اختر صورة الشخصية",
+    "BrowseButtonText": "تصفح",
+    "SuccessMessage": "تم إنشاء شخصية Dungeons And Dragons بنجاح!"
+}

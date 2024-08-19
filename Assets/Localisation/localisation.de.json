@@ -1,0 +1,12 @@
+{
+    "FormTitle": "Sparks D&D Charaktererstellung",
+    "AcceptButtonText": "Weiter",
+    "SkipButtonText": "Überspringen",
+    "CancelButtonText": "Abbrechen",
+    "CharacterNameLabel": "Charaktername:",
+    "PlayerNameLabel": "Spielername:",
+    "AgeLabel": "Alter des Charakters:",
+    "SelectImageLabel": "Charakterbild auswählen",
+    "BrowseButtonText": "Durchsuchen",
+    "SuccessMessage": "Dungeons And Dragons Charakter Erfolgreich Erstellt!"
+}

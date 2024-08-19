@@ -1,0 +1,12 @@
+{
+    "FormTitle": "斯帕克斯 D&D 角色创建器",
+    "AcceptButtonText": "下一步",
+    "SkipButtonText": "跳过",
+    "CancelButtonText": "取消",
+    "CharacterNameLabel": "角色名称:",
+    "PlayerNameLabel": "玩家名称:",
+    "AgeLabel": "角色年龄:",
+    "SelectImageLabel": "选择角色图片",
+    "BrowseButtonText": "浏览",
+    "SuccessMessage": "龙与地下城角色创建成功!"
+}

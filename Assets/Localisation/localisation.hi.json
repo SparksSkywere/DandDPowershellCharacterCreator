@@ -1,0 +1,12 @@
+{
+    "FormTitle": "स्पार्क्स D&D कैरेक्टर क्रिएटर",
+    "AcceptButtonText": "अगला",
+    "SkipButtonText": "छोड़ें",
+    "CancelButtonText": "रद्द करें",
+    "CharacterNameLabel": "कैरेक्टर का नाम:",
+    "PlayerNameLabel": "प्लेयर का नाम:",
+    "AgeLabel": "कैरेक्टर की उम्र:",
+    "SelectImageLabel": "कैरेक्टर की छवि चुनें",
+    "BrowseButtonText": "ब्राउज़ करें",
+    "SuccessMessage": "Dungeons And Dragons कैरेक्टर सफलतापूर्वक बनाया गया!"
+}

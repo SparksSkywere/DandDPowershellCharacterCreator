@@ -1,0 +1,12 @@
+{
+    "FormTitle": "Criador de Personagens D&D de Sparks",
+    "AcceptButtonText": "Próximo",
+    "SkipButtonText": "Pular",
+    "CancelButtonText": "Cancelar",
+    "CharacterNameLabel": "Nome do Personagem:",
+    "PlayerNameLabel": "Nome do Jogador:",
+    "AgeLabel": "Idade do Personagem:",
+    "SelectImageLabel": "Selecionar Imagem do Personagem",
+    "BrowseButtonText": "Procurar",
+    "SuccessMessage": "Personagem de Dungeons And Dragons Criado com Sucesso!"
+}

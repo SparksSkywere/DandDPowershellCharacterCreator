@@ -1,0 +1,12 @@
+{
+    "FormTitle": "スパークス D&D キャラクター作成",
+    "AcceptButtonText": "次へ",
+    "SkipButtonText": "スキップ",
+    "CancelButtonText": "キャンセル",
+    "CharacterNameLabel": "キャラクター名:",
+    "PlayerNameLabel": "プレイヤー名:",
+    "AgeLabel": "キャラクターの年齢:",
+    "SelectImageLabel": "キャラクターの画像を選択",
+    "BrowseButtonText": "ブラウズ",
+    "SuccessMessage": "ダンジョンズ＆ドラゴンズのキャラクターが正常に作成されました!"
+}

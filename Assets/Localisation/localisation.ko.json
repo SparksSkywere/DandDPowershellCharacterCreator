@@ -1,0 +1,12 @@
+{
+    "FormTitle": "스파크스 D&D 캐릭터 생성기",
+    "AcceptButtonText": "다음",
+    "SkipButtonText": "건너뛰기",
+    "CancelButtonText": "취소",
+    "CharacterNameLabel": "캐릭터 이름:",
+    "PlayerNameLabel": "플레이어 이름:",
+    "AgeLabel": "캐릭터 나이:",
+    "SelectImageLabel": "캐릭터 이미지 선택",
+    "BrowseButtonText": "찾아보기",
+    "SuccessMessage": "던전 앤 드래곤 캐릭터가 성공적으로 생성되었습니다!"
+}

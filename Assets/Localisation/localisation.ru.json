@@ -1,0 +1,12 @@
+{
+    "FormTitle": "Создатель Персонажей D&D от Sparks",
+    "AcceptButtonText": "Далее",
+    "SkipButtonText": "Пропустить",
+    "CancelButtonText": "Отмена",
+    "CharacterNameLabel": "Имя Персонажа:",
+    "PlayerNameLabel": "Имя Игрока:",
+    "AgeLabel": "Возраст Персонажа:",
+    "SelectImageLabel": "Выбрать Изображение Персонажа",
+    "BrowseButtonText": "Обзор",
+    "SuccessMessage": "Персонаж Dungeons And Dragons Успешно Создан!"
+}

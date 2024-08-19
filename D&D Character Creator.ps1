@@ -49,7 +49,7 @@ function Set-Localisation {
     $localisationPath = Join-Path $PSScriptRoot "Assets\Localisation\localisation.$languageCode.json"
     if (Test-Path $localisationPath) {
         try {
-            $global:Localisation = Get-Content -Path $localisationPath | ConvertFrom-Json
+            $global:Localisation = Get-Content -Path $localisationPath -Raw -Encoding UTF8 | ConvertFrom-Json
             Debug-Log "[Debug] Loaded localisation for language: $languageCode"
         } catch {
             Write-Warning "[Debug] Failed to load localisation file for language '$languageCode'. Error: $_"
@@ -511,8 +511,8 @@ function Show-BasicInfoForm {
     $form.Add_Shown({$form.Activate()})
     $result = $form.ShowDialog()
 
+    # Capture the values from the form controls
     if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
-        # Capture the values from the form controls
         $global:WrittenCharactername = $characterNameControls[1].Text
         $global:WrittenAge = $age.Text
         $global:WrittenPlayername = $playerNameControls[1].Text

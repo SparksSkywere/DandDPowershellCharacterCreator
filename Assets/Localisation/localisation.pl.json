@@ -1,0 +1,12 @@
+{
+    "FormTitle": "Sparks D&D Character Creator",
+    "AcceptButtonText": "Dalej",
+    "SkipButtonText": "Pomiń",
+    "CancelButtonText": "Anuluj",
+    "CharacterNameLabel": "Nazwa Postaci",
+    "PlayerNameLabel": "Nazwa Gracza:",
+    "AgeLabel": "Wiek Postaci:",
+    "SelectImageLabel": "Wybież Obraz dla Postaci",
+    "BrowseButtonText": "Przeglądaj",
+    "SuccessMessage": "Postać Dungeons and Dragons została stworzona!"
+}

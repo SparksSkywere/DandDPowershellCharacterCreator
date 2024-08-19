@@ -37,7 +37,7 @@ function Debug-Log {
 }
 
 # Change the line below to show debugging information
-Show-Console -Show
+Show-Console -Hide
 Debug-Log "Console shown [Debugging Enabled]"
 
 # Detect system language and load corresponding localisation file

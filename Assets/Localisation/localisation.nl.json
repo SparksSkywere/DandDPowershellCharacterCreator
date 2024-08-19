@@ -1,0 +1,12 @@
+{
+    "FormTitle": "Sparks D&D Personage Creator",
+    "AcceptButtonText": "Volgende",
+    "SkipButtonText": "Overslaan",
+    "CancelButtonText": "Annuleren",
+    "CharacterNameLabel": "Naam Personage:",
+    "PlayerNameLabel": "Naam Speler:",
+    "AgeLabel": "Leeftijd Personage:",
+    "SelectImageLabel": "Kies Foto Personage",
+    "BrowseButtonText": "Bladeren",
+    "SuccessMessage": "Dungeons And Dragons Personage Succesvol Gecreëerd!"
+}

@@ -40,6 +40,50 @@ function Debug-Log {
 Show-Console -Show
 Debug-Log "Console shown [Debugging Enabled]"
 
+# Detect system language and load corresponding localization file
+function Set-Localization {
+    # Get the current system culture (e.g., "en-US" or "es-ES")
+    $currentCulture = [System.Globalization.CultureInfo]::CurrentCulture.Name
+    $languageCode = $currentCulture.Split('-')[0]  # Get the language part (e.g., "en" or "es")
+
+    $localizationPath = Join-Path $PSScriptRoot "Assets\Localisation\localization.$languageCode.json"
+    if (Test-Path $localizationPath) {
+        try {
+            $global:Localization = Get-Content -Path $localizationPath | ConvertFrom-Json
+            Debug-Log "[Debug] Loaded localization for language: $languageCode"
+        } catch {
+            Write-Warning "Failed to load localization file for language '$languageCode'. Error: $_"
+            Set-DefaultLocalization
+        }
+    } else {
+        Write-Warning "Localization file not found for language '$languageCode'. Falling back to default (English)."
+        Set-DefaultLocalization
+    }
+}
+
+# Fallback to default localization (English) if specific localization fails
+function Set-DefaultLocalization {
+    $defaultLocalizationPath = Join-Path $PSScriptRoot "Assets\Localisation\localization.en.json"
+    try {
+        $global:Localization = Get-Content -Path $defaultLocalizationPath | ConvertFrom-Json
+        Debug-Log "[Debug] Loaded default localization (English)"
+    } catch {
+        throw "Failed to load the default localization file."
+    }
+}
+
+# Wrapper function to handle conditional logging
+function Debug-Log {
+    param (
+        [string]$Message
+    )
+    if ($global:DebugLoggingEnabled) {
+        Write-Host $Message
+    }
+}
+# Load the localization based on system language
+Set-Localization
+
 # Function to create a form with specific buttons and styles
 function New-ProgramForm {
     param (
@@ -388,17 +432,17 @@ function Get-SpellSlots {
 function Show-BasicInfoForm {
     Debug-Log "[Debug] Displaying Basic Info Form"
 
-    # Create a new form
-    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 600 -Height 450 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+    # Create a new form with localized text
+    $form = New-ProgramForm -Title $global:Localization.FormTitle -Width 600 -Height 450 -AcceptButtonText $global:Localization.AcceptButtonText -SkipButtonText $global:Localization.SkipButtonText -CancelButtonText $global:Localization.CancelButtonText
 
     # Create controls for Character Name
-    $characterNameControls = Set-TextBox -LabelText 'Character Name:' -X 10 -Y 20 -Width 200 -Height 20 -MaxLength 30
+    $characterNameControls = Set-TextBox -LabelText $global:Localization.CharacterNameLabel -X 10 -Y 20 -Width 200 -Height 20 -MaxLength 30
 
     # Create the Age controls
     $ageLabel = New-Object System.Windows.Forms.Label
     $ageLabel.Location = New-Object System.Drawing.Point(10, 75)
     $ageLabel.Size = New-Object System.Drawing.Size(110, 18)
-    $ageLabel.Text = 'Character Age:'
+    $ageLabel.Text = $global:Localization.AgeLabel
     $ageLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
     $form.Controls.Add($ageLabel)
 
@@ -415,13 +459,13 @@ function Show-BasicInfoForm {
     })
 
     # Create controls for the Player Name
-    $playerNameControls = Set-TextBox -LabelText 'Player Name:' -X 10 -Y 125 -Width 200 -Height 20 -MaxLength 30
+    $playerNameControls = Set-TextBox -LabelText $global:Localization.PlayerNameLabel -X 10 -Y 125 -Width 200 -Height 20 -MaxLength 30
 
     # Create the Browse Image controls
     $PlayerImageLabel = New-Object System.Windows.Forms.Label
     $PlayerImageLabel.Location = New-Object System.Drawing.Point(300, 275)
     $PlayerImageLabel.Size = New-Object System.Drawing.Size(180, 18)
-    $PlayerImageLabel.Text = 'Select Character Image'
+    $PlayerImageLabel.Text = $global:Localization.SelectImageLabel
     $PlayerImageLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
     $form.Controls.Add($PlayerImageLabel)
 
@@ -429,7 +473,7 @@ function Show-BasicInfoForm {
     $browseButton = New-Object System.Windows.Forms.Button
     $browseButton.Location = New-Object System.Drawing.Point(300, 300)
     $browseButton.Size = New-Object System.Drawing.Size(80, 30)
-    $browseButton.Text = "Browse"
+    $browseButton.Text = $global:Localization.BrowseButtonText
 
     # PictureBox to display the selected image
     $pictureBox = New-Object System.Windows.Forms.PictureBox
@@ -444,7 +488,7 @@ function Show-BasicInfoForm {
     # Event handler for the Browse button click
     $browseButton.Add_Click({
         $openFileDialog = New-Object System.Windows.Forms.OpenFileDialog
-        $openFileDialog.Title = "Select Character Image"
+        $openFileDialog.Title = $global:Localization.SelectImageLabel
         $openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp"
 
         if ($openFileDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
@@ -476,6 +520,7 @@ function Show-BasicInfoForm {
         Debug-Log "`n[Debug] Character Name Captured: $($global:WrittenCharactername)"
         Debug-Log "[Debug] Age Captured: $($global:WrittenAge)"
         Debug-Log "[Debug] Player Name Captured: $($global:WrittenPlayername)"
+        Debug-Log "[Debug] Internal check: $ImageSelected"
         Debug-Log "[Debug] Character Image Selected: $($global:CharacterImage)"
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
         Debug-Log "Form was canceled by the user."
@@ -652,15 +697,28 @@ function Show-ClassAndAlignmentForm {
         Debug-Log "Class: $($global:Class)"
         Debug-Log "Alignment: $($global:Alignment)"
         Debug-Log "HD: $($global:HD)"
-        Debug-Log "HD: $($global:SpellCastingClass)"
-        Debug-Log "HD: $($global:SpellCastingAbility)"
-        Debug-Log "HD: $($global:SelectedPack)"
+        Debug-Log "SpellCastingClass: $($global:SpellCastingClass)"
+        Debug-Log "SpellCastingAbility: $($global:SpellCastingAbility)"
+        Debug-Log "SelectedPack: $($global:SelectedPack)"
+
+        # Load cantrips based on selected class
+        $global:Cantrip01 = $global:SelectedClass.Cantrip01
+        $global:Cantrip02 = $global:SelectedClass.Cantrip02
+        $global:Cantrip03 = $global:SelectedClass.Cantrip03
+        $global:Cantrip04 = $global:SelectedClass.Cantrip04
+        $global:Cantrip05 = $global:SelectedClass.Cantrip05
+        $global:Cantrip06 = $global:SelectedClass.Cantrip06
+        $global:Cantrip07 = $global:SelectedClass.Cantrip07
+        $global:Cantrip08 = $global:SelectedClass.Cantrip08
+
+        # Debugging output for cantrips
+        Debug-Log "[Debug] Loaded Cantrips: $global:Cantrip01, $global:Cantrip02, $global:Cantrip03, $global:Cantrip04, $global:Cantrip05, $global:Cantrip06, $global:Cantrip07, $global:Cantrip08"
 
         # Calculate the derived stats based on race and class
-        Debug-Log "Calculating Character Stats"
+        Debug-Log "[Debug] Calculating Character Stats"
         Calculate-CharacterStats
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "Form was canceled by the user."
+        Debug-Log "[Debug] Form was canceled by the user."
         exit
     }
 }

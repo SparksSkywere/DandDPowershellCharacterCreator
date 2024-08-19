@@ -1,0 +1,12 @@
+{
+    "FormTitle": "Sparks D&D Character Creator",
+    "AcceptButtonText": "Next",
+    "SkipButtonText": "Skip",
+    "CancelButtonText": "Cancel",
+    "CharacterNameLabel": "Character Name:",
+    "PlayerNameLabel": "Player Name:",
+    "AgeLabel": "Character Age:",
+    "SelectImageLabel": "Select Character Image",
+    "BrowseButtonText": "Browse",
+    "SuccessMessage": "Dungeons And Dragons Character Successfully Created!"
+}

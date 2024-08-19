@@ -1,8 +1,11 @@
 {
     "name": "Cleric",
     "HitDice": "1d8",
-    "classLevel": "Cleric 1",
+    "classLevel": "0",
     "spellcastingclass": "Cleric",
+    "SpellcastingAbility": "",
+    "SpellCastingSaveDC": "",
+    "SpellCastingAttackBonus": "",
     "check11": "",
     "check18": "",
     "check19": "",
@@ -32,5 +35,9 @@
         "Order Domain",
         "Peace Domain",
         "Twilight Domain"
+    ],
+    "SavingThrows": [
+        "Wisdom",
+        "Charisma"
     ]
 }

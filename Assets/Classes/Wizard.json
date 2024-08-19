@@ -1,8 +1,11 @@
 {
     "name": "Wizard",
     "HitDice": "1d6",
-    "classLevel": "Wizard 1",
+    "classLevel": "0",
     "spellcastingclass": "Wizard",
+    "SpellcastingAbility": "",
+    "SpellCastingSaveDC": "",
+    "SpellCastingAttackBonus": "",
     "check11": "",
     "check18": "",
     "check19": "",
@@ -27,5 +30,9 @@
         "Chronurgy Magic",
         "Gravitygy Magic",
         "Order Of Scribes"
+    ],
+    "SavingThrows": [
+        "Intelligence",
+        "Wisdom"
     ]
 }

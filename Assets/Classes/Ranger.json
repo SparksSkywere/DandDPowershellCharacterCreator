@@ -1,8 +1,11 @@
 {
     "name": "Ranger",
     "HitDice": "1d10",
-    "classLevel": "Ranger 1",
+    "classLevel": "0",
     "spellcastingclass": "Ranger",
+    "SpellcastingAbility": "",
+    "SpellCastingSaveDC": "",
+    "SpellCastingAttackBonus": "",
     "check11": "enable",
     "check18": "enable",
     "check19": "",
@@ -21,5 +24,9 @@
         "Monster Slayer",
         "Fey Wanderer",
         "Swarmkeeper"
+    ],
+    "SavingThrows": [
+        "Strength",
+        "Dexterity"
     ]
 }

@@ -1,8 +1,11 @@
 {
     "name": "Warlock",
     "HitDice": "1d8",
-    "classLevel": "Warlock 1",
+    "classLevel": "0",
     "spellcastingclass": "Warlock",
+    "SpellcastingAbility": "",
+    "SpellCastingSaveDC": "",
+    "SpellCastingAttackBonus": "",
     "check11": "",
     "check18": "",
     "check19": "",
@@ -22,5 +25,9 @@
         "The Hexblade",
         "The Fathomless",
         "The Genie"
+    ],
+    "SavingThrows": [
+        "Wisdom",
+        "Charisma"
     ]
 }

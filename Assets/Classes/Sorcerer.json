@@ -1,8 +1,11 @@
 {
     "name": "Sorcerer",
     "HitDice": "1d6",
-    "classLevel": "Sorcerer 1",
+    "classLevel": "0",
     "spellcastingclass": "Sorcerer",
+    "SpellcastingAbility": "",
+    "SpellCastingSaveDC": "",
+    "SpellCastingAttackBonus": "",
     "check11": "",
     "check18": "",
     "check19": "enable",
@@ -22,5 +25,9 @@
         "Shadow Magic",
         "Aberrant Mind",
         "Clockwork Soul"
+    ],
+    "SavingThrows": [
+        "Constitution",
+        "Charisma"
     ]
 }

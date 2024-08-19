@@ -1,9 +1,11 @@
 {
     "name": "Bard",
     "HitDice": "1d8",
-    "classLevel": "Bard 1",
+    "classLevel": "0",
     "spellcastingclass": "Bard",
     "SpellcastingAbility": "",
+    "SpellCastingSaveDC": "",
+    "SpellCastingAttackBonus": "",
     "check11": "",
     "check18": "enable",
     "check19": "",
@@ -22,5 +24,9 @@
         "College of Whisper",
         "College of Eloquence",
         "College of Creation"
+    ],
+    "SavingThrows": [
+        "Dexterity",
+        "Charisma"
     ]
 }

@@ -1,8 +1,11 @@
 {
     "name": "Rogue",
     "HitDice": "1d8",
-    "classLevel": "Rogue 1",
+    "classLevel": "0",
     "spellcastingclass": "",
+    "SpellcastingAbility": "",
+    "SpellCastingSaveDC": "",
+    "SpellCastingAttackBonus": "",
     "check11": "",
     "check18": "enable",
     "check19": "",
@@ -23,5 +26,9 @@
         "Scout",
         "Phantom",
         "Soulknife"
+    ],
+    "SavingThrows": [
+        "Dexterity",
+        "Intelligence"
     ]
 }

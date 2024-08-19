@@ -1,6 +1,6 @@
 Clear-Host
 # Global variable to control logging
-$global:DebugLoggingEnabled = $true
+$global:DebugLoggingEnabled = $true | Out-Null
 
 # Function to show or hide the console window
 function Show-Console {
@@ -37,7 +37,7 @@ function Debug-Log {
 }
 
 # Change the line below to show debugging information
-Show-Console -Hide
+Show-Console -Show
 Debug-Log "Console shown [Debugging Enabled]"
 
 # Detect system language and load corresponding localisation file
@@ -598,7 +598,7 @@ function Show-ClassAndRaceForm {
         Debug-Log "STR: $global:STR, DEX: $global:DEX, CON: $global:CON, INT: $global:INT, WIS: $global:WIS, CHA: $global:CHA"
         Debug-Log "STRMod: $global:STRMod, DEXMod: $global:DEXMod, CONMod: $global:CONMod, INTMod: $global:INTMod, WISMod: $global:WISMod, CHAMod: $global:CHAMod"
         Debug-Log "ST_STR: $global:ST_STR, ST_DEX: $global:ST_DEX, ST_CON: $global:ST_CON, ST_INT: $global:ST_INT, ST_WIS: $global:ST_WIS, ST_CHA: $global:ST_CHA"
-        
+
         # Calculate derived stats immediately after race selection
         Debug-Log "Calculating Character Stats"
         Calculate-CharacterStats
@@ -694,6 +694,16 @@ function Show-ClassAndAlignmentForm {
         $global:SelectedPack = $global:SelectedClass.Backpack
         $global:Alignment = $alignmentControls[1].SelectedItem.Name
 
+        # Checks from the classes in the json file
+        $checks = @("check11", "check18", "check19", "check20", "check21", "check22")
+
+        foreach ($check in $checks) {
+            if ($global:SelectedClass.$check -eq "enable") {
+                Set-Variable -Name $check.Replace("check", "Check") -Value 'yes'
+                Debug-Log "$check enabled"
+            }
+        }
+
         Debug-Log "SelectedClass: $($global:SelectedClass)"
         Debug-Log "Class: $($global:Class)"
         Debug-Log "Alignment: $($global:Alignment)"
@@ -701,20 +711,7 @@ function Show-ClassAndAlignmentForm {
         Debug-Log "SpellCastingClass: $($global:SpellCastingClass)"
         Debug-Log "SpellCastingAbility: $($global:SpellCastingAbility)"
         Debug-Log "SelectedPack: $($global:SelectedPack)"
-
-        # Load cantrips based on selected class
-        $global:Cantrip01 = $global:SelectedClass.Cantrip01
-        $global:Cantrip02 = $global:SelectedClass.Cantrip02
-        $global:Cantrip03 = $global:SelectedClass.Cantrip03
-        $global:Cantrip04 = $global:SelectedClass.Cantrip04
-        $global:Cantrip05 = $global:SelectedClass.Cantrip05
-        $global:Cantrip06 = $global:SelectedClass.Cantrip06
-        $global:Cantrip07 = $global:SelectedClass.Cantrip07
-        $global:Cantrip08 = $global:SelectedClass.Cantrip08
-
-        # Debugging output for cantrips
-        Debug-Log "[Debug] Loaded Cantrips: $global:Cantrip01, $global:Cantrip02, $global:Cantrip03, $global:Cantrip04, $global:Cantrip05, $global:Cantrip06, $global:Cantrip07, $global:Cantrip08"
-
+        
         # Calculate the derived stats based on race and class
         Debug-Log "[Debug] Calculating Character Stats"
         Calculate-CharacterStats

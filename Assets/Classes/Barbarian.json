@@ -1,7 +1,7 @@
 {
     "name": "Barbarian",
     "HitDice": "1d12",
-    "classLevel": "Barbarian 1",
+    "classLevel": "0",
     "spellcastingclass": "",
     "SpellCastingAbility": "",
     "SpellCastingSaveDC": "",
@@ -25,5 +25,9 @@
         "Zealot",
         "Beast",
         "Wild Magic"
+    ],
+    "SavingThrows": [
+        "Strength",
+        "Constitution"
     ]
 }

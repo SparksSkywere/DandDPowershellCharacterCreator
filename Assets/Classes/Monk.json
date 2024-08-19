@@ -1,8 +1,11 @@
 {
     "name": "Monk",
     "HitDice": "1d8",
-    "classLevel": "Monk 1",
+    "classLevel": "0",
     "spellcastingclass": "",
+    "SpellcastingAbility": "",
+    "SpellCastingSaveDC": "",
+    "SpellCastingAttackBonus": "",
     "check11": "enable",
     "check18": "enable",
     "check19": "",
@@ -23,5 +26,9 @@
         "Way of Kensei",
         "Way of Mercy",
         "Way of Astral Self"
+    ],
+    "SavingThrows": [
+        "Strength",
+        "Dexterity"
     ]
 }

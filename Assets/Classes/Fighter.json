@@ -1,8 +1,11 @@
 {
     "name": "Fighter",
     "HitDice": "1d10",
-    "classLevel": "Fighter 1",
+    "classLevel": "0",
     "spellcastingclass": "",
+    "SpellcastingAbility": "",
+    "SpellCastingSaveDC": "",
+    "SpellCastingAttackBonus": "",
     "check11": "enable",
     "check18": "",
     "check19": "enable",
@@ -24,5 +27,9 @@
         "Echo Knight",
         "Psi Worrior",
         "Rune Knight"
+    ],
+    "SavingThrows": [
+        "Strength",
+        "Constitution"
     ]
 }

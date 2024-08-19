@@ -1,8 +1,11 @@
 {
     "name": "Paladin",
     "HitDice": "1d10",
-    "classLevel": "Paladin 1",
+    "classLevel": "0",
     "spellcastingclass": "Paladin",
+    "SpellcastingAbility": "",
+    "SpellCastingSaveDC": "",
+    "SpellCastingAttackBonus": "",
     "check11": "",
     "check18": "",
     "check19": "",
@@ -23,5 +26,9 @@
         "Oath Of Redemption",
         "Oath Of Glory",
         "Oath Of The Watchers"
+    ],
+    "SavingThrows": [
+        "Wisdom",
+        "Charisma"
     ]
 }

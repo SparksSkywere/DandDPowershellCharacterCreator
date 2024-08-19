@@ -1,8 +1,11 @@
 {
     "name": "Druid",
     "HitDice": "1d8",
-    "classLevel": "Druid 1",
+    "classLevel": "0",
     "spellcastingclass": "Druid",
+    "SpellcastingAbility": "",
+    "SpellCastingSaveDC": "",
+    "SpellCastingAttackBonus": "",
     "check11": "",
     "check18": "",
     "check19": "",
@@ -21,5 +24,9 @@
         "Circle of Spores",
         "Circle of Stars",
         "Circle of Wildlife"
+    ],
+    "SavingThrows": [
+        "Intelligence",
+        "Wisdom"
     ]
 }

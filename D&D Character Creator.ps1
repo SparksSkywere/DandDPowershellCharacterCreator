@@ -35,8 +35,8 @@ function Debug-Log {
         Write-Host $Message
     }
 }
+
 # Change the line below to show debugging information
-# "-Show" to show the console "-Hide" to hide the console
 Show-Console -Show
 Debug-Log "Console shown [Debugging Enabled]"
 
@@ -345,13 +345,43 @@ function Calculate-CharacterStats {
     }
     
     # Calculate initiative
-    #$global:InitiativeTotal = $global:DEXMod
+    $global:InitiativeTotal = $global:DEXMod + $global:SelectedClass.InitiativeBonus
 
     # Calculate passive perception
     $global:Passive = 10 + $global:WISMod
     if ($global:SelectedClass.SkillProficiencies -contains 'Perception') {
         $global:Passive += $global:ProficiencyBonus
     }
+
+    # Calculate hit points
+    $global:HPMax = ($global:HD * $level) + ($global:CONMod * $level)
+
+    # Calculate encumbrance
+    $global:TotalWeightCarried = ($global:Weapon1Weight + $global:Weapon2Weight + $global:Weapon3Weight + $global:GearWeight + $global:ArmorWeight)
+    $global:EncumbranceThreshold = $global:STR * 15  # Standard D&D encumbrance rule
+    if ($global:TotalWeightCarried -gt $global:EncumbranceThreshold) {
+        $global:Speed = [math]::Max(0, $global:Speed - 10)  # Reduce speed if over-encumbered
+    }
+
+    # Calculate spell slots
+    if ($global:SpellCastingClass) {
+        $global:SpellSlots = Get-SpellSlots -class $global:SpellCastingClass -level $level
+    }
+}
+
+# Function to retrieve spell slots based on class and level
+function Get-SpellSlots {
+    param (
+        [string]$class,
+        [int]$level
+    )
+    $slots = @{}
+    switch ($class) {
+        'Wizard' { $slots = @{ 1=4; 2=3; 3=3; 4=3; 5=1 } }  # Example data
+        'Cleric' { $slots = @{ 1=3; 2=3; 3=2; 4=2 } }
+        # Add other classes here
+    }
+    return $slots
 }
 
 # Function to display the basic information form
@@ -740,7 +770,12 @@ function Show-WeaponAndArmorForm {
             $global:ArmourClass += 2
         }
 
-        # Debugging Outputs
+        # Calculate total carried weight
+        $global:ArmorWeight = $selectedArmor.Weight
+        $global:GearWeight = $gearControls[1].SelectedItem.Weight
+        Calculate-CharacterStats
+
+        # Debugging Outputs Weapons
         Debug-Log "Weapon1: $($global:Weapon1)"
         Debug-Log "Weapon1Damage: $($global:Weapon1Damage)"
         Debug-Log "Weapon1ATK_Bonus: $($global:WPN1ATK_Bonus)"
@@ -756,13 +791,17 @@ function Show-WeaponAndArmorForm {
         Debug-Log "Weapon3ATK_Bonus: $($global:WPN3ATK_Bonus)"
         Debug-Log "Weapon1Weight: $($global:Weapon3Weight)"
         Debug-Log "Weapon1Properties: $($global:Weapon3Properties)"
+        # Debugging Outputs Armour
         Debug-Log "Gear: $($global:Gear)"
         Debug-Log "Armour: $($global:Armour)"
-        Debug-Log "Calculated ArmourClass: $($global:ArmourClass)"
         Debug-Log "Selected Armor: $($armorControls[1].SelectedItem)"
-        Debug-Log "Base AC: $baseAC"
         Debug-Log "Armor Type: $armorType"
+        # Debugging Calculations
+        Debug-Log "Base AC: $baseAC"
         Debug-Log "Dexterity Modifier: $dexModifier"
+        Debug-Log "Calculated ArmourClass: $($global:ArmourClass)"
+        Debug-Log "Calculated ArmourWeight: $($global:ArmorWeight)"
+        Debug-Log "Calculated GearWeight: $($global:GearWeight)"
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
         Debug-Log "Form was canceled by the user."
         exit
@@ -972,7 +1011,7 @@ $characterparameters = @{
         'Check Box 39' = $Check39; #Stealth Button
         'Check Box 40' = $Check40; #Survival Button
         'Persuasion' = $Persuation;
-        'HPMax' = $HP;
+        'HPMax' = $HPMax;
         'HPCurrent' = $HP;
         #'HPTemp' = ;
         'Wpn3 Damage ' = $Weapon3Damage;
@@ -1018,7 +1057,7 @@ $characterparameters = @{
         'Spells 1020' = $Cantrip06; #Cantrip 0 slot 6
         'Spells 1021' = $Cantrip07; #Cantrip 0 slot 7
         'Spells 1022' = $Cantrip08; #Cantrip 0 slot 8
-        #'Check Box 314' =  ;
+                #'Check Box 314' =  ;
         #'Check Box 3031' =  ;
         #'Check Box 3032' =  ;
         #'Check Box 3033' =  ;

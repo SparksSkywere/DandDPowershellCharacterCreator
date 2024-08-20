@@ -698,12 +698,20 @@ function Show-ClassAndAlignmentForm {
         $checks = @("check11", "check18", "check19", "check20", "check21", "check22")
 
         foreach ($check in $checks) {
-            if ($global:SelectedClass.$check -eq "enable") {
-                Set-Variable -Name $check.Replace("check", "Check") -Value 'yes'
-                Debug-Log "$check enabled"
+            if ($global:SelectedClass.PSObject.Properties[$check]) {
+                # Trim single quotes from the value to match the expected comparison
+                $value = $global:SelectedClass.PSObject.Properties[$check].Value.Trim("'")
+                if ($value -eq "yes") {
+                    Set-Variable -Name $check.Replace("check", "Check") -Value 'yes'
+                    Debug-Log "$check enabled"
+                } else {
+                    Debug-Log "$check is not enabled."
+                }
+            } else {
+                Debug-Log "$check does not exist in SelectedClass."
             }
-        }
-
+        }        
+        
         Debug-Log "SelectedClass: $($global:SelectedClass)"
         Debug-Log "Class: $($global:Class)"
         Debug-Log "Alignment: $($global:Alignment)"

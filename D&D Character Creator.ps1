@@ -689,17 +689,16 @@ function Show-ClassAndAlignmentForm {
         $global:SelectedClass = $classControls[1].SelectedItem
         $global:Class = $global:SelectedClass.Name
         $global:HD = $global:SelectedClass.HitDice
-        $global:SpellCastingClass = $global:SelectedClass.SpellCastingClass
-        $global:SpellCastingAbility = $global:SelectedClass.SpellcastingAbility
-        $global:SelectedPack = $global:SelectedClass.Backpack
+        $global:SpellCastingClass = $global:SelectedClass.spellcastingclass
+        $global:SpellCastingAbility = $global:SelectedClass.SpellCastingAbility
+        $global:SelectedPack = $global:SelectedClass.backpack
         $global:Alignment = $alignmentControls[1].SelectedItem.Name
 
-        # Checks from the classes in the json file
+        # Process the check fields from the JSON
         $checks = @("check11", "check18", "check19", "check20", "check21", "check22")
 
         foreach ($check in $checks) {
             if ($global:SelectedClass.PSObject.Properties[$check]) {
-                # Trim single quotes from the value to match the expected comparison
                 $value = $global:SelectedClass.PSObject.Properties[$check].Value.Trim("'")
                 if ($value -eq "yes") {
                     Set-Variable -Name $check.Replace("check", "Check") -Value 'yes'
@@ -710,8 +709,8 @@ function Show-ClassAndAlignmentForm {
             } else {
                 Debug-Log "$check does not exist in SelectedClass."
             }
-        }        
-        
+        }
+
         Debug-Log "SelectedClass: $($global:SelectedClass)"
         Debug-Log "Class: $($global:Class)"
         Debug-Log "Alignment: $($global:Alignment)"

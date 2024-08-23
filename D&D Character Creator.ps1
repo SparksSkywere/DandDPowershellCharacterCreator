@@ -248,6 +248,7 @@ $ClassesJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Classes")
 $WeaponJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Weapons")
 $GearJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Gear")
 $ArmourJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Armour")
+$CantripsJSON = Get-JsonData -path (Join-Path $PSScriptRoot "Assets\Cantrips")
 
 # ---- Default Values -----
 $global:WrittenCharactername = $defaultJSON.Charactername
@@ -528,10 +529,9 @@ function Show-BasicInfoForm {
         exit
     }
 }
-Show-BasicInfoForm
 
 # Function to display the class and race selection form
-function Show-ClassAndRaceForm {
+function Show-RaceForm {
     Debug-Log "[Debug] Displaying Class and Race Form"
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 450 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
@@ -607,7 +607,6 @@ function Show-ClassAndRaceForm {
         exit
     }
 }
-Show-ClassAndRaceForm
 
 # Function to display the subrace form
 function Show-SubRaceForm {
@@ -636,7 +635,6 @@ function Show-SubRaceForm {
         Debug-Log "[Debug] No subraces available for the selected race."
     }
 }
-Show-SubRaceForm
 
 # Function to display the character features form
 function Show-CharacterFeaturesForm {
@@ -668,7 +666,6 @@ function Show-CharacterFeaturesForm {
         exit
     }
 }
-Show-CharacterFeaturesForm
 
 # Function to display the class and alignment selection form
 function Show-ClassAndAlignmentForm {
@@ -686,6 +683,7 @@ function Show-ClassAndAlignmentForm {
     $result = $form.ShowDialog()
 
     if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+        # All the values that are pulled from the json files
         $global:SelectedClass = $classControls[1].SelectedItem
         $global:Class = $global:SelectedClass.Name
         $global:HD = $global:SelectedClass.HitDice
@@ -694,22 +692,8 @@ function Show-ClassAndAlignmentForm {
         $global:SelectedPack = $global:SelectedClass.backpack
         $global:Alignment = $alignmentControls[1].SelectedItem.Name
 
-        # Process the check fields from the JSON
-        $checks = @("check11", "check18", "check19", "check20", "check21", "check22")
-
-        foreach ($check in $checks) {
-            if ($global:SelectedClass.PSObject.Properties[$check]) {
-                $value = $global:SelectedClass.PSObject.Properties[$check].Value.Trim("'")
-                if ($value -eq "yes") {
-                    Set-Variable -Name $check.Replace("check", "Check") -Value 'yes'
-                    Debug-Log "$check enabled"
-                } else {
-                    Debug-Log "$check is not enabled."
-                }
-            } else {
-                Debug-Log "$check does not exist in SelectedClass."
-            }
-        }
+        # Convert CanCastCantrips to a boolean
+        $global:CanCastCantrips = [bool]::Parse($global:SelectedClass.CanCastCantrips)
 
         Debug-Log "SelectedClass: $($global:SelectedClass)"
         Debug-Log "Class: $($global:Class)"
@@ -718,16 +702,23 @@ function Show-ClassAndAlignmentForm {
         Debug-Log "SpellCastingClass: $($global:SpellCastingClass)"
         Debug-Log "SpellCastingAbility: $($global:SpellCastingAbility)"
         Debug-Log "SelectedPack: $($global:SelectedPack)"
-        
+        Debug-Log "CanCastCantrips: $($global:CanCastCantrips)"  # Log cantrip capability
+
         # Calculate the derived stats based on race and class
         Debug-Log "[Debug] Calculating Character Stats"
         Calculate-CharacterStats
+
+        # Conditionally display the Cantrip Form if the class can cast cantrips
+        if ($global:CanCastCantrips) {
+            Show-CantripForm
+        } else {
+            Debug-Log "[Debug] Skipping Cantrip Selection as the class cannot cast cantrips."
+        }
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
         Debug-Log "[Debug] Form was canceled by the user."
         exit
     }
 }
-Show-ClassAndAlignmentForm
 
 # Function to display the subclass selection form
 function Show-SubClassForm {
@@ -757,7 +748,45 @@ function Show-SubClassForm {
         Debug-Log "[Debug] No subclasses available for the selected class."
     }
 }
-Show-SubClassForm
+
+# Function to display the cantrip selection form
+function Show-CantripForm {
+    Debug-Log "[Debug] Displaying Cantrip Selection Form"
+
+    # Filter cantrips based on the selected class
+    $filteredCantrips = $CantripsJSON | Where-Object { $_.classes -contains $global:Class }
+
+    $form = New-ProgramForm -Title 'Select Cantrips' -Width 500 -Height 600 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+
+    # Create list box controls for selecting up to 3 cantrips using the filtered cantrips
+    $cantrip1Controls = Set-ListBox -LabelText 'Select Cantrip 1:' -X 10 -Y 20 -Width 460 -Height 150 -DataSource $filteredCantrips -DisplayMember 'name'
+    $cantrip2Controls = Set-ListBox -LabelText 'Select Cantrip 2:' -X 10 -Y 180 -Width 460 -Height 150 -DataSource $filteredCantrips -DisplayMember 'name'
+    $cantrip3Controls = Set-ListBox -LabelText 'Select Cantrip 3:' -X 10 -Y 340 -Width 460 -Height 150 -DataSource $filteredCantrips -DisplayMember 'name'
+
+    # Add controls to the form
+    $form.Controls.AddRange($cantrip1Controls)
+    $form.Controls.AddRange($cantrip2Controls)
+    $form.Controls.AddRange($cantrip3Controls)
+
+    $form.Topmost = $true
+    $form.Add_Shown({$form.Activate()})
+    $result = $form.ShowDialog()
+
+    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+        # Store the selected cantrips in global variables
+        $global:Cantrip01 = $cantrip1Controls[1].SelectedItem.name
+        $global:Cantrip02 = $cantrip2Controls[1].SelectedItem.name
+        $global:Cantrip03 = $cantrip3Controls[1].SelectedItem.name
+
+        # Debugging output
+        Debug-Log "Selected Cantrip 1: $($global:Cantrip01)"
+        Debug-Log "Selected Cantrip 2: $($global:Cantrip02)"
+        Debug-Log "Selected Cantrip 3: $($global:Cantrip03)"
+    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
+        Debug-Log "Form was canceled by the user."
+        exit
+    }
+}
 
 # Function to display the weapon and armor selection form
 function Show-WeaponAndArmorForm {
@@ -870,7 +899,6 @@ function Show-WeaponAndArmorForm {
         exit
     }
 }
-Show-WeaponAndArmorForm
 
 # Function to display the character backstory form
 function Show-BackstoryForm {
@@ -924,7 +952,6 @@ function Show-BackstoryForm {
         exit
     }
 }
-Show-BackstoryForm
 
 # Function to display the additional details form
 function Show-AdditionalDetailsForm {
@@ -962,8 +989,18 @@ function Show-AdditionalDetailsForm {
         exit
     }
 }
-Show-AdditionalDetailsForm
 Debug-Log "[Debug] All forms have been displayed, proceeding with Save"
+
+# Show all forms in order
+Show-BasicInfoForm
+Show-RaceForm
+Show-SubRaceForm
+Show-CharacterFeaturesForm
+Show-ClassAndAlignmentForm
+Show-SubClassForm
+Show-WeaponAndArmorForm
+Show-BackstoryForm
+Show-AdditionalDetailsForm
 
 # Addvanced Debug purposes only for the PDF File inspect, not for normal debug
 #$fieldNames = Get-PdfFieldNames -FilePath "$PSScriptRoot\Assets\Empty_PDF\DnD_5E_CharacterSheet - Form Fillable.pdf"
@@ -1036,12 +1073,12 @@ $characterparameters = @{
         'Wpn2 AtkBonus ' = $WPN2ATK_Bonus;
         'Wpn Name 3' = $Weapon3;
         'Wpn3 AtkBonus  ' = $WPN3ATK_Bonus;
-        'Check Box 11' = $Check11; #Strength Button
-        'Check Box 18' = $Check18; #Dexterity Button
-        'Check Box 19' = $Check19; #Constitution Button
-        'Check Box 20' = $Check20; #Intelligence Button
-        'Check Box 21' = $Check21; #Wisdom Button
-        'Check Box 22' = $Check22; #Charisma Button
+        'Check Box 11' = if ($Check11) { "Yes" } else { "off" }; #Strength Button
+        'Check Box 18' = if ($Check18) { "Yes" } else { "off" }; #Dexterity Button
+        'Check Box 19' = if ($Check19) { "Yes" } else { "off" }; #Constitution Button
+        'Check Box 20' = if ($Check20) { "Yes" } else { "off" }; #Intelligence Button
+        'Check Box 21' = if ($Check21) { "Yes" } else { "off" }; #Wisdom Button
+        'Check Box 22' = if ($Check22) { "Yes" } else { "off" }; #Charisma Button
         'INTmod' = $INTmod;
         'Wpn2 Damage ' = $Weapon2Damage;
         'Investigation ' = $Investigation;
@@ -1055,24 +1092,24 @@ $characterparameters = @{
         'Medicine' = $Medicine;
         'Religion' = $Religion;
         'Stealth ' =  $Stealth;
-        'Check Box 23' = $Check23; #Acrobatics Button
-        'Check Box 24' = $Check24; #Animal Handling Button
-        'Check Box 25' = $Check25; #Arcana Button
-        'Check Box 26' = $Check26; #Athletics Button
-        'Check Box 27' = $Check27; #Deception Button
-        'Check Box 28' = $Check28; #History Button
-        'Check Box 29' = $Check29; #Insight Button
-        'Check Box 30' = $Check30; #Intimidation Button
-        'Check Box 31' = $Check31; #Investigation Button
-        'Check Box 32' = $Check32; #Medicine Button
-        'Check Box 33' = $Check33; #Nature Button
-        'Check Box 34' = $Check34; #Perception Button
-        'Check Box 35' = $Check35; #Performance Button
-        'Check Box 36' = $Check36; #Persuation Button
-        'Check Box 37' = $Check37; #Religion Button
-        'Check Box 38' = $Check38; #Slight of Hand Button
-        'Check Box 39' = $Check39; #Stealth Button
-        'Check Box 40' = $Check40; #Survival Button
+        'Check Box 23' = if ($Check23) { "Yes" } else { "off" }; #Acrobatics Button
+        'Check Box 24' = if ($Check24) { "Yes" } else { "off" }; #Animal Handling Button
+        'Check Box 25' = if ($Check25) { "Yes" } else { "off" }; #Arcana Button
+        'Check Box 26' = if ($Check26) { "Yes" } else { "off" }; #Athletics Button
+        'Check Box 27' = if ($Check27) { "Yes" } else { "off" }; #Deception Button
+        'Check Box 28' = if ($Check28) { "Yes" } else { "off" }; #History Button
+        'Check Box 29' = if ($Check29) { "Yes" } else { "off" }; #Insight Button
+        'Check Box 30' = if ($Check30) { "Yes" } else { "off" }; #Intimidation Button
+        'Check Box 31' = if ($Check31) { "Yes" } else { "off" }; #Investigation Button
+        'Check Box 32' = if ($Check32) { "Yes" } else { "off" }; #Medicine Button
+        'Check Box 33' = if ($Check33) { "Yes" } else { "off" }; #Nature Button
+        'Check Box 34' = if ($Check34) { "Yes" } else { "off" }; #Perception Button
+        'Check Box 35' = if ($Check35) { "Yes" } else { "off" }; #Performance Button
+        'Check Box 36' = if ($Check36) { "Yes" } else { "off" }; #Persuation Button
+        'Check Box 37' = if ($Check37) { "Yes" } else { "off" }; #Religion Button
+        'Check Box 38' = if ($Check38) { "Yes" } else { "off" }; #Slight of Hand Button
+        'Check Box 39' = if ($Check39) { "Yes" } else { "off" }; #Stealth Button
+        'Check Box 40' = if ($Check40) { "Yes" } else { "off" }; #Survival Button
         'Persuasion' = $Persuation;
         'HPMax' = $HPMax;
         'HPCurrent' = $HP;

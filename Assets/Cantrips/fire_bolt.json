@@ -1,0 +1,9 @@
+{
+    "name": "Fire Bolt",
+    "description": "A flammable object hit by this spell ignites if it isn’t being worn or carried.",
+    "damage": "1d10 fire",
+    "range": "120 feet",
+    "components": ["V", "S"],
+    "cast_time": "1 action",
+    "classes": ["Wizard", "Sorcerer"]
+}

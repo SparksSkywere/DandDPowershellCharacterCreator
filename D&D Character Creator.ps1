@@ -414,6 +414,65 @@ function Calculate-CharacterStats {
     }
 }
 
+# Function to handle button clicks, adjusting stat increments
+function HandleButtonClick {
+    param (
+        [string]$stat,
+        [string]$direction,
+        [System.Windows.Forms.Label]$valueLabel,
+        [System.Windows.Forms.Label]$remainingPointsLabel
+    )
+
+    $currentIncrement = $global:StatIncrements[$stat]
+    if ($direction -eq 'up' -and $currentIncrement -lt 8 -and (Calculate-RemainingPoints) -gt 0) {
+        $global:StatIncrements[$stat]++
+    } elseif ($direction -eq 'down' -and $currentIncrement -gt 0) {
+        $global:StatIncrements[$stat]--
+    }
+
+    $valueLabel.Text = $global:BaseStats[$stat] + $global:StatIncrements[$stat]
+    $remainingPointsLabel.Text = "Remaining Points: $(Calculate-RemainingPoints)"
+}
+
+# Define global variables for the stat allocation
+$global:TotalPoints = 27 # Standard D&D point buy system total points
+$global:BaseStats = @{
+    STR = 8
+    DEX = 8
+    CON = 8
+    INT = 8
+    WIS = 8
+    CHA = 8
+}
+$global:StatIncrements = @{
+    STR = 0
+    DEX = 0
+    CON = 0
+    INT = 0
+    WIS = 0
+    CHA = 0
+}
+
+# Function to calculate the remaining points based on current allocation
+function Calculate-RemainingPoints {
+    $remainingPoints = $global:TotalPoints
+    foreach ($stat in $global:StatIncrements.Keys) {
+        $increment = $global:StatIncrements[$stat]
+        switch ($increment) {
+            0 { $remainingPoints -= 0 }
+            1 { $remainingPoints -= 1 }
+            2 { $remainingPoints -= 2 }
+            3 { $remainingPoints -= 3 }
+            4 { $remainingPoints -= 4 }
+            5 { $remainingPoints -= 5 }
+            6 { $remainingPoints -= 6 }
+            7 { $remainingPoints -= 7 }
+            8 { $remainingPoints -= 8 }
+        }
+    }
+    return $remainingPoints
+}
+
 # Function to retrieve spell slots based on class and level
 function Get-SpellSlots {
     param (
@@ -525,7 +584,7 @@ function Show-BasicInfoForm {
         Debug-Log "[Debug] Internal check: $ImageSelected"
         Debug-Log "[Debug] Character Image Selected: $($global:CharacterImage)"
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "Form was canceled by the user."
+        Debug-Log "[Debug] Form was canceled by the user."
         exit
     }
 }
@@ -603,7 +662,7 @@ function Show-RaceForm {
         Debug-Log "Calculating Character Stats"
         Calculate-CharacterStats
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "Form was canceled by the user."
+        Debug-Log "[Debug] Form was canceled by the user."
         exit
     }
 }
@@ -628,7 +687,7 @@ function Show-SubRaceForm {
             Debug-Log "SelectedSubRace: $($global:SelectedSubRace)"
             Debug-Log "ExportSubrace: $($global:ExportSubrace)"
         } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-            Debug-Log "Form was canceled by the user."
+            Debug-Log "[Debug] Form was canceled by the user."
             exit
         }
     } else {
@@ -662,7 +721,7 @@ function Show-CharacterFeaturesForm {
         Debug-Log "Hair: $($global:Hair)"
         Debug-Log "Skin: $($global:Skin)"
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "Form was canceled by the user."
+        Debug-Log "[Debug] Form was canceled by the user."
         exit
     }
 }
@@ -715,7 +774,7 @@ function Show-ClassAndAlignmentForm {
             Debug-Log "[Debug] Skipping Cantrip Selection as the class cannot cast cantrips."
         }
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "[Debug] Form was canceled by the user."
+        Debug-Log "[Debug] [Debug] Form was canceled by the user."
         exit
     }
 }
@@ -741,7 +800,7 @@ function Show-SubClassForm {
                 Debug-Log "Final Selection: $($global:ClassAndSubClass)"
             }
         } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-            Debug-Log "Form was canceled by the user."
+            Debug-Log "[Debug] Form was canceled by the user."
             exit
         }
     } else {
@@ -783,7 +842,7 @@ function Show-CantripForm {
         Debug-Log "Selected Cantrip 2: $($global:Cantrip02)"
         Debug-Log "Selected Cantrip 3: $($global:Cantrip03)"
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "Form was canceled by the user."
+        Debug-Log "[Debug] Form was canceled by the user."
         exit
     }
 }
@@ -845,7 +904,7 @@ function Show-WeaponAndArmorForm {
         $global:Weapon3Properties = $weapon3.Weapon3Properties
 
         $selectedArmor = $armorControls[1].SelectedItem
-        $baseAC = [int]$selectedArmor.BaseAC   # Now correctly mapped to the JSON structure
+        $baseAC = [int]$selectedArmor.BaseAC
         $armorType = $selectedArmor.Type       
         $maxDexBonus = [int]$selectedArmor.MaxDexBonus  
         $dexModifier = [int]$global:DEXMod
@@ -895,10 +954,111 @@ function Show-WeaponAndArmorForm {
         Debug-Log "Calculated ArmourWeight: $($global:ArmorWeight)"
         Debug-Log "Calculated GearWeight: $($global:GearWeight)"
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "Form was canceled by the user."
+        Debug-Log "[Debug] Form was canceled by the user."
         exit
     }
 }
+
+# Function to display the stat chooser formfunction Show-StatsChooserForm {
+    function Show-StatsChooserForm {
+        Debug-Log "[Debug] Displaying Stats Chooser Form"
+        
+        # Create form
+        $form = New-ProgramForm -Title 'Allocate Character Stats' -Width 400 -Height 350 -AcceptButtonText 'OK' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+    
+        # Create label for remaining points
+        $remainingPointsLabel = New-Object System.Windows.Forms.Label
+        $remainingPointsLabel.Location = New-Object System.Drawing.Point(10, 10)
+        $remainingPointsLabel.Size = New-Object System.Drawing.Size(150, 20)
+        $remainingPointsLabel.Text = "Remaining Points: $global:TotalPoints"
+        $form.Controls.Add($remainingPointsLabel)
+    
+        # Create Reset button next to Remaining Points
+        $resetButton = New-Object System.Windows.Forms.Button
+        $resetButton.Location = New-Object System.Drawing.Point(170, 7)
+        $resetButton.Size = New-Object System.Drawing.Size(60, 23)
+        $resetButton.Text = 'Reset'
+        $resetButton.Add_Click({
+            # Store keys in a separate array to avoid modification during enumeration
+            $statKeys = $global:StatIncrements.Keys | ForEach-Object { $_ }
+        
+            # Reset all stats using the stored keys
+            foreach ($stat in $statKeys) {
+                $global:StatIncrements[$stat] = 0
+            }
+        
+            # Update the labels on the current form without reopening it
+            foreach ($control in $form.Controls) {
+                # Update the Remaining Points label
+                if ($control -is [System.Windows.Forms.Label] -and $control.Text -match 'Remaining Points:') {
+                    $control.Text = "Remaining Points: $global:TotalPoints"
+                }
+                # Update only the value labels
+                elseif ($control -is [System.Windows.Forms.Label] -and $null -ne $control.Tag) {
+                    $stat = $control.Tag
+                    $control.Text = $global:BaseStats[$stat] + $global:StatIncrements[$stat]
+                }
+            }
+        })     
+        $form.Controls.Add($resetButton)
+    
+        # Create controls for each stat
+        $yPosition = 40
+        foreach ($stat in $global:BaseStats.Keys) {
+            $currentStat = $stat  # Capture the stat in a local variable to avoid closure issues
+    
+            $label = New-Object System.Windows.Forms.Label
+            $label.Location = New-Object System.Drawing.Point(10, $yPosition)
+            $label.Size = New-Object System.Drawing.Size(80, 20)
+            $label.Text = "$currentStat"
+    
+            $upButton = New-Object System.Windows.Forms.Button
+            $upButton.Location = New-Object System.Drawing.Point(100, $yPosition)
+            $upButton.Size = New-Object System.Drawing.Size(40, 23)
+            $upButton.Text = "+"
+    
+            $downButton = New-Object System.Windows.Forms.Button
+            $downButton.Location = New-Object System.Drawing.Point(150, $yPosition)
+            $downButton.Size = New-Object System.Drawing.Size(40, 23)
+            $downButton.Text = "-"
+    
+            $valueLabel = New-Object System.Windows.Forms.Label
+            $valueLabel.Location = New-Object System.Drawing.Point(200, $yPosition)
+            $valueLabel.Size = New-Object System.Drawing.Size(40, 20)
+            $valueLabel.Text = $global:BaseStats[$currentStat] + $global:StatIncrements[$currentStat]
+            $valueLabel.Tag = $currentStat  # Set the tag to the current stat name
+    
+            # Local function to handle button clicks, ensuring proper scoping
+            $upButton.Add_Click([System.EventHandler]{
+                HandleButtonClick -stat $currentStat -direction 'up' -valueLabel $valueLabel -remainingPointsLabel $remainingPointsLabel
+            })
+    
+            $downButton.Add_Click([System.EventHandler]{
+                HandleButtonClick -stat $currentStat -direction 'down' -valueLabel $valueLabel -remainingPointsLabel $remainingPointsLabel
+            })
+    
+            $form.Controls.Add($label)
+            $form.Controls.Add($upButton)
+            $form.Controls.Add($downButton)
+            $form.Controls.Add($valueLabel)
+            $yPosition += 30
+        }
+    
+        # Display form and handle button events
+        $form.Topmost = $true
+        $form.Add_Shown({$form.Activate()})
+        $result = $form.ShowDialog()
+    
+        if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+            foreach ($stat in $global:BaseStats.Keys) {
+                Set-Variable -Name $stat -Value ($global:BaseStats[$stat] + $global:StatIncrements[$stat]) -Scope Global
+            }
+            Debug-Log "[Debug] Stats have been allocated: Strength=${global:STR}, Dexterity=${global:DEX}, Constitution=${global:CON}, Intelligence=${global:INT}, Wisdom=${global:WIS}, Charisma=${global:CHA}"
+        } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
+            Debug-Log "[Debug] Form was canceled by the user."
+            exit
+        }
+    }
 
 # Function to display the character backstory form
 function Show-BackstoryForm {
@@ -948,7 +1108,7 @@ function Show-BackstoryForm {
         Debug-Log "Bonds: $($global:Bonds)"
         Debug-Log "Flaws: $($global:Flaws)"
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "Form was canceled by the user."
+        Debug-Log "[Debug] Form was canceled by the user."
         exit
     }
 }
@@ -985,7 +1145,7 @@ function Show-AdditionalDetailsForm {
         Debug-Log "AddionalfeatTraits: $($global:AddionalfeatTraits)"
         Debug-Log "FactionName: $($global:factionname)"
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "Form was canceled by the user."
+        Debug-Log "[Debug] Form was canceled by the user."
         exit
     }
 }
@@ -999,6 +1159,7 @@ Show-CharacterFeaturesForm
 Show-ClassAndAlignmentForm
 Show-SubClassForm
 Show-WeaponAndArmorForm
+Show-StatsChooserForm
 Show-BackstoryForm
 Show-AdditionalDetailsForm
 

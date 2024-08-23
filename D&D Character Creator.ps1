@@ -414,45 +414,6 @@ function Calculate-CharacterStats {
     }
 }
 
-# Function to handle button clicks, adjusting stat increments
-function HandleButtonClick {
-    param (
-        [string]$stat,
-        [string]$direction,
-        [System.Windows.Forms.Label]$valueLabel,
-        [System.Windows.Forms.Label]$remainingPointsLabel
-    )
-
-    $currentIncrement = $global:StatIncrements[$stat]
-    if ($direction -eq 'up' -and $currentIncrement -lt 8 -and (Calculate-RemainingPoints) -gt 0) {
-        $global:StatIncrements[$stat]++
-    } elseif ($direction -eq 'down' -and $currentIncrement -gt 0) {
-        $global:StatIncrements[$stat]--
-    }
-
-    $valueLabel.Text = $global:BaseStats[$stat] + $global:StatIncrements[$stat]
-    $remainingPointsLabel.Text = "Remaining Points: $(Calculate-RemainingPoints)"
-}
-
-# Define global variables for the stat allocation
-$global:TotalPoints = 27 # Standard D&D point buy system total points
-$global:BaseStats = @{
-    STR = 8
-    DEX = 8
-    CON = 8
-    INT = 8
-    WIS = 8
-    CHA = 8
-}
-$global:StatIncrements = @{
-    STR = 0
-    DEX = 0
-    CON = 0
-    INT = 0
-    WIS = 0
-    CHA = 0
-}
-
 # Function to calculate the remaining points based on current allocation
 function Calculate-RemainingPoints {
     $remainingPoints = $global:TotalPoints
@@ -594,8 +555,8 @@ function Show-RaceForm {
     Debug-Log "[Debug] Displaying Class and Race Form"
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 450 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
-    $backgroundControls = Set-ListBox -LabelText 'Please Select a Background:' -X 10 -Y 20 -Width 200 -Height 170 -DataSource $CharacterBackgroundJSON -DisplayMember 'name'
-    $raceControls = Set-ListBox -LabelText 'Please select a Race:' -X 220 -Y 20 -Width 150 -Height 170 -DataSource $RacesJSON -DisplayMember 'name'
+    $backgroundControls = Set-ListBox -LabelText 'Select a Background:' -X 10 -Y 20 -Width 200 -Height 170 -DataSource $CharacterBackgroundJSON -DisplayMember 'name'
+    $raceControls = Set-ListBox -LabelText 'Select a Race:' -X 220 -Y 20 -Width 150 -Height 170 -DataSource $RacesJSON -DisplayMember 'name'
 
     $form.Controls.AddRange($backgroundControls)
     $form.Controls.AddRange($raceControls)
@@ -673,7 +634,7 @@ function Show-SubRaceForm {
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     if ($global:SelectedRace.subraces -and $global:SelectedRace.subraces.Count -gt 0) {
-        $subRaceControls = Set-ListBox -LabelText 'Please select a SubRace:' -X 10 -Y 20 -Width 260 -Height 200 -DataSource $global:SelectedRace.subraces -DisplayMember 'name'
+        $subRaceControls = Set-ListBox -LabelText 'Select a SubRace:' -X 10 -Y 20 -Width 260 -Height 200 -DataSource $global:SelectedRace.subraces -DisplayMember 'name'
         $form.Controls.AddRange($subRaceControls)
 
         $form.Topmost = $true
@@ -731,8 +692,8 @@ function Show-ClassAndAlignmentForm {
     Debug-Log "[Debug] Displaying Class and Alignment Form"
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
-    $classControls = Set-ListBox -LabelText 'Please select a Primary Class:' -X 10 -Y 20 -Width 160 -Height 200 -DataSource $ClassesJSON -DisplayMember 'name'
-    $alignmentControls = Set-ListBox -LabelText 'Please select an Alignment:' -X 200 -Y 20 -Width 160 -Height 200 -DataSource $AlignmentJSON -DisplayMember 'name'
+    $classControls = Set-ListBox -LabelText 'Select a Primary Class:' -X 10 -Y 20 -Width 160 -Height 200 -DataSource $ClassesJSON -DisplayMember 'name'
+    $alignmentControls = Set-ListBox -LabelText 'Select an Alignment:' -X 200 -Y 20 -Width 160 -Height 200 -DataSource $AlignmentJSON -DisplayMember 'name'
 
     $form.Controls.AddRange($classControls)
     $form.Controls.AddRange($alignmentControls)
@@ -785,7 +746,7 @@ function Show-SubClassForm {
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     if ($global:SelectedClass.Subclasses -and $global:SelectedClass.Subclasses.Count -gt 0) {
-        $subClassControls = Set-ListBox -LabelText 'Please select a SubClass:' -X 10 -Y 20 -Width 260 -Height 200 -DataSource $global:SelectedClass.Subclasses
+        $subClassControls = Set-ListBox -LabelText 'Select a SubClass:' -X 10 -Y 20 -Width 260 -Height 200 -DataSource $global:SelectedClass.Subclasses
         $form.Controls.AddRange($subClassControls)
 
         $form.Topmost = $true
@@ -962,7 +923,7 @@ function Show-WeaponAndArmorForm {
 # Function to display the stat chooser formfunction Show-StatsChooserForm {
 function Show-StatsChooserForm {
     Debug-Log "[Debug] Displaying Stats Chooser Form"
-    
+
     # Create form
     $form = New-ProgramForm -Title 'Allocate Character Stats' -Width 400 -Height 350 -AcceptButtonText 'OK' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
@@ -979,61 +940,78 @@ function Show-StatsChooserForm {
     $resetButton.Size = New-Object System.Drawing.Size(60, 23)
     $resetButton.Text = 'Reset'
     $resetButton.Add_Click({
-        $statKeys = $global:StatIncrements.Keys | ForEach-Object { $_ }
+        # Clone keys to avoid modifying the collection during enumeration
+        $statKeys = $global:StatIncrements.Keys.Clone()
         foreach ($stat in $statKeys) {
             $global:StatIncrements[$stat] = 0
         }
         foreach ($control in $form.Controls) {
-            if ($control -is [System.Windows.Forms.Label] -and $control.Text -match 'Remaining Points:') {
+            if ($control.Text -match 'Remaining Points:') {
                 $control.Text = "Remaining Points: $global:TotalPoints"
-            }
-            elseif ($control -is [System.Windows.Forms.Label] -and $null -ne $control.Tag) {
-                $stat = $control.Tag
-                $control.Text = $global:BaseStats[$stat] + $global:StatIncrements[$stat]
+            } elseif ($control.Tag) {
+                $control.Text = $global:BaseStats[$control.Tag] + $global:StatIncrements[$control.Tag]
             }
         }
     })
     $form.Controls.Add($resetButton)
 
-    # Create controls for each stat
-    $yPosition = 40
-    foreach ($stat in $global:BaseStats.Keys) {
-        # Use a script block to encapsulate the current stat
-        $script:currentStat = $stat
-
+    # Helper function to create controls
+    function Add-StatControls {
+        param (
+            [string]$stat,
+            [int]$yPosition
+        )
+    
+        # Create label for the stat name
         $label = New-Object System.Windows.Forms.Label
         $label.Location = New-Object System.Drawing.Point(10, $yPosition)
         $label.Size = New-Object System.Drawing.Size(80, 20)
-        $label.Text = "$currentStat"
-
+        $label.Text = $stat
+        
+        # Create the value label for the stat value
+        $valueLabel = New-Object System.Windows.Forms.Label
+        $valueLabel.Location = New-Object System.Drawing.Point(200, $yPosition)
+        $valueLabel.Size = New-Object System.Drawing.Size(40, 20)
+        $valueLabel.Text = $global:BaseStats[$stat] + $global:StatIncrements[$stat]
+        $valueLabel.Tag = $stat  # Tag with the stat name
+        
+        # Log the initialization of the label
+        Debug-Log "[Debug] ValueLabel initialized for $stat $($valueLabel.Text)"
+        
+        # Create the up and down buttons
         $upButton = New-Object System.Windows.Forms.Button
         $upButton.Location = New-Object System.Drawing.Point(100, $yPosition)
         $upButton.Size = New-Object System.Drawing.Size(40, 23)
         $upButton.Text = "+"
-
+    
         $downButton = New-Object System.Windows.Forms.Button
         $downButton.Location = New-Object System.Drawing.Point(150, $yPosition)
         $downButton.Size = New-Object System.Drawing.Size(40, 23)
         $downButton.Text = "-"
-
-        $valueLabel = New-Object System.Windows.Forms.Label
-        $valueLabel.Location = New-Object System.Drawing.Point(200, $yPosition)
-        $valueLabel.Size = New-Object System.Drawing.Size(40, 20)
-        $valueLabel.Text = $global:BaseStats[$currentStat] + $global:StatIncrements[$currentStat]
-        $valueLabel.Tag = $currentStat  # Set the tag to the current stat name
-
-        $upButton.Add_Click([System.EventHandler]{
-            HandleButtonClick -stat $script:currentStat -direction 'up' -valueLabel $valueLabel -remainingPointsLabel $remainingPointsLabel
+    
+        # Event handlers for buttons must be inside the scope of Add-StatControls
+        $upButton.Add_Click({
+            Debug-Log "[Debug] Up button clicked for $currentStat"
+            HandleButtonClick -stat $currentStat -direction 'up' -valueLabel $valueLabel -remainingPointsLabel $remainingPointsLabel
+        })        
+    
+        $downButton.Add_Click({
+            Debug-Log "[Debug] Down button clicked for $stat"
+            HandleButtonClick -stat $stat -direction 'down' -valueLabel $valueLabel -remainingPointsLabel $remainingPointsLabel
         })
-
-        $downButton.Add_Click([System.EventHandler]{
-            HandleButtonClick -stat $script:currentStat -direction 'down' -valueLabel $valueLabel -remainingPointsLabel $remainingPointsLabel
-        })
-
+    
+        # Add controls to the form
         $form.Controls.Add($label)
         $form.Controls.Add($upButton)
         $form.Controls.Add($downButton)
         $form.Controls.Add($valueLabel)
+    }    
+
+    # Create controls for each stat
+    $yPosition = 40
+    foreach ($stat in $global:BaseStats.Keys) {
+        $currentStat = $stat
+        Add-StatControls -stat $currentStat -yPosition $yPosition
         $yPosition += 30
     }
 
@@ -1051,6 +1029,61 @@ function Show-StatsChooserForm {
         Debug-Log "[Debug] Form was canceled by the user."
         exit
     }
+}
+
+# Revised HandleButtonClick function with ref parameter
+function HandleButtonClick {
+    param (
+        [string]$stat,
+        [string]$direction,
+        [System.Windows.Forms.Label]$valueLabel,
+        [System.Windows.Forms.Label]$remainingPointsLabel
+    )
+
+    Debug-Log "[Debug] HandleButtonClick called for $stat with direction $direction"
+    
+    # Ensure that $valueLabel is not null
+    if ($null -eq $valueLabel) {
+        Debug-Log "[Error] valueLabel is null for $stat with direction $direction"
+        return
+    }
+    
+    # Update the StatIncrements and the Remaining Points
+    if ($direction -eq 'up' -and $global:TotalPoints -gt 0) {
+        $global:StatIncrements[$stat]++
+        $global:TotalPoints--
+    } elseif ($direction -eq 'down' -and $global:StatIncrements[$stat] -gt 0) {
+        $global:StatIncrements[$stat]--
+        $global:TotalPoints++
+    }
+
+    # Debug the type of $valueLabel
+    if ($valueLabel -is [System.Windows.Forms.Label]) {
+        $valueLabel.Text = $global:BaseStats[$stat] + $global:StatIncrements[$stat]
+    } else {
+        Debug-Log "[Error] $valueLabel is not a Label control. It is of type $($valueLabel.GetType().FullName)"
+    }
+    
+    $remainingPointsLabel.Text = "Remaining Points: $global:TotalPoints"
+}
+
+# Initialize global variables for the stat allocation
+$global:TotalPoints = 27
+$global:BaseStats = @{
+    STR = 8
+    DEX = 8
+    CON = 8
+    INT = 8
+    WIS = 8
+    CHA = 8
+}
+$global:StatIncrements = @{
+    STR = 0
+    DEX = 0
+    CON = 0
+    INT = 0
+    WIS = 0
+    CHA = 0
 }
 
 # Function to display the character backstory form

@@ -1,0 +1,9 @@
+{
+    "name": "Chill Touch",
+    "description": "You create a ghostly, skeletal hand in the space of a creature within range. Make a ranged spell attack against the creature to assail it with the chill of the grave.",
+    "damage": "1d8 necrotic",
+    "range": "120 feet",
+    "components": ["V", "S"],
+    "cast_time": "1 action",
+    "classes": ["Sorcerer", "Warlock", "Wizard"]
+}

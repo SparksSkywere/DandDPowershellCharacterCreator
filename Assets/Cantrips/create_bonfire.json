@@ -1,0 +1,9 @@
+{
+    "name": "Create Bonfire",
+    "description": "You create a bonfire on ground that you can see within range. Until the spell ends, the bonfire fills a 5-foot cube. Any creature in the bonfire’s space when you cast the spell must succeed on a Dexterity saving throw or take 1d8 fire damage.",
+    "damage": "1d8 fire",
+    "range": "60 feet",
+    "components": ["V", "S"],
+    "cast_time": "1 action",
+    "classes": ["Druid", "Sorcerer", "Warlock", "Wizard"]
+}

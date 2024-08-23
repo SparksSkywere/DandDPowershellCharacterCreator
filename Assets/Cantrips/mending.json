@@ -1,0 +1,9 @@
+{
+    "name": "Mending",
+    "description": "This spell repairs a single break or tear in an object you touch, such as a broken chain link, two halves of a broken key, or a torn cloak.",
+    "damage": "None",
+    "range": "Touch",
+    "components": ["V", "S", "M (two lodestones)"],
+    "cast_time": "1 minute",
+    "classes": ["Bard", "Cleric", "Druid", "Sorcerer", "Wizard"]
+}

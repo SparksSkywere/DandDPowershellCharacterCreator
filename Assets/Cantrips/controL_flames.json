@@ -1,0 +1,9 @@
+{
+    "name": "Control Flames",
+    "description": "You choose nonmagical flame that you can see within range and that fits within a 5-foot cube. You affect it in one of several ways.",
+    "damage": "None",
+    "range": "60 feet",
+    "components": ["S"],
+    "cast_time": "1 action",
+    "classes": ["Druid", "Sorcerer", "Wizard"]
+}

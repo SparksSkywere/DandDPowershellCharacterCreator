@@ -1,0 +1,9 @@
+{
+    "name": "Minor Illusion",
+    "description": "You create a sound or an image of an object within range that lasts for the duration. The illusion ends if you dismiss it or create another illusion.",
+    "damage": "None",
+    "range": "30 feet",
+    "components": ["S", "M (a bit of fleece)"],
+    "cast_time": "1 action",
+    "classes": ["Bard", "Sorcerer", "Warlock", "Wizard"]
+}

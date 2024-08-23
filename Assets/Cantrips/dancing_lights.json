@@ -1,0 +1,9 @@
+{
+    "name": "Dancing Lights",
+    "description": "You create up to four torch-sized lights within range, making them appear as torches, lanterns, or glowing orbs that hover in the air.",
+    "damage": "None",
+    "range": "120 feet",
+    "components": ["V", "S", "M (a bit of phosphorus or wychwood, or a glowworm)"],
+    "cast_time": "1 action",
+    "classes": ["Bard", "Sorcerer", "Wizard"]
+}

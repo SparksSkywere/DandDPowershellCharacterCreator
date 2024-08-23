@@ -1,0 +1,9 @@
+{
+    "name": "Booming Blade",
+    "description": "You brandish the weapon used in the spell's casting and make a melee attack with it against one creature within 5 feet of you. On a hit, the target suffers the weapon attack’s normal effects and becomes sheathed in booming energy until the start of your next turn.",
+    "damage": "Weapon damage + 1d8 thunder",
+    "range": "Self (5-foot radius)",
+    "components": ["V", "M (a weapon)"],
+    "cast_time": "1 action",
+    "classes": ["Sorcerer", "Warlock", "Wizard"]
+}

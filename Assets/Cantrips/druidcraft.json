@@ -1,0 +1,9 @@
+{
+    "name": "Druidcraft",
+    "description": "Whispering to the spirits of nature, you create one of the following effects within range: create a tiny harmless sensory effect, instantly light or snuff out a candle, or predict the weather.",
+    "damage": "None",
+    "range": "30 feet",
+    "components": ["V", "S"],
+    "cast_time": "1 action",
+    "classes": ["Druid"]
+}

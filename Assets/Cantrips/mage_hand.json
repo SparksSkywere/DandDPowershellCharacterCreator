@@ -1,0 +1,9 @@
+{
+    "name": "Mage Hand",
+    "description": "A spectral, floating hand appears at a point you choose within range. The hand lasts for the duration or until you dismiss it. You can use the hand to manipulate an object, open a door or container, or retrieve an item.",
+    "damage": "None",
+    "range": "30 feet",
+    "components": ["V", "S"],
+    "cast_time": "1 action",
+    "classes": ["Bard", "Sorcerer", "Warlock", "Wizard"]
+}

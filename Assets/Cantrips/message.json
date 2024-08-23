@@ -1,0 +1,9 @@
+{
+    "name": "Message",
+    "description": "You point your finger toward a creature within range and whisper a message. The target hears the message and can reply in a whisper that only you can hear.",
+    "damage": "None",
+    "range": "120 feet",
+    "components": ["V", "S", "M (a short piece of copper wire)"],
+    "cast_time": "1 action",
+    "classes": ["Bard", "Sorcerer", "Wizard"]
+}

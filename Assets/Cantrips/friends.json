@@ -1,0 +1,9 @@
+{
+    "name": "Friends",
+    "description": "For the duration, you have advantage on all Charisma checks directed at one creature of your choice that isn’t hostile toward you. When the spell ends, the creature realizes that you used magic to influence its mood and becomes hostile toward you.",
+    "damage": "None",
+    "range": "Self",
+    "components": ["S", "M (a small amount of makeup applied to the face as this spell is cast)"],
+    "cast_time": "1 action",
+    "classes": ["Bard", "Sorcerer", "Warlock", "Wizard"]
+}

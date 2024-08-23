@@ -1,0 +1,9 @@
+{
+    "name": "Shillelagh",
+    "description": "The wood of a club or quarterstaff you are holding is imbued with nature’s power. For the duration, you can use your spellcasting ability instead of Strength for the attack and damage rolls of melee attacks using that weapon.",
+    "damage": "1d8 bludgeoning",
+    "range": "Touch",
+    "components": ["V", "S", "M (mistletoe, a shamrock leaf, and a club or quarterstaff)"],
+    "cast_time": "1 bonus action",
+    "classes": ["Druid"]
+}

@@ -1,0 +1,9 @@
+{
+    "name": "Prestidigitation",
+    "description": "This spell is a minor magical trick that novice spellcasters use for practice. You create one of several minor effects.",
+    "damage": "None",
+    "range": "10 feet",
+    "components": ["V", "S"],
+    "cast_time": "1 action",
+    "classes": ["Bard", "Sorcerer", "Warlock", "Wizard"]
+}

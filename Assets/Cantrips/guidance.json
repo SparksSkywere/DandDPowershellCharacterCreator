@@ -1,0 +1,9 @@
+{
+    "name": "Guidance",
+    "description": "You touch one willing creature. Once before the spell ends, the target can roll a d4 and add the number rolled to one ability check of its choice.",
+    "damage": "None",
+    "range": "Touch",
+    "components": ["V", "S"],
+    "cast_time": "1 action",
+    "classes": ["Cleric", "Druid"]
+}

@@ -1,0 +1,9 @@
+{
+    "name": "Thaumaturgy",
+    "description": "You manifest a minor wonder, a sign of supernatural power. You create one of several magical effects within range.",
+    "damage": "None",
+    "range": "30 feet",
+    "components": ["V"],
+    "cast_time": "1 action",
+    "classes": ["Cleric"]
+}

@@ -1,0 +1,9 @@
+{
+    "name": "True Strike",
+    "description": "You point a finger at a target in range. Your magic grants you a brief insight into the target’s defenses. On your next turn, you gain advantage on your first attack roll against the target, provided this spell hasn’t ended.",
+    "damage": "None",
+    "range": "30 feet",
+    "components": ["S"],
+    "cast_time": "1 action",
+    "classes": ["Bard", "Sorcerer", "Warlock", "Wizard"]
+}

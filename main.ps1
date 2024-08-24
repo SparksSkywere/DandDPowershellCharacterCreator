@@ -5,7 +5,29 @@ Clear-Host
 $global:DebugLoggingEnabled = $true
 
 # Import all functions from the "Functions" folder
-Get-ChildItem -Path "$PSScriptRoot\Assets\Functions" -Filter "*.ps1" | ForEach-Object { . $_.FullName }
+. "$PSScriptRoot\Assets\Functions\Show-Console.ps1"
+. "$PSScriptRoot\Assets\Functions\Debug-Log.ps1"
+. "$PSScriptRoot\Assets\Functions\Set-Localisation.ps1"
+. "$PSScriptRoot\Assets\Functions\New-ProgramForm.ps1"
+. "$PSScriptRoot\Assets\Functions\Set-TextBox.ps1"
+. "$PSScriptRoot\Assets\Functions\Set-ListBox.ps1"
+. "$PSScriptRoot\Assets\Functions\Show-Form.ps1"
+. "$PSScriptRoot\Assets\Functions\Get-JsonData.ps1"
+. "$PSScriptRoot\Assets\Functions\Calculate-CharacterStats.ps1"
+. "$PSScriptRoot\Assets\Functions\Get-SpellSlots.ps1"
+. "$PSScriptRoot\Assets\Functions\Show-BasicInfoForm.ps1"
+. "$PSScriptRoot\Assets\Functions\Show-RaceForm.ps1"
+. "$PSScriptRoot\Assets\Functions\Show-SubRaceForm.ps1"
+. "$PSScriptRoot\Assets\Functions\Show-CharacterFeaturesForm.ps1"
+. "$PSScriptRoot\Assets\Functions\Show-ClassAndAlignmentForm.ps1"
+. "$PSScriptRoot\Assets\Functions\Show-SubClassForm.ps1"
+. "$PSScriptRoot\Assets\Functions\Show-CantripForm.ps1"
+. "$PSScriptRoot\Assets\Functions\Show-WeaponAndArmorForm.ps1"
+. "$PSScriptRoot\Assets\Functions\Show-StatsChooserForm.ps1"
+. "$PSScriptRoot\Assets\Functions\HandleButtonClick.ps1"
+. "$PSScriptRoot\Assets\Functions\UpdateFormControls.ps1"
+. "$PSScriptRoot\Assets\Functions\Show-BackstoryForm.ps1"
+. "$PSScriptRoot\Assets\Functions\Show-AdditionalDetailsForm.ps1"
 
 # Initialize the console and logging
 Show-Console -Show

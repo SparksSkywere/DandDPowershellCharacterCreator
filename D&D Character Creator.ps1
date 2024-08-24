@@ -414,26 +414,6 @@ function Calculate-CharacterStats {
     }
 }
 
-# Function to calculate the remaining points based on current allocation
-function Calculate-RemainingPoints {
-    $remainingPoints = $global:TotalPoints
-    foreach ($stat in $global:StatIncrements.Keys) {
-        $increment = $global:StatIncrements[$stat]
-        switch ($increment) {
-            0 { $remainingPoints -= 0 }
-            1 { $remainingPoints -= 1 }
-            2 { $remainingPoints -= 2 }
-            3 { $remainingPoints -= 3 }
-            4 { $remainingPoints -= 4 }
-            5 { $remainingPoints -= 5 }
-            6 { $remainingPoints -= 6 }
-            7 { $remainingPoints -= 7 }
-            8 { $remainingPoints -= 8 }
-        }
-    }
-    return $remainingPoints
-}
-
 # Function to retrieve spell slots based on class and level
 function Get-SpellSlots {
     param (
@@ -1026,7 +1006,7 @@ function HandleButtonClick {
         [System.Windows.Forms.Label]$valueLabel,
         [System.Windows.Forms.Label]$remainingPointsLabel
     )
-    
+
     # Correct the logic: "up" should add points, "down" should subtract points
     if ($direction -eq 'up' -and $global:TotalPoints -gt 0) {
         $global:StatIncrements[$stat]++     # Increment the stat value

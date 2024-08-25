@@ -37,7 +37,7 @@ function Debug-Log {
 }
 
 # Change the line below to show debugging information
-Show-Console -Show
+Show-Console -Hide
 Debug-Log "Console shown [Debugging Enabled]"
 
 # Detect system language and load corresponding localisation file
@@ -50,7 +50,6 @@ function Set-Localisation {
     if (Test-Path $localisationPath) {
         try {
             $global:Localisation = Get-Content -Path $localisationPath -Raw -Encoding UTF8 | ConvertFrom-Json
-            Debug-Log "[Debug] System Localisation: $global:Localisation"
             Debug-Log "[Debug] Loaded localisation for language: $languageCode"
         } catch {
             Write-Warning "[Debug] Failed to load localisation file for language '$languageCode'. Error: $_"

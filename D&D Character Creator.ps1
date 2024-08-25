@@ -37,7 +37,7 @@ function Debug-Log {
 }
 
 # Change the line below to show debugging information
-Show-Console -Show
+Show-Console -Hide
 Debug-Log "Console shown [Debugging Enabled]"
 
 # Detect system language and load corresponding localisation file
@@ -1195,13 +1195,13 @@ $characterparameters = @{
         'AC' = $ArmourClass;
         'Initiative' = $InitiativeTotal;
         'Speed' = $Speed;
-        'PersonalityTraits ' = $PersonalityTraits.Text;
+        'PersonalityTraits ' = $PersonalityTraits;
         'STRmod' = $STRmod;
         'ST Strength' = $ST_STR;
         'DEX' = $DEX;
-        'Ideals' = $Ideals.Text;
+        'Ideals' = $Ideals;
         'DEXmod ' = $DEXmod;
-        'Bonds' = $Bonds.Text;
+        'Bonds' = $Bonds;
         'CON' = $CON;
         'HDTotal' = $HitDiceTotal;
         'Check Box 12' = $Check12; #first success button (from left)
@@ -1212,7 +1212,7 @@ $characterparameters = @{
         'Check Box 16' = $Check16; #second failure button
         'Check Box 17' = $Check17; #last failure button
         'HD' = $HD;
-        'Flaws' = $Flaws.Text;
+        'Flaws' = $Flaws;
         'INT' = $INT;
         'ST Dexterity' = $ST_DEX;
         'ST Constitution' = $ST_CON;
@@ -1317,7 +1317,7 @@ $characterparameters = @{
         'Spells 1020' = $Cantrip06; #Cantrip 0 slot 6
         'Spells 1021' = $Cantrip07; #Cantrip 0 slot 7
         'Spells 1022' = $Cantrip08; #Cantrip 0 slot 8
-                #'Check Box 314' =  ;
+        #'Check Box 314' =  ;
         #'Check Box 3031' =  ;
         #'Check Box 3032' =  ;
         #'Check Box 3033' =  ;

@@ -10,8 +10,8 @@
     "check18": "",
     "check19": "",
     "check20": "",
-    "check21": "enable",
-    "check22": "enable",
+    "check21": "'yes'",
+    "check22": "'yes'",
     "backpack": "A backpack, a blanket, 10 candles, a tinderbox, an alms box, 2 blocks of incense, a censer, vestments, 2 days of rations and a waterskin",
     "subclasses": [
         "Oath Of Devotion",

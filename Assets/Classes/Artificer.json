@@ -15,8 +15,10 @@
     "check22": "",
     "backpack": "",
     "subclasses": [
-        "",
-        ""
+        "Alchemist",
+        "Armourer",
+        "Artillerist",
+        "Battle Smith"
     ],
     "SavingThrows": [
         "Constitution",

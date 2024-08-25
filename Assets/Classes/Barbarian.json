@@ -15,14 +15,15 @@
     "check22": "",
     "backpack": "A backpack, a bedroll, a mess kit, a tinderbox, 10 torches, 10 days of rations and a waterskin, the backpack also has 50 feet of hempen rope strapped to the side of it",
     "subclasses": [
-        "Berserker",
-        "Totem Warrior",
-        "Battlerager",
-        "Ancestorial Guardian",
-        "Storm Herald",
-        "Zealot",
-        "Beast",
-        "Wild Magic"
+        "Path of the Berserker",
+        "Path of the Totem Warrior",
+        "Path of the Battlerager",
+        "Path of the Ancestorial Guardian",
+        "Path of the Giant",
+        "Path of the Storm Herald",
+        "Path of the Zealot",
+        "Path of the Beast",
+        "Path of the Wild Magic"
     ],
     "SavingThrows": [
         "Strength",

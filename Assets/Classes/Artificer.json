@@ -1,8 +1,12 @@
 {
     "name": "Artificer",
-    "HitDice": "1d",
+    "HitDice": "1d8",
     "classLevel": "",
     "spellcastingclass": "",
+    "SpellCastingAbility": "",
+    "SpellCastingSaveDC": "8",
+    "SpellCastingAttackBonus": "",
+    "CanCastCantrips": true,
     "check11": "",
     "check18": "",
     "check19": "",
@@ -13,5 +17,9 @@
     "subclasses": [
         "",
         ""
+    ],
+    "SavingThrows": [
+        "Constitution",
+        "Intelligence"
     ]
 }

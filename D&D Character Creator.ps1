@@ -37,7 +37,7 @@ function Debug-Log {
 }
 
 # Change the line below to show debugging information
-Show-Console -Hide
+Show-Console -Show
 Debug-Log "Console shown [Debugging Enabled]"
 
 # Detect system language and load corresponding localisation file
@@ -392,6 +392,7 @@ function Calculate-CharacterStats {
     
     # Calculate initiative
     $global:InitiativeTotal = $global:DEXMod + $global:SelectedClass.InitiativeBonus
+    Debug-Log "[Debug] Initiative = $global:InitiativeTotal"
 
     # Calculate passive perception
     $global:Passive = 10 + $global:WISMod
@@ -401,6 +402,7 @@ function Calculate-CharacterStats {
 
     # Calculate hit points
     $global:HPMax = ($global:HD * $level) + ($global:CONMod * $level)
+    Debug-Log "[Debug] Total HP = $global:HPMax"
 
     # Calculate encumbrance
     $global:TotalWeightCarried = ($global:Weapon1Weight + $global:Weapon2Weight + $global:Weapon3Weight + $global:GearWeight + $global:ArmorWeight)

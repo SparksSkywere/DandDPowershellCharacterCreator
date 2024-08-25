@@ -44,12 +44,13 @@ Debug-Log "Console shown [Debugging Enabled]"
 function Set-Localisation {
     # Get the current system culture (e.g., "en-US" or "es-ES")
     $currentCulture = [System.Globalization.CultureInfo]::CurrentCulture.Name
-    $languageCode = $currentCulture.Split('-')[0]  # Get the language part (e.g., "en" or "es")
+    $languageCode = $currentCulture.Split('-')[0]
 
     $localisationPath = Join-Path $PSScriptRoot "Assets\Localisation\localisation.$languageCode.json"
     if (Test-Path $localisationPath) {
         try {
             $global:Localisation = Get-Content -Path $localisationPath -Raw -Encoding UTF8 | ConvertFrom-Json
+            Debug-Log "[Debug] System Localisation: $global:Localisation"
             Debug-Log "[Debug] Loaded localisation for language: $languageCode"
         } catch {
             Write-Warning "[Debug] Failed to load localisation file for language '$languageCode'. Error: $_"

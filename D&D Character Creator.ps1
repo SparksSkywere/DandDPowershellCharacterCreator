@@ -903,7 +903,6 @@ function Show-WeaponAndArmorForm {
 }
 
 # Function to display the choose skills form
-# Function to display the choose skills form
 function Show-ChooseSkillsForm {
     Debug-Log "[Debug] Displaying Choose Skills Form"
 

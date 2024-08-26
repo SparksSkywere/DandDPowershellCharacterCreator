@@ -4,7 +4,7 @@
     "classLevel": "0",
     "spellcastingclass": "Wizard",
     "SpellcastingAbility": "",
-    "SpellCastingSaveDC": "",
+    "SpellCastingSaveDC": "8",
     "SpellCastingAttackBonus": "",
     "CanCastCantrips": true,
     "check11": "",

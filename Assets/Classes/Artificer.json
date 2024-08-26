@@ -1,7 +1,7 @@
 {
     "name": "Artificer",
     "HitDice": "1d8",
-    "classLevel": "",
+    "classLevel": "0",
     "spellcastingclass": "",
     "SpellCastingAbility": "",
     "SpellCastingSaveDC": "8",

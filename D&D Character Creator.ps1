@@ -793,18 +793,24 @@ function Show-CantripForm {
 # Function to display the weapon and armor selection form
 function Show-WeaponAndArmourForm {
     Debug-Log "[Debug] Displaying Weapon and Armor Form"
+    
+    # Create the form
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 600 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     # Limit to 3 weapon selection slots
     $maxWeaponSlots = 3
     $weaponControls = @()
+    
+    # Create controls for weapon selection
     for ($i = 1; $i -le $maxWeaponSlots; $i++) {
         $weaponControls += Set-ListBox -LabelText "Select Weapon $i" -X (15 + (($i - 1) * 150)) -Y 20 -Width 140 -Height 230 -DataSource $WeaponJSON -DisplayMember 'name'
     }
 
-    $gearControls = Set-ListBox -LabelText 'Select extra Adventuring Gear:' -X 240 -Y 275 -Width 220 -Height 200 -DataSource $GearJSON -DisplayMember 'name'
+    # Controls for additional gear and armor
+    $gearControls = Set-ListBox -LabelText 'Select Extra Adventuring Gear:' -X 240 -Y 275 -Width 220 -Height 200 -DataSource $GearJSON -DisplayMember 'name'
     $armorControls = Set-ListBox -LabelText 'Select Armour:' -X 10 -Y 275 -Width 220 -Height 200 -DataSource $ArmourJSON -DisplayMember 'name'
 
+    # Checkbox for shield
     $checkboxShield = New-Object System.Windows.Forms.CheckBox
     $checkboxShield.Location = New-Object System.Drawing.Point(25, 487)
     $checkboxShield.Size = New-Object System.Drawing.Size(120, 40)
@@ -817,6 +823,7 @@ function Show-WeaponAndArmourForm {
     $form.Controls.AddRange($armorControls)
     $form.Controls.Add($checkboxShield)
 
+    # Display the form and capture the result
     $form.Topmost = $true
     $form.Add_Shown({$form.Activate()})
     $result = $form.ShowDialog()

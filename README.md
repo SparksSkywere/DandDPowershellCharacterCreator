@@ -6,9 +6,8 @@ A Powershell script that is used to make a character in D&D, it uses the windows
 I have aquired a lot of official material from Wizards of the Coast to get this script accurate, I have all the current 5E books and cards, I will however do not want to make money off this.
 
 # How to use
-1. When using this program what you will need to do is either run the exe (no admin needed)
+1. When using this program what you will need to do is either run the exe (no admin needed) | If this doesn't load type in "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned" into powershell with admin rights and press Y
 2. Right click the PS1 file and "run in powershell"
-3. Type into powershell ".\DnDCharacterCreator.ps1" within the directory of the git download
 
 # Source Material
 [5E basic rules](https://www.dndbeyond.com/sources/basic-rules)

@@ -26,5 +26,14 @@
     "SavingThrows": [
         "Wisdom",
         "Charisma"
+    ],
+    "Skills": [
+        "Arcana",
+        "Deception",
+        "History",
+        "Intimidation",
+        "Investigation",
+        "Nature",
+        "Religion"
     ]
 }

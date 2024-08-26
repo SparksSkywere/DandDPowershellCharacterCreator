@@ -28,5 +28,14 @@
     "SavingThrows": [
         "Strength",
         "Constitution"
+    ],
+    "Skills": [
+        "Animal Handling",
+        "Athletics",
+        "Intimidation",
+        "Nature",
+        "Perception",
+        "Survival"
+
     ]
 }

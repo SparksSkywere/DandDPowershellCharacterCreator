@@ -37,7 +37,7 @@ function Debug-Log {
 }
 
 # Change the line below to show debugging information
-Show-Console -Hide
+Show-Console -Show
 Debug-Log "Console shown [Debugging Enabled]"
 
 # Detect system language and load corresponding localisation file
@@ -902,6 +902,86 @@ function Show-WeaponAndArmorForm {
     }
 }
 
+# Function to display the choose skills form
+function Show-ChooseSkillsForm {
+    Debug-Log "[Debug] Displaying Choose Skills Form"
+
+    # Mapping of skills to checkboxes
+    $global:SkillToCheckboxMap = @{
+        "Acrobatics" = 'Check Box 23'
+        "Animal Handling" = 'Check Box 24'
+        "Arcana" = 'Check Box 25'
+        "Athletics" = 'Check Box 26'
+        "Deception" = 'Check Box 27'
+        "History" = 'Check Box 28'
+        "Insight" = 'Check Box 29'
+        "Intimidation" = 'Check Box 30'
+        "Investigation" = 'Check Box 31'
+        "Medicine" = 'Check Box 32'
+        "Nature" = 'Check Box 33'
+        "Perception" = 'Check Box 34'
+        "Performance" = 'Check Box 35'
+        "Persuasion" = 'Check Box 36'
+        "Religion" = 'Check Box 37'
+        "Sleight of Hand" = 'Check Box 38'
+        "Stealth" = 'Check Box 39'
+        "Survival" = 'Check Box 40'
+    }
+
+    # Get the available skills from the selected class
+    $availableSkills = $global:SelectedClass.Skills
+
+    # Create form
+    $form = New-ProgramForm -Title 'Select Skills' -Width 400 -Height 600 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+
+    # Create list box controls for selecting up to 3 skills
+    $skill1Controls = Set-ListBox -LabelText 'Select Skill 1:' -X 10 -Y 20 -Width 360 -Height 150 -DataSource $availableSkills -DisplayMember 'name'
+    $skill2Controls = Set-ListBox -LabelText 'Select Skill 2:' -X 10 -Y 190 -Width 360 -Height 150 -DataSource $availableSkills -DisplayMember 'name'
+    $skill3Controls = Set-ListBox -LabelText 'Select Skill 3:' -X 10 -Y 360 -Width 360 -Height 150 -DataSource $availableSkills -DisplayMember 'name'
+
+    # Add controls to the form
+    $form.Controls.AddRange($skill1Controls)
+    $form.Controls.AddRange($skill2Controls)
+    $form.Controls.AddRange($skill3Controls)
+
+    $form.Topmost = $true
+    $form.Add_Shown({$form.Activate()})
+    $result = $form.ShowDialog()
+
+    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+        # Capture the selected skills
+        $global:SelectedSkills = @()
+        if ($skill1Controls[1].SelectedItem) {
+            $global:SelectedSkills += $skill1Controls[1].SelectedItem.Name
+        }
+        if ($skill2Controls[1].SelectedItem) {
+            $global:SelectedSkills += $skill2Controls[1].SelectedItem.Name
+        }
+        if ($skill3Controls[1].SelectedItem) {
+            $global:SelectedSkills += $skill3Controls[1].SelectedItem.Name
+        }
+
+        Debug-Log "Selected Skills: $($global:SelectedSkills -join ', ')"
+
+        # Dynamically set the skill checkboxes based on the selected skills
+        $skillCheckboxes = @{}
+        foreach ($skill in $global:SelectedSkills) {
+            $checkboxField = $global:SkillToCheckboxMap[$skill]
+            if ($checkboxField) {
+                $skillCheckboxes[$checkboxField] = "Yes"
+            }
+        }
+
+        # Add the skill checkboxes to the character parameters
+        foreach ($key in $global:SkillToCheckboxMap.Keys) {
+            $global:CharacterParameters.Fields[$global:SkillToCheckboxMap[$key]] = if ($skillCheckboxes[$global:SkillToCheckboxMap[$key]]) { "Yes" } else { "off" }
+        }
+    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
+        Debug-Log "[Debug] Form was canceled by the user."
+        exit
+    }
+}
+
 # Function to display the stats chooser form
 function Show-StatsChooserForm {
     Debug-Log "[Debug] Displaying Stats Chooser Form"
@@ -1160,6 +1240,7 @@ Show-CharacterFeaturesForm
 Show-ClassAndAlignmentForm
 Show-SubClassForm
 Show-WeaponAndArmorForm
+Show-ChooseSkillsForm
 Show-StatsChooserForm
 Show-BackstoryForm
 Show-AdditionalDetailsForm

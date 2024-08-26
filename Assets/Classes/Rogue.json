@@ -27,5 +27,18 @@
     "SavingThrows": [
         "Dexterity",
         "Intelligence"
+    ],
+    "Skills": [
+        "Acrobatics",
+        "Athletics",
+        "Deception",
+        "Insight",
+        "Intimidation",
+        "Investigation",
+        "Perception",
+        "Performance",
+        "Persuasion",
+        "Sleight of Hand",
+        "Stealth"
     ]
 }

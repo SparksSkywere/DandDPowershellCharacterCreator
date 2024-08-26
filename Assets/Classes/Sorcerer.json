@@ -26,5 +26,13 @@
     "SavingThrows": [
         "Constitution",
         "Charisma"
+    ],
+    "Skills": [
+        "Arcana",
+        "Deception",
+        "Insight",
+        "Intimidation",
+        "Persuasion",
+        "Religion"
     ]
 }

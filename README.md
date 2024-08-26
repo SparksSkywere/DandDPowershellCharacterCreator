@@ -13,7 +13,9 @@ I have aquired a lot of official material from Wizards of the Coast to get this 
 # Source Material
 [5E basic rules](https://www.dndbeyond.com/sources/basic-rules)
 
-[Main Wiki](https://www.dandwiki.com/wiki/Main_Page)
+[Community Wiki](https://www.dandwiki.com/wiki/Main_Page)
+
+[Unofficial Homebrew Wiki](http://dnd5e.wikidot.com)
 
 [Books on Amazon](https://www.amazon.com/stores/page/3F17C185-6EB8-4E6A-A886-1571CA58A5E9)
 

@@ -25,5 +25,15 @@
     "SavingThrows": [
         "Strength",
         "Dexterity"
+    ],
+    "Skills": [
+        "Animal Handling",
+        "Athletics",
+        "Insight",
+        "Investigation",
+        "Nature",
+        "Perception",
+        "Stealth",
+        "Survival"
     ]
 }

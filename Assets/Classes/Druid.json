@@ -25,5 +25,15 @@
     "SavingThrows": [
         "Intelligence",
         "Wisdom"
+    ],
+    "Skills": [
+        "Arcana",
+        "Animal Handling",
+        "Insight",
+        "Medicine",
+        "Nature",
+        "Perception",
+        "Religion",
+        "Survival"
     ]
 }

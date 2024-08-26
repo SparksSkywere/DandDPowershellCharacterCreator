@@ -32,5 +32,13 @@
     "SavingThrows": [
         "Intelligence",
         "Wisdom"
+    ],
+    "Skills": [
+        "Arcana",
+        "History",
+        "Insight",
+        "Investigation",
+        "Medicine",
+        "Religion"
     ]
 }

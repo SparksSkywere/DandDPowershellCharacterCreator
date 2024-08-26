@@ -28,5 +28,13 @@
     "SavingThrows": [
         "Strength",
         "Dexterity"
+    ],
+    "Skills": [
+        "Acrobatics",
+        "Athletics",
+        "History",
+        "Insight",
+        "Religion",
+        "Stealth"
     ]
 }

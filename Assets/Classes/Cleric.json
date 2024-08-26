@@ -36,5 +36,12 @@
     "SavingThrows": [
         "Wisdom",
         "Charisma"
+    ],
+    "Skills": [
+        "History",
+        "Insight",
+        "Medicine",
+        "Persuasion",
+        "Religion"
     ]
 }

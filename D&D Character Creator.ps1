@@ -903,41 +903,46 @@ function Show-WeaponAndArmorForm {
 }
 
 # Function to display the choose skills form
+# Function to display the choose skills form
 function Show-ChooseSkillsForm {
     Debug-Log "[Debug] Displaying Choose Skills Form"
 
-    # Mapping of skills to checkboxes
-    $global:SkillToCheckboxMap = @{
-        "Acrobatics" = 'Check Box 23'
-        "Animal Handling" = 'Check Box 24'
-        "Arcana" = 'Check Box 25'
-        "Athletics" = 'Check Box 26'
-        "Deception" = 'Check Box 27'
-        "History" = 'Check Box 28'
-        "Insight" = 'Check Box 29'
-        "Intimidation" = 'Check Box 30'
-        "Investigation" = 'Check Box 31'
-        "Medicine" = 'Check Box 32'
-        "Nature" = 'Check Box 33'
-        "Perception" = 'Check Box 34'
-        "Performance" = 'Check Box 35'
-        "Persuasion" = 'Check Box 36'
-        "Religion" = 'Check Box 37'
-        "Sleight of Hand" = 'Check Box 38'
-        "Stealth" = 'Check Box 39'
-        "Survival" = 'Check Box 40'
+    # Ensure $global:CharacterParameters is initialized
+    if (-not $global:CharacterParameters) {
+        $global:CharacterParameters = @{
+            Fields = @{}
+        }
     }
 
-    # Get the available skills from the selected class
-    $availableSkills = $global:SelectedClass.Skills
-
-    # Create form
+    # Mapping of skills to checkboxes
+    $global:SkillToCheckboxMap = @{
+        "Acrobatics"        = 'Check Box 23'
+        "Animal Handling"   = 'Check Box 24'
+        "Arcana"            = 'Check Box 25'
+        "Athletics"         = 'Check Box 26'
+        "Deception"         = 'Check Box 27'
+        "History"           = 'Check Box 28'
+        "Insight"           = 'Check Box 29'
+        "Intimidation"      = 'Check Box 30'
+        "Investigation"     = 'Check Box 31'
+        "Medicine"          = 'Check Box 32'
+        "Nature"            = 'Check Box 33'
+        "Perception"        = 'Check Box 34'
+        "Performance"       = 'Check Box 35'
+        "Persuasion"        = 'Check Box 36'
+        "Religion"          = 'Check Box 37'
+        "Sleight of Hand"   = 'Check Box 38'
+        "Stealth"           = 'Check Box 39'
+        "Survival"          = 'Check Box 40'
+    }
+    
+    # Create the form
     $form = New-ProgramForm -Title 'Select Skills' -Width 400 -Height 600 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     # Create list box controls for selecting up to 3 skills
-    $skill1Controls = Set-ListBox -LabelText 'Select Skill 1:' -X 10 -Y 20 -Width 360 -Height 150 -DataSource $availableSkills -DisplayMember 'name'
-    $skill2Controls = Set-ListBox -LabelText 'Select Skill 2:' -X 10 -Y 190 -Width 360 -Height 150 -DataSource $availableSkills -DisplayMember 'name'
-    $skill3Controls = Set-ListBox -LabelText 'Select Skill 3:' -X 10 -Y 360 -Width 360 -Height 150 -DataSource $availableSkills -DisplayMember 'name'
+    $skill1Controls = Set-ListBox -LabelText 'Select Skill 1:' -X 10 -Y 20 -Width 360 -Height 150 -DataSource $global:SelectedClass.Skills
+    $skill2Controls = Set-ListBox -LabelText 'Select Skill 2:' -X 10 -Y 190 -Width 360 -Height 150 -DataSource $global:SelectedClass.Skills
+    $skill3Controls = Set-ListBox -LabelText 'Select Skill 3:' -X 10 -Y 360 -Width 360 -Height 150 -DataSource $global:SelectedClass.Skills
 
     # Add controls to the form
     $form.Controls.AddRange($skill1Controls)
@@ -949,33 +954,56 @@ function Show-ChooseSkillsForm {
     $result = $form.ShowDialog()
 
     if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
-        # Capture the selected skills
+        # Initialize SelectedSkills
         $global:SelectedSkills = @()
+
+        # Capture the selected skills
         if ($skill1Controls[1].SelectedItem) {
             $global:SelectedSkills += $skill1Controls[1].SelectedItem.Name
-        }
-        if ($skill2Controls[1].SelectedItem) {
-            $global:SelectedSkills += $skill2Controls[1].SelectedItem.Name
-        }
-        if ($skill3Controls[1].SelectedItem) {
-            $global:SelectedSkills += $skill3Controls[1].SelectedItem.Name
+            Debug-Log "[Debug] Selected Skill 1: $($skill1Controls[1].SelectedItem.Name)"
+        } else {
+            Debug-Log "[Debug] Skill 1 was not selected."
         }
 
+        if ($skill2Controls[1].SelectedItem) {
+            $global:SelectedSkills += $skill2Controls[1].SelectedItem.Name
+            Debug-Log "[Debug] Selected Skill 2: $($skill2Controls[1].SelectedItem.Name)"
+        } else {
+            Debug-Log "[Debug] Skill 2 was not selected."
+        }
+
+        if ($skill3Controls[1].SelectedItem) {
+            $global:SelectedSkills += $skill3Controls[1].SelectedItem.Name
+            Debug-Log "[Debug] Selected Skill 3: $($skill3Controls[1].SelectedItem.Name)"
+        } else {
+            Debug-Log "[Debug] Skill 3 was not selected."
+        }
+
+        # Debugging the captured skills
         Debug-Log "Selected Skills: $($global:SelectedSkills -join ', ')"
 
         # Dynamically set the skill checkboxes based on the selected skills
-        $skillCheckboxes = @{}
         foreach ($skill in $global:SelectedSkills) {
-            $checkboxField = $global:SkillToCheckboxMap[$skill]
-            if ($checkboxField) {
-                $skillCheckboxes[$checkboxField] = "Yes"
+            if ($skill -and $global:SkillToCheckboxMap.ContainsKey($skill)) {
+                $checkboxField = $global:SkillToCheckboxMap[$skill]
+                if ($checkboxField) {
+                    $global:CharacterParameters.Fields[$checkboxField] = "Yes"
+                    Debug-Log "[Debug] Set checkbox field '$checkboxField' to 'Yes' for skill '$skill'"
+                }
             }
         }
 
-        # Add the skill checkboxes to the character parameters
+        # Set other skills as "off" if not selected
         foreach ($key in $global:SkillToCheckboxMap.Keys) {
-            $global:CharacterParameters.Fields[$global:SkillToCheckboxMap[$key]] = if ($skillCheckboxes[$global:SkillToCheckboxMap[$key]]) { "Yes" } else { "off" }
+            if (-not $global:SelectedSkills -contains $key) {
+                $checkboxField = $global:SkillToCheckboxMap[$key]
+                if ($checkboxField) {
+                    $global:CharacterParameters.Fields[$checkboxField] = "off"
+                    Debug-Log "[Debug] Set checkbox field '$checkboxField' to 'off' for skill '$key'"
+                }
+            }
         }
+
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
         Debug-Log "[Debug] Form was canceled by the user."
         exit

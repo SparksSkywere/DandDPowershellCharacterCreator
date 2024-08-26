@@ -1,18 +1,16 @@
 {
     "name": "Mace",
-
-    "WPN1ATK_Bonus": "+4",
-    "Weapon1Damage": "1d6 Bludgeoning",
-    "Weapon1Weight": "4lb",
-    "Weapon1Properties": "One-Handed",
-
-    "WPN2ATK_Bonus": "+4",
-    "Weapon2Damage": "1d6 Bludgeoning",
-    "Weapon2Weight": "4lb",
-    "Weapon2Properties": "One-Handed",
-
-    "WPN3ATK_Bonus": "+4",
-    "Weapon3Damage": "1d6 Bludgeoning",
-    "Weapon3Weight": "4lb",
-    "Weapon3Properties": "One-Handed"
+    "type": "Melee Weapon",
+    "category": "Simple Weapon",
+    "WPNATK_Bonus": "+2",
+    "WeaponDamage": "1d6 Bludgeoning",
+    "DamageType": "Bludgeoning",
+    "WeaponWeight": "4lb",
+    "WeaponRange": "Melee",
+    "WeaponProperties": "",
+    "CriticalRange": "20",
+    "CriticalMultiplier": "x2",
+    "Magic": false,
+    "SpecialAbilities": [],
+    "Description": "A spiked mace, effective against armored foes."
 }

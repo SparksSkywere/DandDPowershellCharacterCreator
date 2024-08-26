@@ -1,18 +1,16 @@
 {
     "name": "Dart",
-
-    "WPN1ATK_Bonus": "+4",
-    "Weapon1Damage": "1d4 Piercing",
-    "Weapon1Weight": "1/4lb",
-    "Weapon1Properties": "Finesse, thrown (range 20/60)",
-
-    "WPN2ATK_Bonus": "+4",
-    "Weapon2Damage": "1d4 Piercing",
-    "Weapon2Weight": "1/4lb",
-    "Weapon2Properties": "Finesse, thrown (range 20/60)",
-
-    "WPN3ATK_Bonus": "+4",
-    "Weapon3Damage": "1d4 Piercing",
-    "Weapon3Weight": "1/4lb",
-    "Weapon3Properties": "Finesse, thrown (range 20/60)"
+    "type": "Ranged Weapon",
+    "category": "Simple Weapon",
+    "WPNATK_Bonus": "+3",
+    "WeaponDamage": "1d4 Piercing",
+    "DamageType": "Piercing",
+    "WeaponWeight": "0.25lb",
+    "WeaponRange": "20/60ft",
+    "WeaponProperties": "Finesse, Thrown",
+    "CriticalRange": "20",
+    "CriticalMultiplier": "x2",
+    "Magic": false,
+    "SpecialAbilities": [],
+    "Description": "A small, easily thrown weapon that can be deadly in the right hands."
 }

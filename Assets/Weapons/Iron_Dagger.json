@@ -1,18 +1,16 @@
 {
     "name": "Iron Dagger",
-
-    "WPN1ATK_Bonus": "+4",
-    "Weapon1Damage": "1d4 Piercing",
-    "Weapon1Weight": "1lb",
-    "Weapon1Properties": "Finesse, Light, thrown (range 20/60)",
-
-    "WPN2ATK_Bonus": "+4",
-    "Weapon2Damage": "1d4 Piercing",
-    "Weapon2Weight": "1lb",
-    "Weapon2Properties": "Finesse, Light, thrown (range 20/60)",
-
-    "WPN3ATK_Bonus": "+4",
-    "Weapon3Damage": "1d4 Piercing",
-    "Weapon3Weight": "1lb",
-    "Weapon3Properties": "Finesse, Light, thrown (range 20/60)"
+    "type": "Melee Weapon",
+    "category": "Simple Weapon",
+    "WPNATK_Bonus": "+2",
+    "WeaponDamage": "1d4 Piercing",
+    "DamageType": "Piercing",
+    "WeaponWeight": "1lb",
+    "WeaponRange": "Melee, 20/60ft",
+    "WeaponProperties": "Light, Finesse, Thrown",
+    "CriticalRange": "19-20",
+    "CriticalMultiplier": "x2",
+    "Magic": false,
+    "SpecialAbilities": [],
+    "Description": "A basic iron dagger, sharp and easily concealed."
 }

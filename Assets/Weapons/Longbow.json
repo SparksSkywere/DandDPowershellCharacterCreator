@@ -1,18 +1,16 @@
 {
     "name": "Longbow",
-
-    "WPN1ATK_Bonus": "+4",
-    "Weapon1Damage": "1d8 Piercing",
-    "Weapon1Weight": "2lb",
-    "Weapon1Properties": "Ammunition (range 150/600), Heavy, Two-Handed",
-
-    "WPN2ATK_Bonus": "+4",
-    "Weapon2Damage": "1d8 Piercing",
-    "Weapon2Weight": "2lb",
-    "Weapon2Properties": "Ammunition (range 150/600), Heavy, Two-Handed",
-
-    "WPN3ATK_Bonus": "+4",
-    "Weapon3Damage": "1d8 Piercing",
-    "Weapon3Weight": "2lb",
-    "Weapon3Properties": "Ammunition (range 150/600), Heavy, Two-Handed"
+    "type": "Ranged Weapon",
+    "category": "Martial Weapon",
+    "WPNATK_Bonus": "+3",
+    "WeaponDamage": "1d8 Piercing",
+    "DamageType": "Piercing",
+    "WeaponWeight": "2lb",
+    "WeaponRange": "150/600ft",
+    "WeaponProperties": "Heavy, Two-Handed",
+    "CriticalRange": "20",
+    "CriticalMultiplier": "x2",
+    "Magic": false,
+    "SpecialAbilities": [],
+    "Description": "A powerful bow that can fire arrows over great distances."
 }

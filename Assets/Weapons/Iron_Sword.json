@@ -1,18 +1,16 @@
 {
     "name": "Iron Sword",
-
-    "WPN1ATK_Bonus": "+4",
-    "Weapon1Damage": "1d6 Piercing",
-    "Weapon1Weight": "6lb",
-    "Weapon1Properties": "One-Handed",
-
-    "WPN2ATK_Bonus": "+4",
-    "Weapon2Damage": "1d6 Piercing",
-    "Weapon2Weight": "6lb",
-    "Weapon2Properties": "One-Handed",
-
-    "WPN3ATK_Bonus": "+4",
-    "Weapon3Damage": "1d6 Piercing",
-    "Weapon3Weight": "6lb",
-    "Weapon3Properties": "One-Handed"
+    "type": "Melee Weapon",
+    "category": "Martial Weapon",
+    "WPNATK_Bonus": "+3",
+    "WeaponDamage": "1d8 Slashing",
+    "DamageType": "Slashing",
+    "WeaponWeight": "3lb",
+    "WeaponRange": "Melee",
+    "WeaponProperties": "",
+    "CriticalRange": "19-20",
+    "CriticalMultiplier": "x2",
+    "Magic": false,
+    "SpecialAbilities": [],
+    "Description": "A standard iron sword, reliable and effective in most situations."
 }

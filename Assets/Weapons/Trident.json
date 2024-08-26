@@ -1,18 +1,16 @@
 {
     "name": "Trident",
-
-    "WPN1ATK_Bonus": "+4",
-    "Weapon1Damage": "1d6 Piercing",
-    "Weapon1Weight": "4lb",
-    "Weapon1Properties": "Thrown (range 20/60), Versatile (1d8)",
-
-    "WPN2ATK_Bonus": "+4",
-    "Weapon2Damage": "1d6 Piercing",
-    "Weapon2Weight": "4lb",
-    "Weapon2Properties": "Thrown (range 20/60), Versatile (1d8)",
-
-    "WPN3ATK_Bonus": "+4",
-    "Weapon3Damage": "1d6 Piercing",
-    "Weapon3Weight": "4lb",
-    "Weapon3Properties": "Thrown (range 20/60), Versatile (1d8)"
+    "type": "Melee Weapon",
+    "category": "Martial Weapon",
+    "WPNATK_Bonus": "+2",
+    "WeaponDamage": "1d6 Piercing",
+    "DamageType": "Piercing",
+    "WeaponWeight": "4lb",
+    "WeaponRange": "Melee, 20/60ft",
+    "WeaponProperties": "Thrown, Versatile (1d8)",
+    "CriticalRange": "20",
+    "CriticalMultiplier": "x2",
+    "Magic": false,
+    "SpecialAbilities": [],
+    "Description": "A three-pronged spear, often used in naval combat."
 }

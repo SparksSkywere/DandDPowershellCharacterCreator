@@ -1,18 +1,16 @@
 {
     "name": "Great Sword",
-
-    "WPN1ATK_Bonus": "+4",
-    "Weapon1Damage": "2d6 Slashing",
-    "Weapon1Weight": "6lb",
-    "Weapon1Properties": "Heavy, Two-Handed",
-
-    "WPN2ATK_Bonus": "+4",
-    "Weapon2Damage": "2d6 Slashing",
-    "Weapon2Weight": "6lb",
-    "Weapon2Properties": "Heavy, Two-Handed",
-
-    "WPN3ATK_Bonus": "+4",
-    "Weapon3Damage": "2d6 Slashing",
-    "Weapon3Weight": "6lb",
-    "Weapon3Properties": ""
+    "type": "Melee Weapon",
+    "category": "Martial Weapon",
+    "WPNATK_Bonus": "+3",
+    "WeaponDamage": "2d6 Slashing",
+    "DamageType": "Slashing",
+    "WeaponWeight": "6lb",
+    "WeaponRange": "Melee",
+    "WeaponProperties": "Heavy, Two-Handed",
+    "CriticalRange": "19-20",
+    "CriticalMultiplier": "x2",
+    "Magic": false,
+    "SpecialAbilities": [],
+    "Description": "A massive sword requiring both hands, capable of cleaving through foes."
 }

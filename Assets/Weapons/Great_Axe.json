@@ -1,18 +1,16 @@
 {
     "name": "Great Axe",
-
-    "WPN1ATK_Bonus": "+4",
-    "Weapon1Damage": "1d12 Slashing",
-    "Weapon1Weight": "7lb",
-    "Weapon1Properties": "Heavy, Two-Handed",
-
-    "WPN2ATK_Bonus": "+4",
-    "Weapon2Damage": "1d12 Slashing",
-    "Weapon2Weight": "7lb",
-    "Weapon2Properties": "Heavy, Two-Handed",
-
-    "WPN3ATK_Bonus": "+4",
-    "Weapon3Damage": "1d12 Slashing",
-    "Weapon3Weight": "7lb",
-    "Weapon3Properties": "Heavy, Two-Handed"
+    "type": "Melee Weapon",
+    "category": "Martial Weapon",
+    "WPNATK_Bonus": "+4",
+    "WeaponDamage": "1d12 Slashing",
+    "DamageType": "Slashing",
+    "WeaponWeight": "7lb",
+    "WeaponRange": "Melee",
+    "WeaponProperties": "Heavy, Two-Handed",
+    "CriticalRange": "20",
+    "CriticalMultiplier": "x3",
+    "Magic": false,
+    "SpecialAbilities": [],
+    "Description": "A massive axe capable of dealing devastating blows."
 }

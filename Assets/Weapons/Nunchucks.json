@@ -1,18 +1,16 @@
 {
     "name": "Nunchucks",
-
-    "WPN1ATK_Bonus": "+4",
-    "Weapon1Damage": "1d4 Bludgeoning",
-    "Weapon1Weight": "5lb",
-    "Weapon1Properties": "Two-Handed, Thrown (range 20/30)",
-
-    "WPN2ATK_Bonus": "+4",
-    "Weapon2Damage": "1d4 Bludgeoning",
-    "Weapon2Weight": "5lb",
-    "Weapon2Properties": "Two-Handed, Thrown (range 20/30)",
-
-    "WPN3ATK_Bonus": "+4",
-    "Weapon3Damage": "1d4 Bludgeoning",
-    "Weapon3Weight": "5lb",
-    "Weapon3Properties": "Two-Handed, Thrown (range 20/30)"
+    "type": "Melee Weapon",
+    "category": "Martial Weapon",
+    "WPNATK_Bonus": "+2",
+    "WeaponDamage": "1d4 Bludgeoning",
+    "DamageType": "Bludgeoning",
+    "WeaponWeight": "2lb",
+    "WeaponRange": "Melee",
+    "WeaponProperties": "Light, Finesse",
+    "CriticalRange": "20",
+    "CriticalMultiplier": "x2",
+    "Magic": false,
+    "SpecialAbilities": [],
+    "Description": "A pair of short wooden sticks connected by a chain, perfect for quick strikes."
 }

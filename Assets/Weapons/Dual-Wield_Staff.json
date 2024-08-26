@@ -1,18 +1,16 @@
 {
     "name": "Dual-Wield Staff",
-
-    "WPN1ATK_Bonus": "+4",
-    "Weapon1Damage": "1d8 Budgeoning",
-    "Weapon1Weight": "7lb",
-    "Weapon1Properties": "Two-Handed, Light",
-
-    "WPN2ATK_Bonus": "+4",
-    "Weapon2Damage": "1d8 Budgeoning",
-    "Weapon2Weight": "7lb",
-    "Weapon2Properties": "Two-Handed, Light",
-
-    "WPN3ATK_Bonus": "+4",
-    "Weapon3Damage": "1d8 Budgeoning",
-    "Weapon3Weight": "7lb",
-    "Weapon3Properties": "Two-Handed, Light"
+    "type": "Melee Weapon",
+    "category": "Simple Weapon",
+    "WPNATK_Bonus": "+2",
+    "WeaponDamage": "1d8 Bludgeoning",
+    "DamageType": "Bludgeoning",
+    "WeaponWeight": "4lb",
+    "WeaponRange": "Melee",
+    "WeaponProperties": "Double-Ended, Two-Handed",
+    "CriticalRange": "20",
+    "CriticalMultiplier": "x2",
+    "Magic": false,
+    "SpecialAbilities": [],
+    "Description": "A staff with deadly ends, perfect for skilled martial artists."
 }

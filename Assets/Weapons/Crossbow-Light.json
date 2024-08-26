@@ -1,18 +1,16 @@
 {
-    "name": "Crossbow - Light",
-
-    "WPN1ATK_Bonus": "+4",
-    "Weapon1Damage": "1d8 Piercing",
-    "Weapon1Weight": "5lb",
-    "Weapon1Properties": "Ammunition (range 80/320), Loading, Two-Handed",
-
-    "WPN2ATK_Bonus": "+4",
-    "Weapon2Damage": "1d8 Piercing",
-    "Weapon2Weight": "5lb",
-    "Weapon2Properties": "Ammunition (range 80/320), Loading, Two-Handed",
-
-    "WPN3ATK_Bonus": "+4",
-    "Weapon3Damage": "1d8 Piercing",
-    "Weapon3Weight": "5lb",
-    "Weapon3Properties": "Ammunition (range 80/320), Loading, Two-Handed"
+    "name": "Light Crossbow",
+    "type": "Ranged Weapon",
+    "category": "Simple Weapon",
+    "WPNATK_Bonus": "+2",
+    "WeaponDamage": "1d8 Piercing",
+    "DamageType": "Piercing",
+    "WeaponWeight": "5lb",
+    "WeaponRange": "80ft",
+    "WeaponProperties": "Loading, Two-Handed",
+    "CriticalRange": "20",
+    "CriticalMultiplier": "x2",
+    "Magic": false,
+    "SpecialAbilities": [],
+    "Description": "A versatile and easy-to-use crossbow with decent range and damage."
 }

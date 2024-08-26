@@ -1,18 +1,16 @@
 {
-    "name": "QuarterStaff",
-
-    "WPN1ATK_Bonus": "+4",
-    "Weapon1Damage": "1d6 Bludgeoning",
-    "Weapon1Weight": "4lb",
-    "Weapon1Properties": "Versatile (1d8)",
-
-    "WPN2ATK_Bonus": "+4",
-    "Weapon2Damage": "1d6 Bludgeoning",
-    "Weapon2Weight": "4lb",
-    "Weapon2Properties": "Versatile (1d8)",
-
-    "WPN3ATK_Bonus": "+4",
-    "Weapon3Damage": "1d6 Bludgeoning",
-    "Weapon3Weight": "4lb",
-    "Weapon3Properties": "Versatile (1d8)"
+    "name": "Quarterstaff",
+    "type": "Melee Weapon",
+    "category": "Simple Weapon",
+    "WPNATK_Bonus": "+2",
+    "WeaponDamage": "1d6 Bludgeoning",
+    "DamageType": "Bludgeoning",
+    "WeaponWeight": "4lb",
+    "WeaponRange": "Melee",
+    "WeaponProperties": "Versatile (1d8)",
+    "CriticalRange": "20",
+    "CriticalMultiplier": "x2",
+    "Magic": false,
+    "SpecialAbilities": [],
+    "Description": "A sturdy wooden staff, often used by monks and martial artists."
 }

@@ -1,37 +1,22 @@
 {
     "name": "Cleric",
-    "description": "",
-    "hp": 0,
-    "speed": 0,
-    "size": 0,
-    "height": 0,
-    "languages": "",
-    "special": "",
-    "image": "",
-
-    "strength": 0,
-    "dexterity": 0,
-    "constitution": 0,
-    "intelligence": 0,
-    "wisdom": 0,
-    "charisma": 0,
-
+    "description": "Clerics are intermediaries between the mortal world and the distant planes of the gods. As varied as the gods they serve, clerics strive to embody the handiwork of their deities. Clerics draw power directly from their deity or pantheon, channeling divine energy to heal the wounded and smite the wicked.",
+    "hp": "8 + Constitution modifier per level",
+    "speed": "30 feet",
+    "size": "Medium",
+    "height": "Varies",
+    "languages": "You can speak, read, and write Common and one additional language related to your deity.",
+    "special": "Spellcasting: You can cast prepared spells using your Wisdom as your spellcasting ability. Divine Domain: Choose one domain related to your deity, which grants additional spells and features.",
+    "image": "Cleric.png",
     "strengthmod": "+0",
     "dexteritymod": "+0",
-    "constitutionmod": "+0",
+    "constitutionmod": "+1",
     "intelligencemod": "+0",
-    "wisdommod": "+0",
+    "wisdommod": "+2",
     "charismamod": "+0",
-
-    "saving_strength": 0,
-    "saving_dexterity": 0,
-    "saving_constitution": 0,
-    "saving_intelligence": 0,
-    "saving_wisdom": 0,
-    "saving_charisma": 0,
-
     "subraces": [
-    "",
-    ""
+        "Life Domain",
+        "Light Domain",
+        "War Domain"
     ]
 }

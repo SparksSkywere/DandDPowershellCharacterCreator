@@ -1,36 +1,20 @@
 {
     "name": "Triton",
-    "description": "Unknown",
-    "hp": "0",
-    "speed": "0",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Unknown",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "0",
-    "dexterity": "0",
-    "constitution": "0",
-    "intelligence": "0",
-    "wisdom": "0",
-    "charisma": "0",
-
-    "strengthmod": "+0",
+    "description": "Tritons are aquatic humanoids from the deep seas, known for their bravery and duty to protect the ocean from threats. They are noble and self-assured, with a strong sense of responsibility towards maintaining balance in the world. Tritons possess the ability to breathe both air and water, and they are adapted to life in the depths of the ocean. Their skin is often a shade of blue or green, and they have webbed hands and feet.",
+    "hp": "22",
+    "speed": "30 feet, Swim 30 feet",
+    "size": "Medium",
+    "height": "5 to 6 feet",
+    "languages": "You can speak, read, and write Common and Primordial.",
+    "special": "Control Air and Water: You can cast Fog Cloud, Gust of Wind, and Wall of Water once per long rest each.",
+    "image": "Triton.png",
+    "strengthmod": "+1",
     "dexteritymod": "+0",
-    "constitutionmod": "+0",
+    "constitutionmod": "+1",
     "intelligencemod": "+0",
-    "wisdommod": "+0",
+    "wisdommod": "+1",
     "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
     "subraces": [
-    "Triton"
+        "Triton"
     ]
 }

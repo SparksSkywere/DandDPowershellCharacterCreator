@@ -1,36 +1,20 @@
 {
     "name": "Warforged",
-    "description": "Unknown",
-    "hp": "30",
-    "speed": "6",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Unknown",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "16",
-    "dexterity": "16",
-    "constitution": "14",
-    "intelligence": "10",
-    "wisdom": "13",
-    "charisma": "11",
-
-    "strengthmod": "+3",
-    "dexteritymod": "+3",
-    "constitutionmod": "+2",
+    "description": "Warforged are sentient constructs created for war, designed to be tireless soldiers. Over time, they developed free will and a sense of identity. Warforged are made of a blend of metal, stone, and wood, and their bodies are built for durability and combat. They are driven by a desire to understand their place in the world and often seek purpose beyond their original programming.",
+    "hp": "24",
+    "speed": "30 feet",
+    "size": "Medium",
+    "height": "6 to 7 feet",
+    "languages": "You can speak, read, and write Common and one additional language of your choice.",
+    "special": "Integrated Protection: You gain a +1 bonus to Armor Class, and you can don and doff armor as an action.",
+    "image": "Warforged.png",
+    "strengthmod": "+2",
+    "dexteritymod": "+0",
+    "constitutionmod": "+1",
     "intelligencemod": "+0",
-    "wisdommod": "+1",
+    "wisdommod": "+0",
     "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
     "subraces": [
-    "Warforged"
+        "Warforged"
     ]
 }

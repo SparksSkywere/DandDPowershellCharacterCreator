@@ -1,37 +1,20 @@
 {
     "name": "Gnoll",
-    "description": "",
-    "hp": 0,
-    "speed": 0,
-    "size": 0,
-    "height": 0,
-    "languages": "",
-    "special": "",
-    "image": "",
-
-    "strength": 0,
-    "dexterity": 0,
-    "constitution": 0,
-    "intelligence": 0,
-    "wisdom": 0,
-    "charisma": 0,
-
-    "strengthmod": "+0",
-    "dexteritymod": "+0",
-    "constitutionmod": "+0",
-    "intelligencemod": "+0",
+    "description": "Gnolls are feral humanoids that resemble hyenas, known for their brutal and savage behavior. They are often seen as marauding bands, driven by a hunger for destruction and flesh. Gnolls worship the demon lord Yeenoghu and are feared for their insatiable bloodlust and relentless aggression.",
+    "hp": "22",
+    "speed": "30 feet",
+    "size": "Medium",
+    "height": "6 to 7 feet",
+    "languages": "You can speak, read, and write Common and Gnoll.",
+    "special": "Rampage: When you reduce a creature to 0 hit points with a melee attack on your turn, you can take a bonus action to move up to half your speed and make a bite attack.",
+    "image": "Gnoll.png",
+    "strengthmod": "+2",
+    "dexteritymod": "+1",
+    "constitutionmod": "+1",
+    "intelligencemod": "-1",
     "wisdommod": "+0",
-    "charismamod": "+0",
-
-    "saving_strength": 0,
-    "saving_dexterity": 0,
-    "saving_constitution": 0,
-    "saving_intelligence": 0,
-    "saving_wisdom": 0,
-    "saving_charisma": 0,
-
+    "charismamod": "-1",
     "subraces": [
-    "",
-    ""
+        "Gnoll"
     ]
 }

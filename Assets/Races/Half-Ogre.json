@@ -1,36 +1,20 @@
 {
     "name": "Half-Ogre",
-    "description": "",
-    "hp": 0,
-    "speed": 0,
-    "size": 0,
-    "height": 0,
-    "languages": "",
-    "special": "",
-    "image": "",
-
-    "strength": 0,
-    "dexterity": 0,
-    "constitution": 0,
-    "intelligence": 0,
-    "wisdom": 0,
-    "charisma": 0,
-
-    "strengthmod": "+0",
+    "description": "Half-Ogres are the offspring of ogres and humans, possessing the brutish strength of their ogre parent and the cunning of their human parent. They are often shunned by both humans and ogres, leading them to live as outcasts or mercenaries. Half-Ogres are large, intimidating, and incredibly strong, often using their size and power to their advantage.",
+    "hp": "30",
+    "speed": "30 feet",
+    "size": "Large",
+    "height": "7 to 8 feet",
+    "languages": "You can speak, read, and write Common and Giant.",
+    "special": "Brute Force: When you hit with a melee weapon attack, you can roll one of the weapon’s damage dice an additional time and add it to the extra damage of the attack.",
+    "image": "Half-Ogre.png",
+    "strengthmod": "+3",
     "dexteritymod": "+0",
-    "constitutionmod": "+0",
-    "intelligencemod": "+0",
+    "constitutionmod": "+2",
+    "intelligencemod": "-1",
     "wisdommod": "+0",
-    "charismamod": "+0",
-
-    "saving_strength": 0,
-    "saving_dexterity": 0,
-    "saving_constitution": 0,
-    "saving_intelligence": 0,
-    "saving_wisdom": 0,
-    "saving_charisma": 0,
-
+    "charismamod": "-1",
     "subraces": [
-    "Half-Ogre"
+        "Half-Ogre"
     ]
 }

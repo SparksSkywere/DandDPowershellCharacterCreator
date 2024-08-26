@@ -1,38 +1,22 @@
 {
     "name": "Centaur",
-    "description": "Reclusive wanderers and omen-readers of the wild, centaurs avoid conflict but fight fiercely when pressed. They roam the vast wilderness, keeping far from borders, law and the company of other creatures.",
-    "hp": "45",
-    "speed": "50",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Elvish, Sylvan",
-    "special": "Charge. If the cenntaur moves at least 30 feet straight toward a target and then hits with a pike attack on the same turn, the target takes an extra 10 (3d6) piercing damage.",
-    "image": "",
-
-    "strength": "18",
-    "dexterity": "14",
-    "constitution": "14",
-    "intelligence": "9",
-    "wisdom": "13",
-    "charisma": "11",
-
-    "strengthmod": "+0",
+    "description": "Centaurs are a proud and noble race, known for their wisdom and connection to nature. With the upper body of a humanoid and the lower body of a horse, centaurs are strong and swift. They are often seen as guardians of the forest and are known for their excellent archery skills. They live in tribes and value freedom and tradition.",
+    "hp": "26",
+    "speed": "40 feet",
+    "size": "Medium",
+    "height": "6 to 7 feet",
+    "languages": "You can speak, read, and write Common and Sylvan.",
+    "special": "Charge: If you move at least 30 feet straight toward a target and then hit it with a melee weapon attack on the same turn, you can immediately follow that attack with a bonus action, making one attack against the target with your hooves.",
+    "image": "Centaur.png",
+    "strengthmod": "+2",
     "dexteritymod": "+0",
-    "constitutionmod": "+0",
+    "constitutionmod": "+1",
     "intelligencemod": "+0",
     "wisdommod": "+0",
-    "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
+    "charismamod": "+1",
     "subraces": [
-    "Centaur",
-    "Wilderness Nomads",
-    "Reluctant Settlers"
-    ]
+        "Centaur",
+        "Wilderness Nomads",
+        "Reluctant Settlers"
+        ]
 }

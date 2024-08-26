@@ -1,37 +1,21 @@
 {
     "name": "Troll",
-    "description": "Born with horrific appetites, trolls eat anything they can catch and devour. They have no society to speak of, but they do serve as mercenaries to orcs, ogres, ettins, hags and giants. As payment, trolls demand food and treasure. Trolls are difficult to control, however, doing as they please even when working with more powerful creatures.",
-    "hp": "84",
-    "speed": "30",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Giant",
-    "special": "Keen Smell. The troll has advantage on wisdom (perception) checks that rely on smell. Regeneration. The troll regains 10 hit points at the start of it's turn. If the troll takes acid or fire damage, this trait doesn't function at the start of the troll's next turn. The troll dies only if it sarts it's turn with 0 hit point and doesn't regenerate.",
-    "image": "",
-
-    "strength": "18",
-    "dexterity": "13",
-    "constitution": "20",
-    "intelligence": "7",
-    "wisdom": "9",
-    "charisma": "7",
-
-    "strengthmod": "+0",
-    "dexteritymod": "+0",
-    "constitutionmod": "+0",
-    "intelligencemod": "+0",
+    "description": "Trolls are fearsome, hulking humanoids known for their incredible regenerative abilities and insatiable hunger. They are often solitary creatures, living in caves or ruins, and are feared by most other beings for their strength, resilience, and appetite. Trolls have thick, rubbery skin and long limbs, making them formidable in combat. Despite their brutish nature, trolls can sometimes be bargained with, provided one has something valuable to offer.",
+    "hp": "35",
+    "speed": "30 feet",
+    "size": "Large",
+    "height": "8 to 10 feet",
+    "languages": "You can speak, read, and write Common and Giant.",
+    "special": "Regeneration: You regain 10 hit points at the start of your turn if you have at least 1 hit point. Fire or acid damage prevents this trait from working at the start of your next turn.",
+    "image": "Troll.png",
+    "strengthmod": "+4",
+    "dexteritymod": "+1",
+    "constitutionmod": "+3",
+    "intelligencemod": "-2",
     "wisdommod": "+0",
-    "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
+    "charismamod": "-2",
     "subraces": [
-    "Troll",
-    "Troll Freaks"
-    ]
+        "Troll",
+        "Troll Freaks"
+        ]
 }

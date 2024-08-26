@@ -1,36 +1,20 @@
 {
     "name": "Verdan",
-    "description": "Unknown",
-    "hp": "0",
-    "speed": "0",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Unknown",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "0",
-    "dexterity": "0",
-    "constitution": "0",
-    "intelligence": "0",
-    "wisdom": "0",
-    "charisma": "0",
-
+    "description": "Verdan are a new and enigmatic race that has emerged as a result of magical influences. They are adaptable and ever-changing, with their physical appearance evolving as they age. Verdan are curious, compassionate, and deeply empathetic, often striving to help those around them. Despite their mutable nature, they value stability and community, seeking to build bonds wherever they go.",
+    "hp": "20",
+    "speed": "30 feet",
+    "size": "Small or Medium (your choice)",
+    "height": "3 to 6 feet",
+    "languages": "You can speak, read, and write Common and Goblin.",
+    "special": "Telepathic Insight: You can communicate telepathically with any creature you can see within 30 feet of you. You don’t need to share a language with the creature, but it must be able to understand at least one language.",
+    "image": "Verdan.png",
     "strengthmod": "+0",
-    "dexteritymod": "+0",
-    "constitutionmod": "+0",
+    "dexteritymod": "+1",
+    "constitutionmod": "+2",
     "intelligencemod": "+0",
     "wisdommod": "+0",
-    "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
+    "charismamod": "+1",
     "subraces": [
-    "Verdan"
+        "Verdan"
     ]
 }

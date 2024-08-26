@@ -1,35 +1,19 @@
 {
-    "name": "Yuan-Ti Pureblood",
-    "description": "Purebloods from the lowest case of yuan-ti society. They closely resemble humans, yet a pureblood can't pass for human under close scrutiny because there's always some hint of its true nature, such as caly patches of skin, serpentine eyes, pointed teeth, or a forked tongue. Wearing cloaks and cowls, they masquerade as humans and infiltrate civilised lands to gather information, kidnap prisoners for interrogation and sacrifice, and trade with anyone who has something that can further their myriad plots.",
-    "hp": "40",
-    "speed": "30",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Abyssal, Common, Draconic",
-    "special": "Innate Spellcasting. The yuan-ti's spellcasting ability is Charisma (spell save DC 12). The yuan-ti can innately cast the following spells, requiring no material components: At will: animal friendship (snakes only)  3/day each: poison spray, suggestion Magic Resistance. The yuan-ti has advantage on saving throws against spells and other magical effects.",
-    "image": "",
-
-    "strength": "11",
-    "dexterity": "12",
-    "constitution": "11",
-    "intelligence": "13",
-    "wisdom": "12",
-    "charisma": "14",
-
+    "name": "Yuan-ti Pureblood",
+    "description": "Yuan-ti Purebloods are serpentine humanoids known for their cunning, ambition, and ruthlessness. They are the lowest caste of the Yuan-ti society, but they are still dangerous and deceptive. Purebloods often serve as spies and infiltrators, using their ability to blend in with humans to further the goals of their serpent masters. They possess innate magical abilities and resistance to poison.",
+    "hp": "22",
+    "speed": "30 feet",
+    "size": "Medium",
+    "height": "5 to 6 feet",
+    "languages": "You can speak, read, and write Common, Abyssal, and Draconic.",
+    "special": "Magic Resistance: You have advantage on saving throws against spells and other magical effects.",
+    "image": "Yuan-ti_Pureblood.png",
     "strengthmod": "+0",
     "dexteritymod": "+1",
     "constitutionmod": "+0",
     "intelligencemod": "+1",
-    "wisdommod": "+1",
+    "wisdommod": "+0",
     "charismamod": "+2",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
     "subraces": [
     "Yuan-ti Pureblood"
     ]

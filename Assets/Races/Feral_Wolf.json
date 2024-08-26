@@ -1,36 +1,20 @@
 {
     "name": "Feral Wolf",
-    "description": "Unknown",
-    "hp": "0",
-    "speed": "0",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Unknown",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "0",
-    "dexterity": "0",
-    "constitution": "0",
-    "intelligence": "0",
-    "wisdom": "0",
-    "charisma": "0",
-
-    "strengthmod": "+0",
-    "dexteritymod": "+0",
-    "constitutionmod": "+0",
-    "intelligencemod": "+0",
-    "wisdommod": "+0",
-    "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
+    "description": "Feral Wolves are wild, predatory creatures that embody the untamed spirit of nature. Larger and more aggressive than typical wolves, they are often feared by those who venture into their territory. Their thick fur and sharp fangs make them formidable hunters, and their pack mentality ensures that they are rarely alone.",
+    "hp": "22",
+    "speed": "40 feet",
+    "size": "Medium",
+    "height": "2.5 feet at the shoulder",
+    "languages": "Understands Common and Sylvan but cannot speak.",
+    "special": "Pack Tactics: You have advantage on an attack roll against a creature if at least one of your allies is within 5 feet of the creature and the ally isn’t incapacitated.",
+    "image": "Feral_Wolf.png",
+    "strengthmod": "+2",
+    "dexteritymod": "+2",
+    "constitutionmod": "+1",
+    "intelligencemod": "-2",
+    "wisdommod": "+2",
+    "charismamod": "-1",
     "subraces": [
-    "Feral Wolf"
+        "Feral Wolf"
     ]
 }

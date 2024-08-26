@@ -1,36 +1,20 @@
 {
     "name": "Feral Tiefling",
-    "description": "Unknown",
-    "hp": "0",
-    "speed": "0",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Unknown",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "0",
-    "dexterity": "0",
-    "constitution": "0",
-    "intelligence": "0",
-    "wisdom": "0",
-    "charisma": "0",
-
+    "description": "Feral Tieflings are a variant of Tieflings, emphasizing their fiendish heritage with a more bestial appearance and demeanor. They have sharp features, often with horns, tails, and fangs, embodying the darker aspects of their infernal bloodline. Despite their fearsome appearance, Feral Tieflings can be found pursuing various paths, from redemption to destruction.",
+    "hp": "20",
+    "speed": "30 feet",
+    "size": "Medium",
+    "height": "5 to 6 feet",
+    "languages": "You can speak, read, and write Common and Infernal.",
+    "special": "Infernal Legacy: You know the *Thaumaturgy* cantrip. At 3rd level, you can cast *Hellish Rebuke* as a 2nd-level spell once per long rest. At 5th level, you can cast *Darkness* once per long rest.",
+    "image": "Feral_Tiefling.png",
     "strengthmod": "+0",
-    "dexteritymod": "+0",
+    "dexteritymod": "+2",
     "constitutionmod": "+0",
-    "intelligencemod": "+0",
+    "intelligencemod": "+1",
     "wisdommod": "+0",
-    "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
+    "charismamod": "+2",
     "subraces": [
-    "Feral Tiefling"
+        "Feral Tiefling"
     ]
 }

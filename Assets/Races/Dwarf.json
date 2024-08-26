@@ -1,38 +1,23 @@
 {
     "name": "Dwarf",
-    "description": "Kingdoms rich in ancient grandeur, halls carved into the roots of mountains, the echoing of picks and hammers in deep mines and blazing forges, a commitment to clan and tradition, and a burning hatred of goblins and orcs, these common threads unite all dwarves.",
-    "hp": "30",
-    "speed": "25",
-    "size": "150 Pounds, Medium",
-    "height": "5 Feet",
-    "languages": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "14",
-    "dexterity": "16",
-    "constitution": "14",
-    "intelligence": "10",
-    "wisdom": "15",
-    "charisma": "11",
-
+    "description": "Dwarves are known for their skill in warfare, their ability to withstand physical and magical punishment, their knowledge of the earth’s secrets, and their capacity for hard work. Strong, hardy, and bold, dwarves value tradition, community, and their ancient ancestry.",
+    "hp": "25",
+    "speed": "25 feet",
+    "size": "Medium",
+    "height": "4 to 5 feet",
+    "languages": "You can speak, read, and write Common and Dwarvish.",
+    "special": "Dwarven Resilience: You have advantage on saving throws against poison, and you have resistance against poison damage.",
+    "image": "Dwarf.png",
     "strengthmod": "+2",
-    "dexteritymod": "+3",
+    "dexteritymod": "+0",
     "constitutionmod": "+2",
     "intelligencemod": "+0",
-    "wisdommod": "+2",
+    "wisdommod": "+0",
     "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
     "subraces": [
-    "Dwarf",
-    "Hill Dwarves",
-    "Mountain Dwarves"
+        "Dwarf",
+        "Hill Dwarf",
+        "Mountain Dwarf",
+        "Duergar"
     ]
 }

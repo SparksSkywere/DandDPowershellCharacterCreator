@@ -1,37 +1,21 @@
 {
     "name": "Aarakocra",
-    "description": "From below, aarakocra look much like large birds. Only when they descend to roost on a branch or walk across the ground does their humanoid appearance reveal itself. Standing upright, aarakocra might reach 5 feet tall, and they have long, narrow legs that taper to sharp talons. Feathers cover their bodies. Their plumage typically denotes membership in a tribe. Males are brightly colored, with feathers of red, orange, or yellow. Females have more subdued colors, usually brown or gray. Their heads complete the avian appearance, being something like a parrot or eagle with distinct tribal variations.",
-    "hp": "13",
-    "speed": "25, 50 if flying",
-    "size": "100 Pounds, Medium",
-    "height": "5 Feet",
+    "description": "Sequestered in high mountains atop tall trees, the Aarakocra, sometimes called birdfolk, evoke fear and wonder. Many Aarakocra aren’t even native to the Material Plane. They hail from a world beyond—from the boundless vistas of the Elemental Plane of Air. They have slender, avian bodies with wings instead of arms, and their legs are more suited for perching than walking. Their feathers can be various colors, but they are most commonly white, grey, or brown.",
+    "hp": "18",
+    "speed": "25 feet, Fly 50 feet",
+    "size": "Medium",
+    "height": "5 to 6 feet",
     "languages": "You can speak, read, and write Common, Aarakocra, and Auran.",
-    "special": "Dive Attack",
-    "image": "",
-
-    "strength": "10",
-    "dexterity": "14",
-    "constitution": "10",
-    "intelligence": "11",
-    "wisdom": "12",
-    "charisma": "11",
-
+    "special": "Flight: You have a flying speed of 50 feet. To use this speed, you can’t be wearing medium or heavy armor.",
+    "image": "Aarakocra.png",
     "strengthmod": "+0",
     "dexteritymod": "+2",
-    "constitutionmod": "+0",
+    "constitutionmod": "+1",
     "intelligencemod": "+0",
     "wisdommod": "+1",
     "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
     "subraces": [
-    "Aarakocra",
-    "Enemies of Elemental Evil"
+        "Aarakocra",
+        "Enemies of Elemental Evil"
     ]
 }

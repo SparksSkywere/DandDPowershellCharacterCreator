@@ -1,36 +1,20 @@
 {
     "name": "Vedalken",
-    "description": "Unknown",
-    "hp": "0",
-    "speed": "0",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Unknown",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "0",
-    "dexterity": "0",
-    "constitution": "0",
-    "intelligence": "0",
-    "wisdom": "0",
-    "charisma": "0",
-
+    "description": "Vedalken are a race of intelligent, blue-skinned humanoids known for their logical minds and passion for knowledge. They are often found in positions of study, research, or governance, where their keen intellects can be put to use. Vedalken are patient, methodical, and often emotionless, focusing on the pursuit of perfection in all things. Their communities value progress, innovation, and collaboration.",
+    "hp": "20",
+    "speed": "30 feet",
+    "size": "Medium",
+    "height": "6 to 7 feet",
+    "languages": "You can speak, read, and write Common and Vedalken.",
+    "special": "Vedalken Dispassion: You have advantage on all Intelligence, Wisdom, and Charisma saving throws.",
+    "image": "Vedalken.png",
     "strengthmod": "+0",
     "dexteritymod": "+0",
-    "constitutionmod": "+0",
-    "intelligencemod": "+0",
-    "wisdommod": "+0",
+    "constitutionmod": "+1",
+    "intelligencemod": "+2",
+    "wisdommod": "+1",
     "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
     "subraces": [
-    "Vadelken"
+        "Vedalken"
     ]
 }

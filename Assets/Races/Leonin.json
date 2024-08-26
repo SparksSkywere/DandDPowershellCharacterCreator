@@ -1,36 +1,20 @@
 {
     "name": "Leonin",
-    "description": "",
-    "hp": "0",
-    "speed": "0",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "0",
-    "dexterity": "0",
-    "constitution": "0",
-    "intelligence": "0",
-    "wisdom": "0",
-    "charisma": "0",
-
-    "strengthmod": "+0",
-    "dexteritymod": "+0",
-    "constitutionmod": "+0",
+    "description": "Leonin are proud, leonine humanoids from the plains of Oreskos. They are known for their bravery, strength, and strong sense of honor. Leonin tribes value self-sufficiency and often live in close-knit communities. They possess a strong bond with nature and a fierce protective instinct, especially towards their own kind.",
+    "hp": "24",
+    "speed": "35 feet",
+    "size": "Medium",
+    "height": "6 to 7 feet",
+    "languages": "You can speak, read, and write Common and Leonin.",
+    "special": "Daunting Roar: As a bonus action, you can let out an intimidating roar. Creatures of your choice within 10 feet that can hear you must succeed on a Wisdom saving throw (DC 8 + your proficiency bonus + your Constitution modifier) or become frightened until the end of your next turn.",
+    "image": "Leonin.png",
+    "strengthmod": "+2",
+    "dexteritymod": "+1",
+    "constitutionmod": "+1",
     "intelligencemod": "+0",
     "wisdommod": "+0",
     "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
     "subraces": [
-    "Leonin"
+        "Leonin"
     ]
 }

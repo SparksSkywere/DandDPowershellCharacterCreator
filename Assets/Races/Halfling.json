@@ -1,38 +1,22 @@
 {
     "name": "Halfling",
-    "description": "The comforts of home are the goals of most halflings lives: a place to settle in peace and quiet, far from marauding monsters and clashing armies; a blazing fire and a generous meal; fine drink and fine conversation. Though some halflings live out their days in remote agricultural communities, others form nomadic bands that travel constantly, lured by the open road and the wide horizon to discover the wonders of new lands and peoples. But even these wanderers love peace, food, hearth, and home, though home might be a wagon jostling along a dirt road or a raft floating downriver.",
-    "hp": "28",
-    "speed": "25",
-    "size": "40 Pounds, Small",
-    "height": "3 Feet",
-    "languages": "You can speak, read, and write Common and Halfling. The Halfling language isnt secret, but halflings are loath to share it with others. They write very little, so they dont have a rich body of literature. Their oral tradition, however, is very strong. Almost all halflings speak Common to converse with the people in whose lands they dwell or through which they are traveling.",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "14",
-    "dexterity": "18",
-    "constitution": "12",
-    "intelligence": "10",
-    "wisdom": "13",
-    "charisma": "13",
-
-    "strengthmod": "+2",
-    "dexteritymod": "+4",
-    "constitutionmod": "+1",
+    "description": "Halflings are small, nimble, and cheerful folk who are known for their love of peace, food, and community. They are naturally stealthy and surprisingly brave for their size. Halflings live in pastoral regions and are typically content with a quiet, simple life, though many are also curious and eager for adventure.",
+    "hp": "18",
+    "speed": "25 feet",
+    "size": "Small",
+    "height": "3 to 4 feet",
+    "languages": "You can speak, read, and write Common and Halfling.",
+    "special": "Lucky: When you roll a 1 on the d20 for an attack roll, ability check, or saving throw, you can reroll the die and must use the new roll.",
+    "image": "Halfling.png",
+    "strengthmod": "+0",
+    "dexteritymod": "+2",
+    "constitutionmod": "+0",
     "intelligencemod": "+0",
     "wisdommod": "+1",
-    "charismamod": "+1",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
+    "charismamod": "+0",
     "subraces": [
-    "Halfling",
-    "Lightfoot Halfling",
-    "Stout Halfling"
+        "Halfling",
+        "Lightfoot Halfling",
+        "Stout Halfling"
     ]
 }

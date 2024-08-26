@@ -1,36 +1,20 @@
 {
     "name": "Goliath",
-    "description": "At the highest mountain peaks, far above the slopes where trees grow and where the air is thin and the frigid winds howl dwell the reclusive goliaths. Few folk can claim to have seen a goliath, and fewer still can claim friendship with them. Goliaths wander a bleak realm of rock, wind, and cold. Their bodies look as if they are carved from mountain stone and give them great physical power. Their spirits take after the wandering wind, making them nomads who wander from peak to peak. Their hearts are infused with the cold regard of their frigid realm, leaving each goliath with the responsibility to earn a place in the tribe or die trying.",
-    "hp": "30",
-    "speed": "30",
-    "size": "280-340 Pounds",
-    "height": "8 Feet",
+    "description": "Goliaths are towering humanoids with the strength of giants and the endurance of the mountains they call home. They are known for their competitiveness, resilience, and the hardiness that comes from surviving in the harshest environments. Goliaths have a natural affinity for climbing, and they often serve as guardians or warriors in their mountain clans.",
+    "hp": "28",
+    "speed": "30 feet",
+    "size": "Medium",
+    "height": "7 to 8 feet",
     "languages": "You can speak, read, and write Common and Giant.",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "16",
-    "dexterity": "16",
-    "constitution": "14",
-    "intelligence": "10",
-    "wisdom": "13",
-    "charisma": "11",
-
-    "strengthmod": "+3",
-    "dexteritymod": "+3",
-    "constitutionmod": "+2",
+    "special": "Stone's Endurance: You can use your reaction to roll a d12 and add your Constitution modifier, reducing damage by the total. Once you use this trait, you can’t use it again until you finish a short or long rest.",
+    "image": "Goliath.png",
+    "strengthmod": "+2",
+    "dexteritymod": "+0",
+    "constitutionmod": "+1",
     "intelligencemod": "+0",
-    "wisdommod": "+1",
+    "wisdommod": "+0",
     "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
     "subraces": [
-    "Goliath"
+        "Goliath"
     ]
 }

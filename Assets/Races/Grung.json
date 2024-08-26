@@ -1,36 +1,20 @@
 {
     "name": "Grung",
-    "description": "Unknown",
-    "hp": "0",
-    "speed": "0",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Unknown",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "0",
-    "dexterity": "0",
-    "constitution": "0",
-    "intelligence": "0",
-    "wisdom": "0",
-    "charisma": "0",
-
+    "description": "Grungs are small, frog-like humanoids known for their agility and toxic skin. They live in tree-dwelling communities in dense jungles and rainforests. Grungs are territorial and often hostile to outsiders. Their vibrant skin colors denote their caste within their strict social hierarchy, and their skin excretes a poisonous substance that can paralyze their foes.",
+    "hp": "16",
+    "speed": "25 feet, Climb 25 feet",
+    "size": "Small",
+    "height": "2 to 3 feet",
+    "languages": "You can speak, read, and write Grung.",
+    "special": "Poisonous Skin: Any creature that grapples you or otherwise comes into direct contact with your skin must succeed on a DC 12 Constitution saving throw or become poisoned for 1 minute.",
+    "image": "Grung.png",
     "strengthmod": "+0",
-    "dexteritymod": "+0",
-    "constitutionmod": "+0",
+    "dexteritymod": "+2",
+    "constitutionmod": "+1",
     "intelligencemod": "+0",
     "wisdommod": "+0",
     "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
     "subraces": [
-    "Grung"
+        "Grung"
     ]
 }

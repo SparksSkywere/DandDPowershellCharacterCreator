@@ -1,36 +1,23 @@
 {
     "name": "Aasimar",
-    "description": "Unknown",
-    "hp": "0",
-    "speed": "0",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Unknown",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "0",
-    "dexterity": "0",
-    "constitution": "0",
-    "intelligence": "0",
-    "wisdom": "0",
-    "charisma": "0",
-
+    "description": "Aasimar are born to serve as champions of the gods, their births hailed as blessed events. They are imbued with celestial power and a strong sense of justice. An Aasimar, except for one who has turned to evil, has a link to an angelic being. That being provides guidance to the Aasimar, though this connection is a severe responsibility. Aasimar often look human, but with an otherworldly presence and a radiant aura.",
+    "hp": "20",
+    "speed": "30 feet",
+    "size": "Medium",
+    "height": "5 to 6 feet",
+    "languages": "You can speak, read, and write Common and Celestial.",
+    "special": "Celestial Resistance: You have resistance to necrotic damage and radiant damage. Healing Hands: As an action, you can touch a creature and restore a number of hit points equal to your level. Once you use this trait, you can’t use it again until you finish a long rest.",
+    "image": "Aasimar.png",
     "strengthmod": "+0",
     "dexteritymod": "+0",
-    "constitutionmod": "+0",
+    "constitutionmod": "+1",
     "intelligencemod": "+0",
-    "wisdommod": "+0",
-    "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
+    "wisdommod": "+1",
+    "charismamod": "+2",
     "subraces": [
-    "Aasimar"
+        "Aasimar",
+        "Protector Aasimar",
+        "Scourge Aasimar",
+        "Fallen Aasimar"
     ]
 }

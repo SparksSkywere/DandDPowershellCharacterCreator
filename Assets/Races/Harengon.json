@@ -1,36 +1,20 @@
 {
     "name": "Harengon",
-    "description": "Unknown",
-    "hp": "0",
-    "speed": "0",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Unknown",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "0",
-    "dexterity": "0",
-    "constitution": "0",
-    "intelligence": "0",
-    "wisdom": "0",
-    "charisma": "0",
-
+    "description": "Harengons are rabbit-like humanoids with an energetic and curious nature. They hail from the Feywild, embodying the spirit of freedom and adventure. Harengons are quick on their feet and have an innate sense of luck that often guides them through tricky situations. Their keen senses and sharp reflexes make them excellent scouts and rogues.",
+    "hp": "20",
+    "speed": "30 feet",
+    "size": "Medium or Small (your choice)",
+    "height": "3 to 5 feet",
+    "languages": "You can speak, read, and write Common and Sylvan.",
+    "special": "Lucky Footwork: When you fail a Dexterity saving throw, you can use your reaction to add a d4 to the roll, potentially turning the failure into a success.",
+    "image": "Harengon.png",
     "strengthmod": "+0",
-    "dexteritymod": "+0",
+    "dexteritymod": "+2",
     "constitutionmod": "+0",
     "intelligencemod": "+0",
-    "wisdommod": "+0",
+    "wisdommod": "+1",
     "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
     "subraces": [
-    "Herengon"
+        "Harengon"
     ]
 }

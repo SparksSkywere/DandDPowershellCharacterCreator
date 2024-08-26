@@ -1,36 +1,20 @@
 {
     "name": "Simic Hybrid",
-    "description": "Unknown",
-    "hp": "0",
-    "speed": "0",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Unknown",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "0",
-    "dexterity": "0",
-    "constitution": "0",
-    "intelligence": "0",
-    "wisdom": "0",
-    "charisma": "0",
-
-    "strengthmod": "+0",
-    "dexteritymod": "+0",
-    "constitutionmod": "+0",
+    "description": "Simic Hybrids are the result of genetic experiments conducted by the Simic Combine, a guild that seeks to improve life through magic and science. These hybrids combine humanoid traits with the characteristics of various animals, resulting in unique and varied abilities. Simic Hybrids are adaptable, resilient, and often possess physical enhancements that make them stronger, faster, or more durable than typical members of their original species.",
+    "hp": "22",
+    "speed": "30 feet",
+    "size": "Medium",
+    "height": "5 to 6 feet",
+    "languages": "You can speak, read, and write Common and one additional language of your choice.",
+    "special": "Animal Enhancements: Choose two enhancements: Manta Glide, Nimble Climber, Underwater Adaptation, Grappling Appendages, Carapace, or Acid Spit.",
+    "image": "Simic_Hybrid.png",
+    "strengthmod": "+1",
+    "dexteritymod": "+1",
+    "constitutionmod": "+2",
     "intelligencemod": "+0",
     "wisdommod": "+0",
     "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
     "subraces": [
-    "Simic Hybrid"
+        "Simic_Hybrid"
     ]
 }

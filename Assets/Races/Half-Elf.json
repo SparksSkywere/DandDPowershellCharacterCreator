@@ -1,36 +1,20 @@
 {
     "name": "Half-Elf",
-    "description": "Walking in two worlds but truly belonging to neither, half elves combine what some say are the best qualities of their elf and human parents: human curiosity, inventiveness, and ambition tempered by the refined senses, love of nature, and artistic tastes of the elves. Some half elves live among humans, set apart by their emotional and physical differences, watching friends and loved ones age while time barely touches them. Others live with the elves, growing restless as they reach adulthood in the timeless elven realms, while their peers continue to live as children. Many half elves, unable to fit into either society, choose lives of solitary wandering or join with other misfits and outcasts in the adventuring life.",
-    "hp": "30",
-    "speed": "30",
-    "size": "Varies On Build, Medium",
-    "height": "6 Feet",
+    "description": "Half-Elves are a blend of human versatility and elven grace. They are often seen as charismatic and adaptable, fitting into both human and elven societies but truly belonging to neither. Half-Elves inherit the best traits of both their parents, often possessing an innate charm, keen senses, and a love of freedom and adventure.",
+    "hp": "22",
+    "speed": "30 feet",
+    "size": "Medium",
+    "height": "5 to 6 feet",
     "languages": "You can speak, read, and write Common, Elvish, and one extra language of your choice.",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "14",
-    "dexterity": "16",
-    "constitution": "14",
-    "intelligence": "10",
-    "wisdom": "13",
-    "charisma": "13",
-
-    "strengthmod": "+2",
-    "dexteritymod": "+3",
-    "constitutionmod": "+2",
+    "special": "Fey Ancestry: You have advantage on saving throws against being charmed, and magic can’t put you to sleep.",
+    "image": "Half-Elf.png",
+    "strengthmod": "+0",
+    "dexteritymod": "+0",
+    "constitutionmod": "+0",
     "intelligencemod": "+0",
-    "wisdommod": "+1",
-    "charismamod": "+1",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
+    "wisdommod": "+0",
+    "charismamod": "+2",
     "subraces": [
-    "Half-Elf"
+        "Half-Elf"
     ]
 }

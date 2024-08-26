@@ -1,36 +1,20 @@
 {
-    "name": "Changling",
-    "description": "Unknown",
-    "hp": "0",
-    "speed": "0",
-    "size": "0",
-    "height": "0",
-    "languages": "Unknown",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "0",
-    "dexterity": "0",
-    "constitution": "0",
-    "intelligence": "0",
-    "wisdom": "0",
-    "charisma": "0",
-
+    "name": "Changeling",
+    "description": "Changelings are shapeshifters, capable of altering their appearance at will. They have no true form, instead adopting the physical characteristics of others. This ability makes them excellent spies, infiltrators, and con artists. Changelings value freedom and adaptability, often moving between different identities as it suits them.",
+    "hp": "20",
+    "speed": "30 feet",
+    "size": "Medium",
+    "height": "5 to 6 feet",
+    "languages": "You can speak, read, and write Common and two other languages of your choice.",
+    "special": "Shapechanger: As an action, you can change your appearance and your voice. You determine the specifics of the changes, including your coloration, hair length, and sex. You can also adjust your height and weight, but not so much that your size changes. You can make yourself appear as a member of another race, though none of your game statistics change.",
+    "image": "Changeling.png",
     "strengthmod": "+0",
-    "dexteritymod": "+0",
+    "dexteritymod": "+1",
     "constitutionmod": "+0",
-    "intelligencemod": "+0",
+    "intelligencemod": "+1",
     "wisdommod": "+0",
-    "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
+    "charismamod": "+2",
     "subraces": [
-    "Changling"
+        "Changeling"
     ]
 }

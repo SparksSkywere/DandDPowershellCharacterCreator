@@ -1,36 +1,20 @@
 {
     "name": "Fairy",
-    "description": "Unknown",
-    "hp": "0",
-    "speed": "0",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Unknown",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "0",
-    "dexterity": "0",
-    "constitution": "0",
-    "intelligence": "0",
-    "wisdom": "0",
-    "charisma": "0",
-
+    "description": "Fairies are small, whimsical creatures with an innate connection to the magic of the Feywild. They have delicate wings that allow them to flutter through the air, and their appearance is often vibrant and colorful, reflecting the beauty and chaos of their fey nature. Fairies are playful, curious, and often capricious, embodying the spirit of the wild places they call home.",
+    "hp": "15",
+    "speed": "30 feet, Fly 30 feet",
+    "size": "Small",
+    "height": "2 to 3 feet",
+    "languages": "You can speak, read, and write Common and Sylvan.",
+    "special": "Fey Magic: You can cast the *Druidcraft* and *Faerie Fire* spells without expending a spell slot. You can use this trait a number of times equal to your proficiency bonus, regaining all uses after a long rest.",
+    "image": "Fairy.png",
     "strengthmod": "+0",
-    "dexteritymod": "+0",
+    "dexteritymod": "+2",
     "constitutionmod": "+0",
-    "intelligencemod": "+0",
-    "wisdommod": "+0",
-    "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
+    "intelligencemod": "+1",
+    "wisdommod": "+1",
+    "charismamod": "+2",
     "subraces": [
-    "Fairy"
+        "Fairy"
     ]
 }

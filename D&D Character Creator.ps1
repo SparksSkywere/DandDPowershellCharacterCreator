@@ -399,7 +399,19 @@ function CharacterStats {
     # Calculate spell slots
     if ($global:SpellCastingClass) {
         $global:SpellSlots = Get-SpellSlots -class $global:SpellCastingClass -level $level
+        Debug-Log "[Debug] SpellSlots = $global:SpellSlots"
     }
+
+        # Calculate SpellCastingAttackBonus
+        switch ($global:SpellCastingAbility) {
+            'INT' { $spellCastingAbilityMod = $global:INTMod }
+            'WIS' { $spellCastingAbilityMod = $global:WISMod }
+            'CHA' { $spellCastingAbilityMod = $global:CHAMod }
+            default { $spellCastingAbilityMod = 0 }
+        }
+        
+        $global:SpellCastingAttackBonus = $spellCastingAbilityMod + $global:ProficiencyBonus
+        Debug-Log "[Debug] SpellCastingAttackBonus = $global:SpellCastingAttackBonus"
 }
 
 # Function to retrieve spell slots based on class and level
@@ -544,24 +556,12 @@ function Show-RaceForm {
         $global:Height = $global:SelectedRace.Height
         $global:SpokenLanguages = $global:SelectedRace.Languages
         $global:Special = $global:SelectedRace.Special
-        $global:STR = [int]$global:SelectedRace.Strength
-        $global:DEX = [int]$global:SelectedRace.Dexterity
-        $global:CON = [int]$global:SelectedRace.Constitution
-        $global:INT = [int]$global:SelectedRace.Intelligence
-        $global:WIS = [int]$global:SelectedRace.Wisdom
-        $global:CHA = [int]$global:SelectedRace.Charisma
         $global:STRMod = $global:SelectedRace.StrengthMod
         $global:DEXMod = $global:SelectedRace.DexterityMod
         $global:CONMod = $global:SelectedRace.ConstitutionMod
         $global:INTMod = $global:SelectedRace.IntelligenceMod
         $global:WISMod = $global:SelectedRace.WisdomMod
         $global:CHAMod = $global:SelectedRace.CharismaMod
-        $global:ST_STR = $global:SelectedRace.Saving_Strength
-        $global:ST_DEX = $global:SelectedRace.Saving_Dexterity
-        $global:ST_CON = $global:SelectedRace.Saving_Constitution
-        $global:ST_INT = $global:SelectedRace.Saving_Intelligence
-        $global:ST_WIS = $global:SelectedRace.Saving_Wisdom
-        $global:ST_CHA = $global:SelectedRace.Saving_Charisma
 
         # Assign default image if no image was selected by the user
         if (-not $global:ImageSelected) {
@@ -582,7 +582,6 @@ function Show-RaceForm {
         Debug-Log "$global:Special"
         # Debugging: Output the ability scores
         Debug-Log "`n[Debug] Ability Scores:"
-        Debug-Log "STR: $global:STR, DEX: $global:DEX, CON: $global:CON, INT: $global:INT, WIS: $global:WIS, CHA: $global:CHA"
         Debug-Log "STRMod: $global:STRMod, DEXMod: $global:DEXMod, CONMod: $global:CONMod, INTMod: $global:INTMod, WISMod: $global:WISMod, CHAMod: $global:CHAMod"
         Debug-Log "ST_STR: $global:ST_STR, ST_DEX: $global:ST_DEX, ST_CON: $global:ST_CON, ST_INT: $global:ST_INT, ST_WIS: $global:ST_WIS, ST_CHA: $global:ST_CHA"
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {

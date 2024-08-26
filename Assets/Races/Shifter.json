@@ -1,36 +1,24 @@
 {
     "name": "Shifter",
-    "description": "Unknown",
-    "hp": "28",
-    "speed": "6",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Unknown",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "16",
-    "dexterity": "16",
-    "constitution": "12",
-    "intelligence": "10",
-    "wisdom": "15",
-    "charisma": "11",
-
-    "strengthmod": "+3",
-    "dexteritymod": "+3",
+    "description": "Shifters are humanoids with a bestial nature, capable of transforming into a more animalistic form. They are descendants of lycanthropes, and while they cannot fully change shape, they can partially transform to enhance their physical abilities. Shifters are known for their adaptability, resilience, and strong connection to their primal instincts.",
+    "hp": "20",
+    "speed": "30 feet",
+    "size": "Medium",
+    "height": "5 to 6 feet",
+    "languages": "You can speak, read, and write Common and one additional language of your choice.",
+    "special": "Shifting: As a bonus action, you can shift your form for up to 1 minute, gaining temporary hit points equal to your level + your Constitution modifier, and additional benefits based on your subrace.",
+    "image": "Shifter.png",
+    "strengthmod": "+1",
+    "dexteritymod": "+2",
     "constitutionmod": "+1",
     "intelligencemod": "+0",
-    "wisdommod": "+2",
+    "wisdommod": "+1",
     "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
     "subraces": [
-    "Shifter"
+        "Shifter",
+        "Beasthide",
+        "Longtooth",
+        "Swiftstride",
+        "Wildhunt"
     ]
 }

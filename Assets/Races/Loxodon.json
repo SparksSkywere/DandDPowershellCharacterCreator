@@ -1,36 +1,20 @@
 {
     "name": "Loxodon",
-    "description": "Unknown",
-    "hp": "0",
-    "speed": "0",
-    "size": "0 Pounds",
-    "height": "0 Feet",
-    "languages": "Unknown",
-    "special": "Unknown",
-    "image": "",
-
-    "strength": "0",
-    "dexterity": "0",
-    "constitution": "0",
-    "intelligence": "0",
-    "wisdom": "0",
-    "charisma": "0",
-
-    "strengthmod": "+0",
+    "description": "Loxodons are elephant-like humanoids known for their wisdom, strength, and calm demeanor. They are often found in positions of leadership, serving as judges, priests, or healers in their communities. Loxodons value tradition and stability, and they are fiercely protective of their kin. Their thick skin and powerful trunks make them formidable in both battle and negotiation.",
+    "hp": "28",
+    "speed": "30 feet",
+    "size": "Medium",
+    "height": "7 to 8 feet",
+    "languages": "You can speak, read, and write Common and Loxodon.",
+    "special": "Powerful Build: You count as one size larger when determining your carrying capacity and the weight you can push, drag, or lift.",
+    "image": "Loxodon.png",
+    "strengthmod": "+2",
     "dexteritymod": "+0",
-    "constitutionmod": "+0",
+    "constitutionmod": "+2",
     "intelligencemod": "+0",
-    "wisdommod": "+0",
+    "wisdommod": "+1",
     "charismamod": "+0",
-
-    "saving_strength": "0",
-    "saving_dexterity": "0",
-    "saving_constitution": "0",
-    "saving_intelligence": "0",
-    "saving_wisdom": "0",
-    "saving_charisma": "0",
-
     "subraces": [
-    "Loxodon"
+        "Loxodon"
     ]
 }

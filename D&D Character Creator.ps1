@@ -585,9 +585,6 @@ function Show-RaceForm {
         Debug-Log "STR: $global:STR, DEX: $global:DEX, CON: $global:CON, INT: $global:INT, WIS: $global:WIS, CHA: $global:CHA"
         Debug-Log "STRMod: $global:STRMod, DEXMod: $global:DEXMod, CONMod: $global:CONMod, INTMod: $global:INTMod, WISMod: $global:WISMod, CHAMod: $global:CHAMod"
         Debug-Log "ST_STR: $global:ST_STR, ST_DEX: $global:ST_DEX, ST_CON: $global:ST_CON, ST_INT: $global:ST_INT, ST_WIS: $global:ST_WIS, ST_CHA: $global:ST_CHA"
-        # Calculate derived stats immediately after race selection
-        Debug-Log "Calculating Character Stats"
-        Calculate-CharacterStats
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
         Debug-Log "[Debug] Form was canceled by the user."
         exit
@@ -706,10 +703,6 @@ function Show-ClassAndAlignmentForm {
         Debug-Log "Wisdom: $global:Check21"
         Debug-Log "Charisma: $global:Check22"
 
-        # Calculate the derived stats based on race and class
-        Debug-Log "[Debug] Calculating Character Stats"
-        Calculate-CharacterStats
-
         # Conditionally display the Cantrip Form if the class can cast cantrips
         if ($global:CanCastCantrips) {
             Show-CantripForm
@@ -797,66 +790,49 @@ function Show-WeaponAndArmourForm {
     # Create the form
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 600 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
-    # Limit to 3 weapon selection slots
-    $maxWeaponSlots = 3
-    $weaponControls = @()
+    # Create individual ListBox controls for weapon selection
+    $weapon1Controls = Set-ListBox -LabelText "Select Weapon 1" -X 15 -Y 20 -Width 140 -Height 230 -DataSource $WeaponJSON -DisplayMember 'name'
+    $weapon2Controls = Set-ListBox -LabelText "Select Weapon 2" -X 165 -Y 20 -Width 140 -Height 230 -DataSource $WeaponJSON -DisplayMember 'name'
+    $weapon3Controls = Set-ListBox -LabelText "Select Weapon 3" -X 315 -Y 20 -Width 140 -Height 230 -DataSource $WeaponJSON -DisplayMember 'name'
     
-    # Create controls for weapon selection
-    for ($i = 1; $i -le $maxWeaponSlots; $i++) {
-        $weaponControls += Set-ListBox -LabelText "Select Weapon $i" -X (15 + (($i - 1) * 150)) -Y 20 -Width 140 -Height 230 -DataSource $WeaponJSON -DisplayMember 'name'
-    }
+    # Add controls to the form
+    $form.Controls.AddRange($weapon1Controls)
+    $form.Controls.AddRange($weapon2Controls)
+    $form.Controls.AddRange($weapon3Controls)
 
-    # Controls for additional gear and armor
+    # Additional controls for armor and gear
     $gearControls = Set-ListBox -LabelText 'Select Extra Adventuring Gear:' -X 240 -Y 275 -Width 220 -Height 200 -DataSource $GearJSON -DisplayMember 'name'
     $armorControls = Set-ListBox -LabelText 'Select Armour:' -X 10 -Y 275 -Width 220 -Height 200 -DataSource $ArmourJSON -DisplayMember 'name'
 
-    # Checkbox for shield
     $checkboxShield = New-Object System.Windows.Forms.CheckBox
     $checkboxShield.Location = New-Object System.Drawing.Point(25, 487)
     $checkboxShield.Size = New-Object System.Drawing.Size(120, 40)
     $checkboxShield.Text = "Shield?"
     $checkboxShield.Checked = $false
 
-    # Add all controls to the form
-    $form.Controls.AddRange($weaponControls)
     $form.Controls.AddRange($gearControls)
     $form.Controls.AddRange($armorControls)
     $form.Controls.Add($checkboxShield)
 
-    # Display the form and capture the result
+    # Display the form and process result
     $form.Topmost = $true
     $form.Add_Shown({$form.Activate()})
     $result = $form.ShowDialog()
 
     if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
-        # Initialize global weapons array
+        # Initialize weapons array and weapon descriptions
         $global:Weapons = @()
+        $global:WeaponDescription = ""
 
-        for ($i = 0; $i -lt $maxWeaponSlots; $i++) {
-            $selectedWeapon = $weaponControls[$i][1].SelectedItem
-            if ($selectedWeapon) {
-                # Add selected weapon details to the global array
-                $global:Weapons += @{
-                    Name = $selectedWeapon.Name
-                    Damage = $selectedWeapon.WeaponDamage
-                    ATK_Bonus = $selectedWeapon.WPNATK_Bonus
-                    Weight = $selectedWeapon.WeaponWeight
-                    Properties = $selectedWeapon.WeaponProperties
-                }
+        # Handle individual weapon slots and build the weapon description
+        $global:WeaponDescription += Process-WeaponSelection -selectedWeapon $weapon1Controls[1].SelectedItem -slotNumber 1
+        $global:WeaponDescription += Process-WeaponSelection -selectedWeapon $weapon2Controls[1].SelectedItem -slotNumber 2
+        $global:WeaponDescription += Process-WeaponSelection -selectedWeapon $weapon3Controls[1].SelectedItem -slotNumber 3
 
-                # Debug output for each selected weapon
-                Debug-Log "Weapon$(($i+1)) Name: $($selectedWeapon.Name)"
-                Debug-Log "Weapon$(($i+1)) Damage: $($selectedWeapon.WeaponDamage)"
-                Debug-Log "Weapon$(($i+1)) ATK_Bonus: $($selectedWeapon.WPNATK_Bonus)"
-                Debug-Log "Weapon$(($i+1)) Weight: $($selectedWeapon.WeaponWeight)"
-                Debug-Log "Weapon$(($i+1)) Properties: $($selectedWeapon.WeaponProperties)"
-            } else {
-                # Log when no weapon is selected
-                Debug-Log "No Weapon Selected for Weapon Slot $($i+1)"
-            }
-        }
+        # Remove trailing comma and space from the description
+        $global:WeaponDescription = $global:WeaponDescription.TrimEnd(", ")
 
-        # Handle armor selection
+        # Handle armor and gear selection
         $selectedArmor = $armorControls[1].SelectedItem
         if ($selectedArmor) {
             $baseAC = [int]$selectedArmor.BaseAC
@@ -864,37 +840,60 @@ function Show-WeaponAndArmourForm {
             $maxDexBonus = [int]$selectedArmor.MaxDexBonus
             $dexModifier = [int]$global:DEXMod
 
-            # Apply Dex Modifier if applicable
             if ($selectedArmor.DexModifierApplicable -and $armorType -eq 'Medium') {
                 $dexModifier = [math]::Min($dexModifier, $maxDexBonus)
             }
 
             $global:ArmourClass = $baseAC + $dexModifier
 
-            # Apply shield bonus if selected
             if ($checkboxShield.Checked) {
                 $global:ArmourClass += 2
             }
 
-            # Calculate total carried weight
+            # Set weights
             $global:ArmorWeight = $selectedArmor.Weight
             $global:GearWeight = $gearControls[1].SelectedItem.Weight
-            Calculate-CharacterStats
 
-            # Debug log for armor
             Debug-Log "Selected Armor: $($selectedArmor.Name)"
             Debug-Log "Armor Type: $armorType"
             Debug-Log "Base AC: $baseAC"
             Debug-Log "Dexterity Modifier: $dexModifier"
             Debug-Log "Calculated ArmourClass: $($global:ArmourClass)"
-            Debug-Log "Calculated ArmourWeight: $($global:ArmorWeight)"
-            Debug-Log "Calculated GearWeight: $($global:GearWeight)"
         } else {
             Debug-Log "No Armor Selected"
         }
+
+        # Debug the combined WeaponDescription
+        Debug-Log "Combined Weapon Description: $($global:WeaponDescription)"
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
         Debug-Log "[Debug] Form was canceled by the user."
         exit
+    }
+}
+
+function Process-WeaponSelection {
+    param (
+        [object]$selectedWeapon,
+        [int]$slotNumber
+    )
+
+    if ($selectedWeapon) {
+        $global:Weapons += @{
+            Name = $selectedWeapon.Name
+            Damage = $selectedWeapon.WeaponDamage
+            ATK_Bonus = $selectedWeapon.WPNATK_Bonus
+            Weight = $selectedWeapon.WeaponWeight
+            Properties = $selectedWeapon.WeaponProperties
+        }
+
+        # Build the weapon description string
+        $description = "$($selectedWeapon.Name) - Damage: $($selectedWeapon.WeaponDamage), ATK Bonus: $($selectedWeapon.WPNATK_Bonus); "
+        Debug-Log "Weapon$slotNumber Selected: $($selectedWeapon.Name)"
+
+        return $description
+    } else {
+        Debug-Log "No Weapon Selected for Weapon Slot $slotNumber"
+        return ""
     }
 }
 
@@ -1267,6 +1266,8 @@ Show-StatsChooserForm
 Show-BackstoryForm
 Show-AdditionalDetailsForm
 
+Debug-Log "[Debug] Calculating stats"
+Calculate-CharacterStats
 Debug-Log "[Debug] All forms have been displayed, proceeding with Save"
 
 # Addvanced Debug purposes only for the PDF File inspect, not for normal debug
@@ -1331,15 +1332,15 @@ $characterparameters = @{
         'Athletics' = $Athletics;
         'Deception ' = $Deception;
         'History ' = $History;
-        'Wpn Name' = $Weapon1;
-        'Wpn1 AtkBonus' = $WPN1ATK_Bonus;
-        'Wpn1 Damage' = $Weapon1Damage;
+        'Wpn Name' = $global:Weapons[0].Name;
+        'Wpn1 AtkBonus' = $global:Weapons[0].ATK_Bonus;
+        'Wpn1 Damage' = $global:Weapons[0].Damage;
         'Insight' = $Insight;
         'Intimidation' = $Intimidation;
-        'Wpn Name 2' = $Weapon2;
-        'Wpn2 AtkBonus ' = $WPN2ATK_Bonus;
-        'Wpn Name 3' = $Weapon3;
-        'Wpn3 AtkBonus  ' = $WPN3ATK_Bonus;
+        'Wpn Name 2' = $global:Weapons[1].Name;
+        'Wpn2 AtkBonus ' = $global:Weapons[1].ATK_Bonus;
+        'Wpn Name 3' = $global:Weapons[2].Name;
+        'Wpn3 AtkBonus  ' = $global:Weapons[2].ATK_Bonus;
         'Check Box 11' = if ($Check11) { "Yes" } else { "off" }; #Strength Button
         'Check Box 18' = if ($Check18) { "Yes" } else { "off" }; #Dexterity Button
         'Check Box 19' = if ($Check19) { "Yes" } else { "off" }; #Constitution Button
@@ -1347,7 +1348,7 @@ $characterparameters = @{
         'Check Box 21' = if ($Check21) { "Yes" } else { "off" }; #Wisdom Button
         'Check Box 22' = if ($Check22) { "Yes" } else { "off" }; #Charisma Button
         'INTmod' = $INTmod;
-        'Wpn2 Damage ' = $Weapon2Damage;
+        'Wpn2 Damage ' = $global:Weapons[1].Damage;
         'Investigation ' = $Investigation;
         'WIS' = $WIS;
         'Arcana' = $Arcana;
@@ -1381,7 +1382,7 @@ $characterparameters = @{
         'HPMax' = $HPMax;
         'HPCurrent' = $HP;
         #'HPTemp' = ;
-        'Wpn3 Damage ' = $Weapon3Damage;
+        'Wpn3 Damage ' = $global:Weapons[2].Damage;
         'SleightofHand' = $SleightOfHand;
         'CHamod' = $CHAmod;
         'Survival' = $Survival;

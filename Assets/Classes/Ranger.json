@@ -3,7 +3,7 @@
     "HitDice": "1d10",
     "classLevel": "0",
     "spellcastingclass": "Ranger",
-    "SpellcastingAbility": "",
+    "SpellcastingAbility": "Wisdom",
     "SpellCastingSaveDC": "8",
     "SpellCastingAttackBonus": "",
     "CanCastCantrips": false,

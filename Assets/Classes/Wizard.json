@@ -3,7 +3,7 @@
     "HitDice": "1d6",
     "classLevel": "0",
     "spellcastingclass": "Wizard",
-    "SpellcastingAbility": "",
+    "SpellcastingAbility": "Intelligence",
     "SpellCastingSaveDC": "8",
     "SpellCastingAttackBonus": "",
     "CanCastCantrips": true,

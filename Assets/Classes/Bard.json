@@ -3,7 +3,7 @@
     "HitDice": "1d8",
     "classLevel": "0",
     "spellcastingclass": "Bard",
-    "SpellcastingAbility": "",
+    "SpellcastingAbility": "Charisma",
     "SpellCastingSaveDC": "8",
     "SpellCastingAttackBonus": "",
     "CanCastCantrips": true,

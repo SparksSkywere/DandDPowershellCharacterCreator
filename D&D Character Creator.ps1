@@ -532,9 +532,9 @@ function Show-BasicInfoForm {
     }
 }
 
-# Function to display the class and race selection form
+# Function to display the race selection form
 function Show-RaceForm {
-    Debug-Log "[Debug] Displaying Class and Race Form"
+    Debug-Log "[Debug] Displaying Race Form"
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 450 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     $backgroundControls = Set-ListBox -LabelText 'Select a Background:' -X 10 -Y 20 -Width 200 -Height 170 -DataSource $CharacterBackgroundJSON -DisplayMember 'name'
@@ -691,8 +691,16 @@ function Show-ClassAndAlignmentForm {
         $global:HD = $global:SelectedClass.HitDice
         $global:SpellCastingClass = $global:SelectedClass.spellcastingclass
         $global:SpellCastingAbility = $global:SelectedClass.SpellCastingAbility
+        $global:SpellCastingSaveDC = $global:SelectedClass.SpellCastingSaveDC
         $global:SelectedPack = $global:SelectedClass.backpack
         $global:Alignment = $alignmentControls[1].SelectedItem.Name
+        # All checks
+        $global:Check11 = $global:SelectedClass.Check11
+        $global:Check18 = $global:SelectedClass.Check18
+        $global:Check19 = $global:SelectedClass.Check19
+        $global:Check20 = $global:SelectedClass.Check20
+        $global:Check21 = $global:SelectedClass.Check21
+        $global:Check22 = $global:SelectedClass.Check22
 
         # Convert CanCastCantrips to a boolean
         $global:CanCastCantrips = [bool]::Parse($global:SelectedClass.CanCastCantrips)
@@ -703,8 +711,16 @@ function Show-ClassAndAlignmentForm {
         Debug-Log "HD: $($global:HD)"
         Debug-Log "SpellCastingClass: $($global:SpellCastingClass)"
         Debug-Log "SpellCastingAbility: $($global:SpellCastingAbility)"
+        Debug-Log "SpellCastingSaveDC: $($global:SpellCastingSaveDC)"
         Debug-Log "SelectedPack: $($global:SelectedPack)"
-        Debug-Log "CanCastCantrips: $($global:CanCastCantrips)"  # Log cantrip capability
+        Debug-Log "CanCastCantrips: $($global:CanCastCantrips)"
+        Debug-Log "The Following Checks are enabled"
+        Debug-Log "Strength: $global:Check11"
+        Debug-Log "Dexterity: $global:Check18"
+        Debug-Log "Constitution: $global:Check19"
+        Debug-Log "Intelligence: $global:Check20"
+        Debug-Log "Wisdom: $global:Check21"
+        Debug-Log "Charisma: $global:Check22"
 
         # Calculate the derived stats based on race and class
         Debug-Log "[Debug] Calculating Character Stats"

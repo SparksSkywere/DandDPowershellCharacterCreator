@@ -323,7 +323,7 @@ $global:Comma = ", "
 Debug-Log "[Debug] Loaded Defaults"
 
 # Function to calculate ability modifiers and other derived stats
-function Calculate-CharacterStats {
+function CharacterStats {
     # Calculate ability modifiers
     $global:STRMod = [math]::Floor(($global:STR - 10) / 2)
     $global:DEXMod = [math]::Floor(($global:DEX - 10) / 2)
@@ -825,9 +825,9 @@ function Show-WeaponAndArmourForm {
         $global:WeaponDescription = ""
 
         # Handle individual weapon slots and build the weapon description
-        $global:WeaponDescription += Process-WeaponSelection -selectedWeapon $weapon1Controls[1].SelectedItem -slotNumber 1
-        $global:WeaponDescription += Process-WeaponSelection -selectedWeapon $weapon2Controls[1].SelectedItem -slotNumber 2
-        $global:WeaponDescription += Process-WeaponSelection -selectedWeapon $weapon3Controls[1].SelectedItem -slotNumber 3
+        $global:WeaponDescription += WeaponSelection -selectedWeapon $weapon1Controls[1].SelectedItem -slotNumber 1
+        $global:WeaponDescription += WeaponSelection -selectedWeapon $weapon2Controls[1].SelectedItem -slotNumber 2
+        $global:WeaponDescription += WeaponSelection -selectedWeapon $weapon3Controls[1].SelectedItem -slotNumber 3
 
         # Remove trailing comma and space from the description
         $global:WeaponDescription = $global:WeaponDescription.TrimEnd(", ")
@@ -871,7 +871,7 @@ function Show-WeaponAndArmourForm {
     }
 }
 
-function Process-WeaponSelection {
+function WeaponSelection {
     param (
         [object]$selectedWeapon,
         [int]$slotNumber
@@ -887,7 +887,7 @@ function Process-WeaponSelection {
         }
 
         # Build the weapon description string
-        $description = "$($selectedWeapon.Name) - Damage: $($selectedWeapon.WeaponDamage), ATK Bonus: $($selectedWeapon.WPNATK_Bonus); "
+        $description = "$($selectedWeapon.Name) - $($selectedWeapon.Description); "
         Debug-Log "Weapon$slotNumber Selected: $($selectedWeapon.Name)"
 
         return $description
@@ -1267,7 +1267,7 @@ Show-BackstoryForm
 Show-AdditionalDetailsForm
 
 Debug-Log "[Debug] Calculating stats"
-Calculate-CharacterStats
+CharacterStats
 Debug-Log "[Debug] All forms have been displayed, proceeding with Save"
 
 # Addvanced Debug purposes only for the PDF File inspect, not for normal debug

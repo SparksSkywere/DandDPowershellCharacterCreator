@@ -341,7 +341,7 @@ function CharacterStats {
         elseif ($level -le 16) { $global:ProficiencyBonus = 5 }
         else { $global:ProficiencyBonus = 6 }
     } else {
-        $global:ProficiencyBonus = 2  # Default to 2 if level is not detected
+        $global:ProficiencyBonus = 2
     }
 
     # Calculate saving throws
@@ -390,10 +390,13 @@ function CharacterStats {
     Debug-Log "[Debug] Total HP = $global:HPMax"
 
     # Calculate encumbrance
-    $global:TotalWeightCarried = ($global:Weapon1Weight + $global:Weapon2Weight + $global:Weapon3Weight + $global:GearWeight + $global:ArmorWeight)
-    $global:EncumbranceThreshold = $global:STR * 15  # Standard D&D encumbrance rule
+    $global:TotalWeightCarried = ($global:Weapon1Weight + $global:Weapon2Weight + $global:Weapon3Weight + $global:GearWeight + $global:ArmourWeight)
+    $global:EncumbranceThreshold = $global:STR * 15 
     if ($global:TotalWeightCarried -gt $global:EncumbranceThreshold) {
-        $global:Speed = [math]::Max(0, $global:Speed - 10)  # Reduce speed if over-encumbered
+        $global:Speed = [math]::Max(0, $global:Speed - 10)
+        Debug-Log "[Debug] Character is over-encumbered. Speed reduced to $global:Speed."
+    } else {
+        Debug-Log "[Debug] Character is not over-encumbered. Speed remains at $global:Speed."
     }
 
     # Calculate spell slots
@@ -821,6 +824,7 @@ function Show-WeaponAndArmourForm {
     if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
         # Initialize weapons array and weapon descriptions
         $global:Weapons = @()
+        Debug-Log "Weapons Array: $Weapons"
         $global:WeaponDescription = ""
 
         # Handle individual weapon slots and build the weapon description
@@ -850,7 +854,7 @@ function Show-WeaponAndArmourForm {
             }
 
             # Set weights
-            $global:ArmorWeight = $selectedArmor.Weight
+            $global:ArmourWeight = $selectedArmor.Weight
             $global:GearWeight = $gearControls[1].SelectedItem.Weight
 
             Debug-Log "Selected Armor: $($selectedArmor.Name)"
@@ -858,6 +862,8 @@ function Show-WeaponAndArmourForm {
             Debug-Log "Base AC: $baseAC"
             Debug-Log "Dexterity Modifier: $dexModifier"
             Debug-Log "Calculated ArmourClass: $($global:ArmourClass)"
+            Debug-Log "Total Armour Weight: $global:ArmourWeight"
+            Debug-Log "Total Gear Weight: $global:GearWeight"
         } else {
             Debug-Log "No Armor Selected"
         }

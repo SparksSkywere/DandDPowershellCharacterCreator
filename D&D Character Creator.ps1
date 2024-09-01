@@ -1063,35 +1063,43 @@ function Add-StatControls {
         [System.Windows.Forms.Label]$remainingPointsLabel
     )
 
+    # Create a label for the stat name
     $label = New-Object System.Windows.Forms.Label
     $label.Location = New-Object System.Drawing.Point(10, $yPosition)
     $label.Size = New-Object System.Drawing.Size(80, 20)
     $label.Text = $stat
     $form.Controls.Add($label)
 
+    # Create the value label to display the current stat value
     $valueLabel = New-Object System.Windows.Forms.Label
     $valueLabel.Location = New-Object System.Drawing.Point(200, $yPosition)
     $valueLabel.Size = New-Object System.Drawing.Size(40, 20)
     $valueLabel.Text = ($global:BaseStats[$stat] + $global:StatIncrements[$stat]).ToString()
-    $valueLabel.Tag = $stat
+    $valueLabel.Tag = $stat  # Tag the value label with the stat name
     $form.Controls.Add($valueLabel)
 
-    Debug-Log "[Debug] valueLabel created for stat: $stat with initial value: $($valueLabel.Text)"
+    Debug-Log "[Debug] Created valueLabel for stat: $stat at yPosition: $yPosition with initial value: $($valueLabel.Text)"
 
+    # Create the "+" button and associate it with the correct stat
     $upButton = New-Object System.Windows.Forms.Button
     $upButton.Location = New-Object System.Drawing.Point(100, $yPosition)
     $upButton.Size = New-Object System.Drawing.Size(40, 23)
     $upButton.Text = "+"
+    $upButton.Tag = $valueLabel  # Correctly tag the button with the value label
     $upButton.Add_Click({
+        Debug-Log "[Debug] Up button clicked for stat: $stat"
         HandleButtonClick -stat $stat -direction 'up' -valueLabel $valueLabel -remainingPointsLabel $remainingPointsLabel
     })
     $form.Controls.Add($upButton)
 
+    # Create the "-" button and associate it with the correct stat
     $downButton = New-Object System.Windows.Forms.Button
     $downButton.Location = New-Object System.Drawing.Point(150, $yPosition)
     $downButton.Size = New-Object System.Drawing.Size(40, 23)
     $downButton.Text = "-"
+    $downButton.Tag = $valueLabel  # Correctly tag the button with the value label
     $downButton.Add_Click({
+        Debug-Log "[Debug] Down button clicked for stat: $stat"
         HandleButtonClick -stat $stat -direction 'down' -valueLabel $valueLabel -remainingPointsLabel $remainingPointsLabel
     })
     $form.Controls.Add($downButton)
@@ -1106,36 +1114,40 @@ function HandleButtonClick {
         [System.Windows.Forms.Label]$remainingPointsLabel
     )
 
+    # Validate that the stat and valueLabel are correct
     if (-not $stat) {
-        Debug-Log "[Error] The stat variable is empty."
+        Debug-Log "[Error] The stat variable is empty or undefined."
         return
     }
 
     if ($null -eq $valueLabel) {
-        Debug-Log "[Error] The valueLabel is null for stat: $stat."
+        Debug-Log "[Error] The valueLabel is null or not associated correctly for stat: $stat."
         return
     }
 
-    Debug-Log "[Debug] Button Click: Stat = $stat, Direction = $direction, Current Value = $($global:StatIncrements[$stat]), Total Points = $($global:TotalPoints)"
+    # Debug log for tracking button clicks and their intended effect
+    Debug-Log "[Debug] Button Click Detected: Stat = $stat, Direction = $direction, Current Stat Increment = $($global:StatIncrements[$stat]), Remaining Points = $($global:TotalPoints)"
 
+    # Update stat based on the button direction
     if ($direction -eq 'up' -and $global:TotalPoints -gt 0) {
         $global:StatIncrements[$stat]++
         $global:TotalPoints--
-        Debug-Log "[Debug] Incremented $stat New Value = $($global:StatIncrements[$stat]), Remaining Points = $($global:TotalPoints)"
+        Debug-Log "[Debug] Incremented $stat New Increment Value = $($global:StatIncrements[$stat]), Remaining Points = $($global:TotalPoints)"
     } elseif ($direction -eq 'down' -and $global:StatIncrements[$stat] -gt 0) {
         $global:StatIncrements[$stat]--
         $global:TotalPoints++
-        Debug-Log "[Debug] Decremented $stat New Value = $($global:StatIncrements[$stat]), Remaining Points = $($global:TotalPoints)"
+        Debug-Log "[Debug] Decremented $stat New Increment Value = $($global:StatIncrements[$stat]), Remaining Points = $($global:TotalPoints)"
     } else {
-        Debug-Log "[Debug] No change applied: Direction = $direction, Stat = $stat"
+        Debug-Log "[Debug] No stat change applied: Direction = $direction, Stat = $stat, Current Stat Increment = $($global:StatIncrements[$stat])"
     }
 
+    # Update and refresh labels to reflect changes
     $valueLabel.Text = ($global:BaseStats[$stat] + $global:StatIncrements[$stat]).ToString()
     $valueLabel.Refresh()
     $remainingPointsLabel.Text = "Remaining Points: $($global:TotalPoints)"
     $remainingPointsLabel.Refresh()
 
-    Debug-Log "[Debug] Updated Label for $stat New Display Value = $($valueLabel.Text)"
+    Debug-Log "[Debug] Updated $stat Label: New Value Displayed = $($valueLabel.Text)"
 }
 
 # Function to update form controls

@@ -1143,11 +1143,7 @@ function HandleButtonClick {
 
     # Update and refresh labels to reflect changes
     $valueLabel.Text = ($global:BaseStats[$stat] + $global:StatIncrements[$stat]).ToString()
-    $valueLabel.Refresh()
     $remainingPointsLabel.Text = "Remaining Points: $($global:TotalPoints)"
-    $remainingPointsLabel.Refresh()
-
-    Debug-Log "[Debug] Updated $stat Label: New Value Displayed = $($valueLabel.Text)"
 }
 
 # Function to update form controls

@@ -18,7 +18,21 @@ function Show-Console {
     $nCmdShow = if ($Show) { 5 } elseif ($Hide) { 0 } else { return }
     [Console.Window]::ShowWindow($consolePtr, $nCmdShow) | Out-Null
     $global:DebugLoggingEnabled = $Show.IsPresent
-    Debug-Log "Console visibility set to: $($Show.IsPresent)"
+    Write-Log "Console visibility set to: $($Show.IsPresent)" -Level DEBUG
+}
+
+# Improved logging function with levels
+function Write-Log {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]$Message,
+        [ValidateSet('INFO', 'DEBUG', 'ERROR', 'WARN')]
+        [string]$Level = 'INFO'
+    )
+    if ($global:DebugLoggingEnabled -or $Level -ne 'DEBUG') {
+        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        Write-Host "[$timestamp] $Level - $Message"
+    }
 }
 
 # Wrapper function to handle conditional logging
@@ -33,7 +47,7 @@ function Debug-Log {
 
 # Change the line below to show debugging information
 Show-Console -Show
-Debug-Log "Console shown [Debugging Enabled]"
+Write-Log "Console shown [Debugging Enabled]" -Level DEBUG
 
 # Detect system language and load corresponding localisation file
 function Set-Localisation {
@@ -45,7 +59,7 @@ function Set-Localisation {
     if (Test-Path $localisationPath) {
         try {
             $global:Localisation = Get-Content -Path $localisationPath -Raw -Encoding UTF8 | ConvertFrom-Json
-            Debug-Log "[Debug] Loaded localisation for language: $languageCode"
+            Write-Log "Loaded localisation for language: $languageCode" -Level DEBUG
         } catch {
             Write-Warning "[Debug] Failed to load localisation file for language '$languageCode'. Error: $_"
             Set-DefaultLocalisation
@@ -61,7 +75,7 @@ function Set-DefaultLocalisation {
     $defaultLocalisationPath = Join-Path $PSScriptRoot "Assets\Localisation\localisation.en.json"
     try {
         $global:Localisation = Get-Content -Path $defaultLocalisationPath | ConvertFrom-Json
-        Debug-Log "[Debug] Loaded default localisation (English)"
+        Write-Log "Loaded default localisation (English)" -Level DEBUG
     } catch {
         throw "[Debug] Failed to load the default localisation file."
     }
@@ -205,21 +219,30 @@ Add-Type -AssemblyName PresentationCore,PresentationFramework
 Import-Module -Name "$PSScriptRoot\Assets\iText\PDFForm" | Out-Null
 Add-Type -Path "$PSScriptRoot\Assets\iText\itextsharp.dll"
 
-# Function to load JSON data from a given path
-function Get-JsonData($path) {
-    $jsonFiles = Get-ChildItem -Path $path -Filter *.json -ErrorAction Stop
-    $data = @()
-
-    foreach ($file in $jsonFiles) {
-        try {
+# Optimize JSON loading with caching
+$script:JsonCache = @{}
+function Get-JsonData {
+    param (
+        [string]$path
+    )
+    if ($script:JsonCache.ContainsKey($path)) {
+        return $script:JsonCache[$path]
+    }
+    
+    try {
+        $jsonFiles = Get-ChildItem -Path $path -Filter *.json -ErrorAction Stop
+        $data = @()
+        foreach ($file in $jsonFiles) {
             $content = Get-Content -Path $file.FullName -Raw -ErrorAction Stop
             $jsonData = $content | ConvertFrom-Json -ErrorAction Stop
             $data += $jsonData
-        } catch {
-            Write-Warning "Failed to load JSON from file: $($file.FullName). Error: $($_.Exception.Message)"
         }
+        $script:JsonCache[$path] = $data
+        return $data
+    } catch {
+        Write-Log "Failed to load JSON from path: $path. Error: $($_.Exception.Message)" -Level ERROR
+        throw
     }
-    return $data
 }
 
 # Load JSON data from various directories
@@ -320,7 +343,7 @@ $global:Backstory = $defaultJSON.Backstory
 $global:Equipment = $defaultJSON.Equipment
 $global:FeaturesAndTraits = $defaultJSON.'Features and Traits'
 $global:Comma = ", "
-Debug-Log "[Debug] Loaded Defaults"
+Write-Log "Loaded Defaults" -Level DEBUG
 
 # Function to calculate ability modifiers and other derived stats
 function CharacterStats {
@@ -377,7 +400,7 @@ function CharacterStats {
     
     # Calculate initiative
     $global:InitiativeTotal = $global:DEXMod + $global:SelectedClass.InitiativeBonus
-    Debug-Log "[Debug] Initiative = $global:InitiativeTotal"
+    Write-Log "Initiative = $global:InitiativeTotal" -Level DEBUG
 
     # Calculate passive perception
     $global:Passive = 10 + $global:WISMod
@@ -387,22 +410,22 @@ function CharacterStats {
 
     # Calculate hit points
     $global:HPMax = ($global:HD * $level) + ($global:CONMod * $level)
-    Debug-Log "[Debug] Total HP = $global:HPMax"
+    Write-Log "Total HP = $global:HPMax" -Level DEBUG
 
     # Calculate encumbrance
     $global:TotalWeightCarried = ($global:Weapon1Weight + $global:Weapon2Weight + $global:Weapon3Weight + $global:GearWeight + $global:ArmourWeight)
     $global:EncumbranceThreshold = $global:STR * 15 
     if ($global:TotalWeightCarried -gt $global:EncumbranceThreshold) {
         $global:Speed = [math]::Max(0, $global:Speed - 10)
-        Debug-Log "[Debug] Character is over-encumbered. Speed reduced to $global:Speed."
+        Write-Log "Character is over-encumbered. Speed reduced to $global:Speed." -Level DEBUG
     } else {
-        Debug-Log "[Debug] Character is not over-encumbered. Speed remains at $global:Speed."
+        Write-Log "Character is not over-encumbered. Speed remains at $global:Speed." -Level DEBUG
     }
 
     # Calculate spell slots
     if ($global:SpellCastingClass) {
         $global:SpellSlots = Get-SpellSlots -class $global:SpellCastingClass -level $level
-        Debug-Log "[Debug] SpellSlots = $global:SpellSlots"
+        Write-Log "SpellSlots = $global:SpellSlots" -Level DEBUG
     }
 
         # Calculate SpellCastingAttackBonus
@@ -414,7 +437,7 @@ function CharacterStats {
         }
         
         $global:SpellCastingAttackBonus = $spellCastingAbilityMod + $global:ProficiencyBonus
-        Debug-Log "[Debug] SpellCastingAttackBonus = $global:SpellCastingAttackBonus"
+        Write-Log "SpellCastingAttackBonus = $global:SpellCastingAttackBonus" -Level DEBUG
 }
 
 # Function to retrieve spell slots based on class and level
@@ -432,110 +455,101 @@ function Get-SpellSlots {
     return $slots
 }
 
+# Form state management
+$script:FormState = @{
+    CurrentForm = $null
+    PreviousForm = $null
+    FormData = @{}
+}
+
+# Generic form creation function
+function New-DndForm {
+    param (
+        [string]$Title,
+        [hashtable]$Controls,
+        [scriptblock]$OnAccept,
+        [scriptblock]$OnCancel
+    )
+    
+    $form = New-ProgramForm -Title $Title -Width 600 -Height 450 `
+        -AcceptButtonText $global:Localisation.AcceptButtonText `
+        -SkipButtonText $global:Localisation.SkipButtonText `
+        -CancelButtonText $global:Localisation.CancelButtonText
+
+    foreach ($control in $Controls.GetEnumerator()) {
+        $form.Controls.Add($control.Value)
+    }
+
+    $form.Add_Shown({ $form.Activate() })
+    $script:FormState.CurrentForm = $form
+    
+    $result = $form.ShowDialog()
+    
+    switch ($result) {
+        ([System.Windows.Forms.DialogResult]::OK) { 
+            & $OnAccept 
+        }
+        ([System.Windows.Forms.DialogResult]::Cancel) { 
+            Write-Log "Form cancelled by user" -Level INFO
+            & $OnCancel
+        }
+    }
+}
+
+# Validation functions
+function Test-RequiredFields {
+    param (
+        [hashtable]$Fields,
+        [string[]]$Required
+    )
+    
+    foreach ($field in $Required) {
+        if ([string]::IsNullOrWhiteSpace($Fields[$field])) {
+            Write-Log "Required field '$field' is empty" -Level ERROR
+            return $false
+        }
+    }
+    return $true
+}
+
+# Character state management
+$script:CharacterState = @{
+    BasicInfo = @{}
+    Stats = @{}
+    Equipment = @{}
+    Skills = @{}
+}
+
 # Function to display the basic information form
 function Show-BasicInfoForm {
-    Debug-Log "[Debug] Displaying Basic Info Form"
-
-    # Create a new form with localized text
-    $form = New-ProgramForm -Title $global:Localisation.FormTitle -Width 600 -Height 450 -AcceptButtonText $global:Localisation.AcceptButtonText -SkipButtonText $global:Localisation.SkipButtonText -CancelButtonText $global:Localisation.CancelButtonText
-
-    # Create controls for Character Name
-    $characterNameControls = Set-TextBox -LabelText $global:Localisation.CharacterNameLabel -X 10 -Y 20 -Width 200 -Height 20 -MaxLength 30
-
-    # Create the Age controls
-    $ageLabel = New-Object System.Windows.Forms.Label
-    $ageLabel.Location = New-Object System.Drawing.Point(10, 75)
-    $ageLabel.Size = New-Object System.Drawing.Size(110, 18)
-    $ageLabel.Text = $global:Localisation.AgeLabel
-    $ageLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
-    $form.Controls.Add($ageLabel)
-
-    $age = New-Object System.Windows.Forms.TextBox
-    $age.Location = New-Object System.Drawing.Point(10, 95)
-    $age.Size = New-Object System.Drawing.Size(58, 20)
-    $age.MaxLength = 5
-
-    $age.Add_TextChanged({
-        if ($age.Text -match '\D') {
-            $age.Text = $age.Text -replace '\D', ''
-            $age.SelectionStart = $age.Text.Length
+    Write-Log "Displaying Basic Info Form" -Level DEBUG
+    
+    $controls = @{
+        CharacterName = Set-TextBox -LabelText $global:Localisation.CharacterNameLabel -X 10 -Y 20 -Width 200 -Height 20 -MaxLength 30
+        Age = Set-TextBox -LabelText $global:Localisation.AgeLabel -X 10 -Y 75 -Width 58 -Height 20 -MaxLength 5
+        PlayerName = Set-TextBox -LabelText $global:Localisation.PlayerNameLabel -X 10 -Y 125 -Width 200 -Height 20 -MaxLength 30
+    }
+    
+    New-DndForm -Title $global:Localisation.FormTitle -Controls $controls -OnAccept {
+        $script:CharacterState.BasicInfo = @{
+            CharacterName = $controls.CharacterName[1].Text
+            Age = $controls.Age[1].Text
+            PlayerName = $controls.PlayerName[1].Text
         }
-    })
-
-    # Create controls for the Player Name
-    $playerNameControls = Set-TextBox -LabelText $global:Localisation.PlayerNameLabel -X 10 -Y 125 -Width 200 -Height 20 -MaxLength 30
-
-    # Create the Browse Image controls
-    $PlayerImageLabel = New-Object System.Windows.Forms.Label
-    $PlayerImageLabel.Location = New-Object System.Drawing.Point(300, 275)
-    $PlayerImageLabel.Size = New-Object System.Drawing.Size(180, 18)
-    $PlayerImageLabel.Text = $global:Localisation.SelectImageLabel
-    $PlayerImageLabel.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
-    $form.Controls.Add($PlayerImageLabel)
-
-    # Create the "Browse" button to select an image
-    $browseButton = New-Object System.Windows.Forms.Button
-    $browseButton.Location = New-Object System.Drawing.Point(300, 300)
-    $browseButton.Size = New-Object System.Drawing.Size(80, 30)
-    $browseButton.Text = $global:Localisation.BrowseButtonText
-
-    # PictureBox to display the selected image
-    $pictureBox = New-Object System.Windows.Forms.PictureBox
-    $pictureBox.Location = New-Object System.Drawing.Point(300, 20)
-    $pictureBox.Size = New-Object System.Drawing.Size(250, 250)
-    $pictureBox.BorderStyle = [System.Windows.Forms.BorderStyle]::Fixed3D
-    $pictureBox.SizeMode = [System.Windows.Forms.PictureBoxSizeMode]::StretchImage
-
-    # Global flag to track if the user selected an image
-    $global:ImageSelected = $false
-
-    # Event handler for the Browse button click
-    $browseButton.Add_Click({
-        $openFileDialog = New-Object System.Windows.Forms.OpenFileDialog
-        $openFileDialog.Title = $global:Localisation.SelectImageLabel
-        $openFileDialog.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp"
-
-        if ($openFileDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
-            $global:CharacterImage = $openFileDialog.FileName
-            $pictureBox.Image = [System.Drawing.Image]::FromFile($global:CharacterImage)
-            $global:ImageSelected = $true
-            Debug-Log "[Debug] Internal-Path = $global:ImageSelected"
+        
+        if (-not (Test-RequiredFields -Fields $script:CharacterState.BasicInfo -Required @('CharacterName', 'PlayerName'))) {
+            return
         }
-    })
-
-    # Add controls to the form
-    $form.Controls.AddRange($characterNameControls)
-    $form.Controls.Add($age)
-    $form.Controls.Add($PlayerImageLabel)
-    $form.Controls.AddRange($playerNameControls)
-    $form.Controls.Add($browseButton)
-    $form.Controls.Add($pictureBox)
-
-    # Display the form
-    $form.Topmost = $true
-    $form.Add_Shown({$form.Activate()})
-    $result = $form.ShowDialog()
-
-    # Capture the values from the form controls
-    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
-        $global:WrittenCharactername = $characterNameControls[1].Text
-        $global:WrittenAge = $age.Text
-        $global:WrittenPlayername = $playerNameControls[1].Text
-
-        Debug-Log "`n[Debug] Character Name Captured: $($global:WrittenCharactername)"
-        Debug-Log "[Debug] Age Captured: $($global:WrittenAge)"
-        Debug-Log "[Debug] Player Name Captured: $($global:WrittenPlayername)"
-        Debug-Log "[Debug] Internal check: $ImageSelected"
-        Debug-Log "[Debug] Character Image Selected: $($global:CharacterImage)"
-    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "[Debug] Form was canceled by the user."
+        
+        Write-Log "Basic info captured successfully" -Level INFO
+    } -OnCancel {
         exit
     }
 }
 
 # Function to display the race selection form
 function Show-RaceForm {
-    Debug-Log "[Debug] Displaying Race Form"
+    Write-Log "Displaying Race Form" -Level DEBUG
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 450 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     $backgroundControls = Set-ListBox -LabelText 'Select a Background:' -X 10 -Y 20 -Width 200 -Height 170 -DataSource $CharacterBackgroundJSON -DisplayMember 'name'
@@ -569,33 +583,33 @@ function Show-RaceForm {
         # Assign default image if no image was selected by the user
         if (-not $global:ImageSelected) {
             $global:CharacterImage = Join-Path $PSScriptRoot "Assets\Races\Images\$($global:SelectedRace.image)"
-            Debug-Log "No image selected, setting default race image: $($global:CharacterImage)"
+            Write-Log "No image selected, setting default race image: $($global:CharacterImage)" -Level DEBUG
         }
 
         # Debugging Character
-        Debug-Log "$global:ExportBackground"
-        Debug-Log "$global:SelectedRace"
-        Debug-Log "$global:ExportRace"
-        Debug-Log "$global:Feature1TTraits1"
-        Debug-Log "$global:HP"
-        Debug-Log "$global:Speed"
-        Debug-Log "$global:Size"
-        Debug-Log "$global:Height"
-        Debug-Log "$global:SpokenLanguages"
-        Debug-Log "$global:Special"
+        Write-Log "$global:ExportBackground" -Level DEBUG
+        Write-Log "$global:SelectedRace" -Level DEBUG
+        Write-Log "$global:ExportRace" -Level DEBUG
+        Write-Log "$global:Feature1TTraits1" -Level DEBUG
+        Write-Log "$global:HP" -Level DEBUG
+        Write-Log "$global:Speed" -Level DEBUG
+        Write-Log "$global:Size" -Level DEBUG
+        Write-Log "$global:Height" -Level DEBUG
+        Write-Log "$global:SpokenLanguages" -Level DEBUG
+        Write-Log "$global:Special" -Level DEBUG
         # Debugging: Output the ability scores
-        Debug-Log "`n[Debug] Ability Scores:"
-        Debug-Log "STRMod: $global:STRMod, DEXMod: $global:DEXMod, CONMod: $global:CONMod, INTMod: $global:INTMod, WISMod: $global:WISMod, CHAMod: $global:CHAMod"
-        Debug-Log "ST_STR: $global:ST_STR, ST_DEX: $global:ST_DEX, ST_CON: $global:ST_CON, ST_INT: $global:ST_INT, ST_WIS: $global:ST_WIS, ST_CHA: $global:ST_CHA"
+        Write-Log "`n[Debug] Ability Scores:" -Level DEBUG
+        Write-Log "STRMod: $global:STRMod, DEXMod: $global:DEXMod, CONMod: $global:CONMod, INTMod: $global:INTMod, WISMod: $global:WISMod, CHAMod: $global:CHAMod" -Level DEBUG
+        Write-Log "ST_STR: $global:ST_STR, ST_DEX: $global:ST_DEX, ST_CON: $global:ST_CON, ST_INT: $global:ST_INT, ST_WIS: $global:ST_WIS, ST_CHA: $global:ST_CHA" -Level DEBUG
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "[Debug] Form was canceled by the user."
+        Write-Log "Form was canceled by the user." -Level DEBUG
         exit
     }
 }
 
 # Function to display the subrace form
 function Show-SubRaceForm {
-    Debug-Log "[Debug] Displaying SubRace Form"
+    Write-Log "Displaying SubRace Form" -Level DEBUG
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     if ($global:SelectedRace.subraces -and $global:SelectedRace.subraces.Count -gt 0) {
@@ -610,20 +624,20 @@ function Show-SubRaceForm {
             $global:SelectedSubRace = $subRaceControls[1].SelectedItem
             $global:ExportSubrace = $global:SelectedSubRace.Name
 
-            Debug-Log "SelectedSubRace: $($global:SelectedSubRace)"
-            Debug-Log "ExportSubrace: $($global:ExportSubrace)"
+            Write-Log "SelectedSubRace: $($global:SelectedSubRace)" -Level DEBUG
+            Write-Log "ExportSubrace: $($global:ExportSubrace)" -Level DEBUG
         } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-            Debug-Log "[Debug] Form was canceled by the user."
+            Write-Log "Form was canceled by the user." -Level DEBUG
             exit
         }
     } else {
-        Debug-Log "[Debug] No subraces available for the selected race."
+        Write-Log "No subraces available for the selected race." -Level DEBUG
     }
 }
 
 # Function to display the character features form
 function Show-CharacterFeaturesForm {
-    Debug-Log "[Debug] Displaying Character Features Form"
+    Write-Log "Displaying Character Features Form" -Level DEBUG
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     $eyesControls = Set-ListBox -LabelText 'Select Eyes:' -X 10 -Y 20 -Width 110 -Height 170 -DataSource $EyesJSON -DisplayMember 'name'
@@ -643,18 +657,18 @@ function Show-CharacterFeaturesForm {
         $global:Hair = $hairControls[1].SelectedItem.Name
         $global:Skin = $skinControls[1].SelectedItem.Name
 
-        Debug-Log "Eyes: $($global:Eyes)"
-        Debug-Log "Hair: $($global:Hair)"
-        Debug-Log "Skin: $($global:Skin)"
+        Write-Log "Eyes: $($global:Eyes)" -Level DEBUG
+        Write-Log "Hair: $($global:Hair)" -Level DEBUG
+        Write-Log "Skin: $($global:Skin)" -Level DEBUG
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "[Debug] Form was canceled by the user."
+        Write-Log "Form was canceled by the user." -Level DEBUG
         exit
     }
 }
 
 # Function to display the class and alignment selection form
 function Show-ClassAndAlignmentForm {
-    Debug-Log "[Debug] Displaying Class and Alignment Form"
+    Write-Log "Displaying Class and Alignment Form" -Level DEBUG
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     $classControls = Set-ListBox -LabelText 'Select a Primary Class:' -X 10 -Y 20 -Width 160 -Height 200 -DataSource $ClassesJSON -DisplayMember 'name'
@@ -688,38 +702,38 @@ function Show-ClassAndAlignmentForm {
         # Convert CanCastCantrips to a boolean
         $global:CanCastCantrips = [bool]::Parse($global:SelectedClass.CanCastCantrips)
 
-        Debug-Log "SelectedClass: $($global:SelectedClass)"
-        Debug-Log "Class: $($global:Class)"
-        Debug-Log "Alignment: $($global:Alignment)"
-        Debug-Log "HD: $($global:HD)"
-        Debug-Log "SpellCastingClass: $($global:SpellCastingClass)"
-        Debug-Log "SpellCastingAbility: $($global:SpellCastingAbility)"
-        Debug-Log "SpellCastingSaveDC: $($global:SpellCastingSaveDC)"
-        Debug-Log "SelectedPack: $($global:SelectedPack)"
-        Debug-Log "CanCastCantrips: $($global:CanCastCantrips)"
-        Debug-Log "The Following Checks are enabled"
-        Debug-Log "Strength: $global:Check11"
-        Debug-Log "Dexterity: $global:Check18"
-        Debug-Log "Constitution: $global:Check19"
-        Debug-Log "Intelligence: $global:Check20"
-        Debug-Log "Wisdom: $global:Check21"
-        Debug-Log "Charisma: $global:Check22"
+        Write-Log "SelectedClass: $($global:SelectedClass)" -Level DEBUG
+        Write-Log "Class: $($global:Class)" -Level DEBUG
+        Write-Log "Alignment: $($global:Alignment)" -Level DEBUG
+        Write-Log "HD: $($global:HD)" -Level DEBUG
+        Write-Log "SpellCastingClass: $($global:SpellCastingClass)" -Level DEBUG
+        Write-Log "SpellCastingAbility: $($global:SpellCastingAbility)" -Level DEBUG
+        Write-Log "SpellCastingSaveDC: $($global:SpellCastingSaveDC)" -Level DEBUG
+        Write-Log "SelectedPack: $($global:SelectedPack)" -Level DEBUG
+        Write-Log "CanCastCantrips: $($global:CanCastCantrips)" -Level DEBUG
+        Write-Log "The Following Checks are enabled" -Level DEBUG
+        Write-Log "Strength: $global:Check11" -Level DEBUG
+        Write-Log "Dexterity: $global:Check18" -Level DEBUG
+        Write-Log "Constitution: $global:Check19" -Level DEBUG
+        Write-Log "Intelligence: $global:Check20" -Level DEBUG
+        Write-Log "Wisdom: $global:Check21" -Level DEBUG
+        Write-Log "Charisma: $global:Check22" -Level DEBUG
 
         # Conditionally display the Cantrip Form if the class can cast cantrips
         if ($global:CanCastCantrips) {
             Show-CantripForm
         } else {
-            Debug-Log "[Debug] Skipping Cantrip Selection as the class cannot cast cantrips."
+            Write-Log "Skipping Cantrip Selection as the class cannot cast cantrips." -Level DEBUG
         }
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "[Debug] [Debug] Form was canceled by the user."
+        Write-Log "[Debug] Form was canceled by the user." -Level DEBUG
         exit
     }
 }
 
 # Function to display the subclass selection form
 function Show-SubClassForm {
-    Debug-Log "[Debug] Displaying SubClass Form"
+    Write-Log "Displaying SubClass Form" -Level DEBUG
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     if ($global:SelectedClass.Subclasses -and $global:SelectedClass.Subclasses.Count -gt 0) {
@@ -734,21 +748,21 @@ function Show-SubClassForm {
             if ($subClassControls[1].SelectedItem) {
                 $global:SubClass = $subClassControls[1].SelectedItem
                 $global:ClassAndSubClass = "$($global:Class) - $($global:SubClass)"
-                Debug-Log "SubClass Selected: $($global:SubClass)"
-                Debug-Log "Final Selection: $($global:ClassAndSubClass)"
+                Write-Log "SubClass Selected: $($global:SubClass)" -Level DEBUG
+                Write-Log "Final Selection: $($global:ClassAndSubClass)" -Level DEBUG
             }
         } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-            Debug-Log "[Debug] Form was canceled by the user."
+            Write-Log "Form was canceled by the user." -Level DEBUG
             exit
         }
     } else {
-        Debug-Log "[Debug] No subclasses available for the selected class."
+        Write-Log "No subclasses available for the selected class." -Level DEBUG
     }
 }
 
 # Function to display the cantrip selection form
 function Show-CantripForm {
-    Debug-Log "[Debug] Displaying Cantrip Selection Form"
+    Write-Log "Displaying Cantrip Selection Form" -Level DEBUG
 
     # Filter cantrips based on the selected class
     $filteredCantrips = $CantripsJSON | Where-Object { $_.classes -contains $global:Class }
@@ -776,18 +790,18 @@ function Show-CantripForm {
         $global:Cantrip03 = $cantrip3Controls[1].SelectedItem.name
 
         # Debugging output
-        Debug-Log "Selected Cantrip 1: $($global:Cantrip01)"
-        Debug-Log "Selected Cantrip 2: $($global:Cantrip02)"
-        Debug-Log "Selected Cantrip 3: $($global:Cantrip03)"
+        Write-Log "Selected Cantrip 1: $($global:Cantrip01)" -Level DEBUG
+        Write-Log "Selected Cantrip 2: $($global:Cantrip02)" -Level DEBUG
+        Write-Log "Selected Cantrip 3: $($global:Cantrip03)" -Level DEBUG
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "[Debug] Form was canceled by the user."
+        Write-Log "Form was canceled by the user." -Level DEBUG
         exit
     }
 }
 
 # Function to display the weapon and armor selection form
 function Show-WeaponAndArmourForm {
-    Debug-Log "[Debug] Displaying Weapon and Armor Form"
+    Write-Log "Displaying Weapon and Armor Form" -Level DEBUG
     
     # Create the form
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 600 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
@@ -824,7 +838,7 @@ function Show-WeaponAndArmourForm {
     if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
         # Initialize weapons array and weapon descriptions
         $global:Weapons = @()
-        Debug-Log "Weapons Array: $Weapons"
+        Write-Log "Weapons Array: $Weapons" -Level DEBUG
         $global:WeaponDescription = ""
 
         # Handle individual weapon slots and build the weapon description
@@ -857,21 +871,21 @@ function Show-WeaponAndArmourForm {
             $global:ArmourWeight = $selectedArmor.Weight
             $global:GearWeight = $gearControls[1].SelectedItem.Weight
 
-            Debug-Log "Selected Armor: $($selectedArmor.Name)"
-            Debug-Log "Armor Type: $armorType"
-            Debug-Log "Base AC: $baseAC"
-            Debug-Log "Dexterity Modifier: $dexModifier"
-            Debug-Log "Calculated ArmourClass: $($global:ArmourClass)"
-            Debug-Log "Total Armour Weight: $global:ArmourWeight"
-            Debug-Log "Total Gear Weight: $global:GearWeight"
+            Write-Log "Selected Armor: $($selectedArmor.Name)" -Level DEBUG
+            Write-Log "Armor Type: $armorType" -Level DEBUG
+            Write-Log "Base AC: $baseAC" -Level DEBUG
+            Write-Log "Dexterity Modifier: $dexModifier" -Level DEBUG
+            Write-Log "Calculated ArmourClass: $($global:ArmourClass)" -Level DEBUG
+            Write-Log "Total Armour Weight: $global:ArmourWeight" -Level DEBUG
+            Write-Log "Total Gear Weight: $global:GearWeight" -Level DEBUG
         } else {
-            Debug-Log "No Armor Selected"
+            Write-Log "No Armor Selected" -Level DEBUG
         }
 
         # Debug the combined WeaponDescription
-        Debug-Log "Combined Weapon Description: $($global:WeaponDescription)"
+        Write-Log "Combined Weapon Description: $($global:WeaponDescription)" -Level DEBUG
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "[Debug] Form was canceled by the user."
+        Write-Log "Form was canceled by the user." -Level DEBUG
         exit
     }
 }
@@ -893,18 +907,18 @@ function WeaponSelection {
 
         # Build the weapon description string
         $description = "$($selectedWeapon.Name) - $($selectedWeapon.Description); "
-        Debug-Log "Weapon$slotNumber Selected: $($selectedWeapon.Name)"
+        Write-Log "Weapon$slotNumber Selected: $($selectedWeapon.Name)" -Level DEBUG
 
         return $description
     } else {
-        Debug-Log "No Weapon Selected for Weapon Slot $slotNumber"
+        Write-Log "No Weapon Selected for Weapon Slot $slotNumber" -Level DEBUG
         return ""
     }
 }
 
 # Function to display the choose skills form
 function Show-ChooseSkillsForm {
-    Debug-Log "[Debug] Displaying Choose Skills Form"
+    Write-Log "Displaying Choose Skills Form" -Level DEBUG
 
     # Ensure $global:CharacterParameters is initialized
     if (-not $global:CharacterParameters) {
@@ -959,27 +973,27 @@ function Show-ChooseSkillsForm {
         # Capture the selected skills
         if ($skill1Controls[1].SelectedItem) {
             $global:SelectedSkills += $skill1Controls[1].SelectedItem.Name
-            Debug-Log "[Debug] Selected Skill 1: $($skill1Controls[1].SelectedItem.Name)"
+            Write-Log "[Debug] Selected Skill 1: $($skill1Controls[1].SelectedItem.Name)" -Level DEBUG
         } else {
-            Debug-Log "[Debug] Skill 1 was not selected."
+            Write-Log "[Debug] Skill 1 was not selected." -Level DEBUG
         }
 
         if ($skill2Controls[1].SelectedItem) {
             $global:SelectedSkills += $skill2Controls[1].SelectedItem.Name
-            Debug-Log "[Debug] Selected Skill 2: $($skill2Controls[1].SelectedItem.Name)"
+            Write-Log "[Debug] Selected Skill 2: $($skill2Controls[1].SelectedItem.Name)" -Level DEBUG
         } else {
-            Debug-Log "[Debug] Skill 2 was not selected."
+            Write-Log "[Debug] Skill 2 was not selected." -Level DEBUG
         }
 
         if ($skill3Controls[1].SelectedItem) {
             $global:SelectedSkills += $skill3Controls[1].SelectedItem.Name
-            Debug-Log "[Debug] Selected Skill 3: $($skill3Controls[1].SelectedItem.Name)"
+            Write-Log "[Debug] Selected Skill 3: $($skill3Controls[1].SelectedItem.Name)" -Level DEBUG
         } else {
-            Debug-Log "[Debug] Skill 3 was not selected."
+            Write-Log "[Debug] Skill 3 was not selected." -Level DEBUG
         }
 
         # Debugging the captured skills
-        Debug-Log "Selected Skills: $($global:SelectedSkills -join ', ')"
+        Write-Log "Selected Skills: $($global:SelectedSkills -join ', ')" -Level DEBUG
 
         # Dynamically set the skill checkboxes based on the selected skills
         foreach ($skill in $global:SelectedSkills) {
@@ -987,7 +1001,7 @@ function Show-ChooseSkillsForm {
                 $checkboxField = $global:SkillToCheckboxMap[$skill]
                 if ($checkboxField) {
                     $global:CharacterParameters.Fields[$checkboxField] = "Yes"
-                    Debug-Log "[Debug] Set checkbox field '$checkboxField' to 'Yes' for skill '$skill'"
+                    Write-Log "[Debug] Set checkbox field '$checkboxField' to 'Yes' for skill '$skill'" -Level DEBUG
                 }
             }
         }
@@ -998,20 +1012,20 @@ function Show-ChooseSkillsForm {
                 $checkboxField = $global:SkillToCheckboxMap[$key]
                 if ($checkboxField) {
                     $global:CharacterParameters.Fields[$checkboxField] = "off"
-                    Debug-Log "[Debug] Set checkbox field '$checkboxField' to 'off' for skill '$key'"
+                    Write-Log "[Debug] Set checkbox field '$checkboxField' to 'off' for skill '$key'" -Level DEBUG
                 }
             }
         }
 
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "[Debug] Form was canceled by the user."
+        Write-Log "Form was canceled by the user." -Level DEBUG
         exit
     }
 }
 
 # Function to display the stats chooser form
 function Show-StatsChooserForm {
-    Debug-Log "[Debug] Displaying Stats Chooser Form"
+    Write-Log "Displaying Stats Chooser Form" -Level DEBUG
 
     $form = New-ProgramForm -Title 'Allocate Character Stats' -Width 400 -Height 350 -AcceptButtonText 'OK' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
     
@@ -1034,7 +1048,7 @@ function Show-StatsChooserForm {
     $yPosition = 40
 
     foreach ($stat in $global:BaseStats.Keys) {
-        Debug-Log "[Debug] Creating controls for stat: $stat at yPosition: $yPosition"
+        Write-Log "[Debug] Creating controls for stat: $stat at yPosition: $yPosition" -Level DEBUG
         Add-StatControls -form $form -stat $stat -yPosition $yPosition -remainingPointsLabel $remainingPointsLabel
         $yPosition += 30
     }
@@ -1047,9 +1061,9 @@ function Show-StatsChooserForm {
         foreach ($stat in $global:BaseStats.Keys) {
             Set-Variable -Name $stat -Value ($global:BaseStats[$stat] + $global:StatIncrements[$stat]) -Scope Global
         }
-        Debug-Log "[Debug] Stats allocated: STR=$($global:STR), DEX=$($global:DEX), CON=$($global:CON), INT=$($global:INT), WIS=$($global:WIS), CHA=$($global:CHA)"
+        Write-Log "[Debug] Stats allocated: STR=$($global:STR), DEX=$($global:DEX), CON=$($global:CON), INT=$($global:INT), WIS=$($global:WIS), CHA=$($global:CHA)" -Level DEBUG
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "[Debug] Form canceled by the user."
+        Write-Log "Form canceled by the user." -Level DEBUG
         exit
     }
 }
@@ -1078,7 +1092,7 @@ function Add-StatControls {
     $valueLabel.Tag = $stat  # Tag the value label with the stat name
     $form.Controls.Add($valueLabel)
 
-    Debug-Log "[Debug] Created valueLabel for stat: $stat at yPosition: $yPosition with initial value: $($valueLabel.Text)"
+    Write-Log "[Debug] Created valueLabel for stat: $stat at yPosition: $yPosition with initial value: $($valueLabel.Text)" -Level DEBUG
 
     # Create the "+" button and associate it with the correct stat
     $upButton = New-Object System.Windows.Forms.Button
@@ -1087,7 +1101,7 @@ function Add-StatControls {
     $upButton.Text = "+"
     $upButton.Tag = $valueLabel  # Correctly tag the button with the value label
     $upButton.Add_Click({
-        Debug-Log "[Debug] Up button clicked for stat: $stat"
+        Write-Log "[Debug] Up button clicked for stat: $stat" -Level DEBUG
         HandleButtonClick -stat $stat -direction 'up' -valueLabel $valueLabel -remainingPointsLabel $remainingPointsLabel
     })
     $form.Controls.Add($upButton)
@@ -1099,7 +1113,7 @@ function Add-StatControls {
     $downButton.Text = "-"
     $downButton.Tag = $valueLabel  # Correctly tag the button with the value label
     $downButton.Add_Click({
-        Debug-Log "[Debug] Down button clicked for stat: $stat"
+        Write-Log "[Debug] Down button clicked for stat: $stat" -Level DEBUG
         HandleButtonClick -stat $stat -direction 'down' -valueLabel $valueLabel -remainingPointsLabel $remainingPointsLabel
     })
     $form.Controls.Add($downButton)
@@ -1116,29 +1130,29 @@ function HandleButtonClick {
 
     # Validate that the stat and valueLabel are correct
     if (-not $stat) {
-        Debug-Log "[Error] The stat variable is empty or undefined."
+        Write-Log "[Error] The stat variable is empty or undefined." -Level ERROR
         return
     }
 
     if ($null -eq $valueLabel) {
-        Debug-Log "[Error] The valueLabel is null or not associated correctly for stat: $stat."
+        Write-Log "[Error] The valueLabel is null or not associated correctly for stat: $stat." -Level ERROR
         return
     }
 
     # Debug log for tracking button clicks and their intended effect
-    Debug-Log "[Debug] Button Click Detected: Stat = $stat, Direction = $direction, Current Stat Increment = $($global:StatIncrements[$stat]), Remaining Points = $($global:TotalPoints)"
+    Write-Log "[Debug] Button Click Detected: Stat = $stat, Direction = $direction, Current Stat Increment = $($global:StatIncrements[$stat]), Remaining Points = $($global:TotalPoints)" -Level DEBUG
 
     # Update stat based on the button direction
     if ($direction -eq 'up' -and $global:TotalPoints -gt 0) {
         $global:StatIncrements[$stat]++
         $global:TotalPoints--
-        Debug-Log "[Debug] Incremented $stat New Increment Value = $($global:StatIncrements[$stat]), Remaining Points = $($global:TotalPoints)"
+        Write-Log "[Debug] Incremented $stat New Increment Value = $($global:StatIncrements[$stat]), Remaining Points = $($global:TotalPoints)" -Level DEBUG
     } elseif ($direction -eq 'down' -and $global:StatIncrements[$stat] -gt 0) {
         $global:StatIncrements[$stat]--
         $global:TotalPoints++
-        Debug-Log "[Debug] Decremented $stat New Increment Value = $($global:StatIncrements[$stat]), Remaining Points = $($global:TotalPoints)"
+        Write-Log "[Debug] Decremented $stat New Increment Value = $($global:StatIncrements[$stat]), Remaining Points = $($global:TotalPoints)" -Level DEBUG
     } else {
-        Debug-Log "[Debug] No stat change applied: Direction = $direction, Stat = $stat, Current Stat Increment = $($global:StatIncrements[$stat])"
+        Write-Log "[Debug] No stat change applied: Direction = $direction, Stat = $stat, Current Stat Increment = $($global:StatIncrements[$stat])" -Level DEBUG
     }
 
     # Update and refresh labels to reflect changes
@@ -1182,7 +1196,7 @@ $global:StatIncrements = @{
 
 # Function to display the character backstory form
 function Show-BackstoryForm {
-    Debug-Log "[Debug] Displaying Backstory Form"
+    Write-Log "Displaying Backstory Form" -Level DEBUG
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 800 -Height 605 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     $backstoryControls = Set-TextBox -LabelText 'Write your backstory:' -X 10 -Y 20 -Width 400 -Height 500 -MaxLength 0
@@ -1222,20 +1236,20 @@ function Show-BackstoryForm {
         $global:Bonds = $bondsControls[1].Text
         $global:Flaws = $flawsControls[1].Text
 
-        Debug-Log "Characterbackstory: $($global:Characterbackstory)"
-        Debug-Log "PersonalityTraits: $($global:PersonalityTraits)"
-        Debug-Log "Ideals: $($global:Ideals)"
-        Debug-Log "Bonds: $($global:Bonds)"
-        Debug-Log "Flaws: $($global:Flaws)"
+        Write-Log "Characterbackstory: $($global:Characterbackstory)" -Level DEBUG
+        Write-Log "PersonalityTraits: $($global:PersonalityTraits)" -Level DEBUG
+        Write-Log "Ideals: $($global:Ideals)" -Level DEBUG
+        Write-Log "Bonds: $($global:Bonds)" -Level DEBUG
+        Write-Log "Flaws: $($global:Flaws)" -Level DEBUG
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "[Debug] Form was canceled by the user."
+        Write-Log "Form was canceled by the user." -Level DEBUG
         exit
     }
 }
 
 # Function to display the additional details form
 function Show-AdditionalDetailsForm {
-    Debug-Log "[Debug] Displaying Additional Details Form"
+    Write-Log "Displaying Additional Details Form" -Level DEBUG
     $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 790 -Height 620 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
 
     $alliesControls = Set-TextBox -LabelText 'Write about your Allies and Organisations:' -X 10 -Y 20 -Width 360 -Height 480 -MaxLength 0
@@ -1261,11 +1275,11 @@ function Show-AdditionalDetailsForm {
         $global:AddionalfeatTraits = $featTraitsControls[1].Text
         $global:factionname = $factionNameControls[1].Text
 
-        Debug-Log "Allies: $($global:Allies)"
-        Debug-Log "AddionalfeatTraits: $($global:AddionalfeatTraits)"
-        Debug-Log "FactionName: $($global:factionname)"
+        Write-Log "Allies: $($global:Allies)" -Level DEBUG
+        Write-Log "AddionalfeatTraits: $($global:AddionalfeatTraits)" -Level DEBUG
+        Write-Log "FactionName: $($global:factionname)" -Level DEBUG
     } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Debug-Log "[Debug] Form was canceled by the user."
+        Write-Log "Form was canceled by the user." -Level DEBUG
         exit
     }
 }
@@ -1283,9 +1297,9 @@ Show-StatsChooserForm
 Show-BackstoryForm
 Show-AdditionalDetailsForm
 
-Debug-Log "[Debug] Calculating stats"
+Write-Log "Calculating stats" -Level DEBUG
 CharacterStats
-Debug-Log "[Debug] All forms have been displayed, proceeding with Save"
+Write-Log "All forms have been displayed, proceeding with Save" -Level DEBUG
 
 # Addvanced Debug purposes only for the PDF File inspect, not for normal debug
 #$fieldNames = Get-PdfFieldNames -FilePath "$PSScriptRoot\Assets\Empty_PDF\DnD_5E_CharacterSheet - Form Fillable.pdf"
@@ -1654,8 +1668,19 @@ $characterparameters = @{
 $characterparameters.Fields = [hashtable]$characterparameters.Fields
 $characterparameters.ImageFields = [hashtable]$characterparameters.ImageFields
 
-# Execute the PDF save function
-Save-PdfField @characterparameters
+# Add error handling for PDF generation
+try {
+    Save-PdfField @characterparameters
+    Write-Log "PDF generated successfully" -Level INFO
+} catch {
+    Write-Log "Failed to generate PDF: $($_.Exception.Message)" -Level ERROR
+    [System.Windows.MessageBox]::Show(
+        "Failed to create character sheet. Please check the logs.",
+        "Error",
+        [System.Windows.MessageBoxButton]::OK,
+        [System.Windows.MessageBoxImage]::Error
+    )
+}
 
 # End of character Creation Dialog box
 $ButtonType = [System.Windows.MessageBoxButton]::Ok
@@ -1663,5 +1688,5 @@ $MessageIcon = [System.Windows.MessageBoxImage]::Information
 $MessageBody = "Dungeons And Dragons Character Successfully Created!"
 $MessageTitle = "Spark's D&D Character Creator"
 [System.Windows.MessageBox]::Show($MessageBody, $MessageTitle, $ButtonType, $MessageIcon)
-Debug-Log "[Debug] Character successfully created message displayed."
+Write-Log "Character successfully created message displayed." -Level DEBUG
 Exit

@@ -476,8 +476,15 @@ function New-DndForm {
         -SkipButtonText $global:Localisation.SkipButtonText `
         -CancelButtonText $global:Localisation.CancelButtonText
 
+    # Modified to handle array of controls properly
     foreach ($control in $Controls.GetEnumerator()) {
-        $form.Controls.Add($control.Value)
+        if ($control.Value -is [Array]) {
+            foreach ($ctrl in $control.Value) {
+                $form.Controls.Add($ctrl)
+            }
+        } else {
+            $form.Controls.Add($control.Value)
+        }
     }
 
     $form.Add_Shown({ $form.Activate() })
@@ -526,9 +533,17 @@ function Show-BasicInfoForm {
     
     $controls = @{
         CharacterName = Set-TextBox -LabelText $global:Localisation.CharacterNameLabel -X 10 -Y 20 -Width 200 -Height 20 -MaxLength 30
-        Age = Set-TextBox -LabelText $global:Localisation.AgeLabel -X 10 -Y 75 -Width 58 -Height 20 -MaxLength 5
+        Age = Set-TextBox -LabelText "Age:" -X 10 -Y 75 -Width 58 -Height 20 -MaxLength 3
         PlayerName = Set-TextBox -LabelText $global:Localisation.PlayerNameLabel -X 10 -Y 125 -Width 200 -Height 20 -MaxLength 30
     }
+
+    # Add KeyPress event handler to Age textbox to only allow numbers
+    $controls.Age[1].Add_KeyPress({
+        param($sender, $e)
+        if (-not [char]::IsDigit($e.KeyChar) -and $e.KeyChar -ne [char]8) {
+            $e.Handled = $true
+        }
+    })
     
     New-DndForm -Title $global:Localisation.FormTitle -Controls $controls -OnAccept {
         $script:CharacterState.BasicInfo = @{
@@ -537,11 +552,31 @@ function Show-BasicInfoForm {
             PlayerName = $controls.PlayerName[1].Text
         }
         
+        # Additional validation for age
+        if (-not [string]::IsNullOrEmpty($controls.Age[1].Text)) {
+            try {
+                $age = [int]$controls.Age[1].Text
+                if ($age -lt 1 -or $age -gt 999) {
+                    [System.Windows.Forms.MessageBox]::Show("Age must be between 1 and 999.", "Invalid Age", 
+                        [System.Windows.Forms.MessageBoxButtons]::OK, 
+                        [System.Windows.Forms.MessageBoxIcon]::Warning)
+                    return
+                }
+            } catch {
+                [System.Windows.Forms.MessageBox]::Show("Age must be a valid number.", "Invalid Age", 
+                    [System.Windows.Forms.MessageBoxButtons]::OK, 
+                    [System.Windows.Forms.MessageBoxIcon]::Warning)
+                return
+            }
+        }
+        
         if (-not (Test-RequiredFields -Fields $script:CharacterState.BasicInfo -Required @('CharacterName', 'PlayerName'))) {
             return
         }
         
         Write-Log "Basic info captured successfully" -Level INFO
+        $global:WrittenAge = $controls.Age[1].Text
+        Write-Log "Age set to: $global:WrittenAge" -Level DEBUG
     } -OnCancel {
         exit
     }
@@ -1659,14 +1694,23 @@ $characterparameters = @{
     InputPdfFilePath = "$PSScriptRoot\Assets\Empty_PDF\DnD_5E_CharacterSheet - Form Fillable.pdf"
     ITextSharpLibrary = "$PSScriptRoot\Assets\iText\itextsharp.dll"
     OutputPdfFilePath = $PathSelected
-    ImageFields = @{
-        'CHARACTER IMAGE' = $CharacterImage
-    }
 }
 
-# Validate that the Fields and ImageField are correctly cast to Hashtable
+# Only add ImageFields if the character image exists and is valid
+if ($CharacterImage -and (Test-Path $CharacterImage)) {
+    $characterparameters.ImageFields = @{
+        'CHARACTER IMAGE' = $CharacterImage
+    }
+    Write-Log "Character image found and will be included: $CharacterImage" -Level DEBUG
+} else {
+    Write-Log "No character image found or invalid path, proceeding without image" -Level DEBUG
+}
+
+# Validate that the Fields are correctly cast to Hashtable
 $characterparameters.Fields = [hashtable]$characterparameters.Fields
-$characterparameters.ImageFields = [hashtable]$characterparameters.ImageFields
+if ($characterparameters.ContainsKey('ImageFields')) {
+    $characterparameters.ImageFields = [hashtable]$characterparameters.ImageFields
+}
 
 # Add error handling for PDF generation
 try {

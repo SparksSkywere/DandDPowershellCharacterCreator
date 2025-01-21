@@ -8,5 +8,8 @@
     "AgeLabel": "角色年龄:",
     "SelectImageLabel": "选择角色图片",
     "BrowseButtonText": "浏览",
-    "SuccessMessage": "龙与地下城角色创建成功!"
+    "SuccessMessage": "龙与地下城角色创建成功!",
+    "BackButtonText": "返回",
+    "FinishButtonText": "完成",
+    "ErrorMessage": "创建角色时发生错误。"
 }

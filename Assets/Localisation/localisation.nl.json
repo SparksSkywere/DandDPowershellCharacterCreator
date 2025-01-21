@@ -8,5 +8,8 @@
     "AgeLabel": "Leeftijd Personage:",
     "SelectImageLabel": "Kies Foto Personage",
     "BrowseButtonText": "Bladeren",
-    "SuccessMessage": "Dungeons And Dragons Personage Succesvol Gecreëerd!"
+    "SuccessMessage": "Dungeons And Dragons Personage Succesvol Gecreëerd!",
+    "BackButtonText": "Terug",
+    "FinishButtonText": "Voltooien",
+    "ErrorMessage": "Er is een fout opgetreden bij het maken van het personage."
 }

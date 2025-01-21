@@ -8,5 +8,8 @@
     "AgeLabel": "Wiek Postaci:",
     "SelectImageLabel": "Wybież Obraz dla Postaci",
     "BrowseButtonText": "Przeglądaj",
-    "SuccessMessage": "Postać Dungeons and Dragons została stworzona!"
+    "SuccessMessage": "Postać Dungeons and Dragons została stworzona!",
+    "BackButtonText": "Wstecz",
+    "FinishButtonText": "Zakończ",
+    "ErrorMessage": "Wystąpił błąd podczas tworzenia postaci."
 }

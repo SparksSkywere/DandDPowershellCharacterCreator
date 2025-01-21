@@ -8,5 +8,8 @@
     "AgeLabel": "Alter des Charakters:",
     "SelectImageLabel": "Charakterbild auswählen",
     "BrowseButtonText": "Durchsuchen",
-    "SuccessMessage": "Dungeons And Dragons Charakter Erfolgreich Erstellt!"
+    "SuccessMessage": "Dungeons And Dragons Charakter Erfolgreich Erstellt!",
+    "BackButtonText": "Zurück",
+    "FinishButtonText": "Fertigstellen",
+    "ErrorMessage": "Beim Erstellen des Charakters ist ein Fehler aufgetreten."
 }

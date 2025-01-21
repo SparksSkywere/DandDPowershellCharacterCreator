@@ -8,5 +8,8 @@
     "AgeLabel": "Возраст Персонажа:",
     "SelectImageLabel": "Выбрать Изображение Персонажа",
     "BrowseButtonText": "Обзор",
-    "SuccessMessage": "Персонаж Dungeons And Dragons Успешно Создан!"
+    "SuccessMessage": "Персонаж Dungeons And Dragons Успешно Создан!",
+    "BackButtonText": "Назад",
+    "FinishButtonText": "Завершить",
+    "ErrorMessage": "Произошла ошибка при создании персонажа."
 }

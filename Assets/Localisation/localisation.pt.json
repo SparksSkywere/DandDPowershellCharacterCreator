@@ -8,5 +8,8 @@
     "AgeLabel": "Idade do Personagem:",
     "SelectImageLabel": "Selecionar Imagem do Personagem",
     "BrowseButtonText": "Procurar",
-    "SuccessMessage": "Personagem de Dungeons And Dragons Criado com Sucesso!"
+    "SuccessMessage": "Personagem de Dungeons And Dragons Criado com Sucesso!",
+    "BackButtonText": "Voltar",
+    "FinishButtonText": "Concluir",
+    "ErrorMessage": "Ocorreu um erro ao criar o personagem."
 }

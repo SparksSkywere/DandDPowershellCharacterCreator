@@ -8,5 +8,8 @@
     "AgeLabel": "عمر الشخصية:",
     "SelectImageLabel": "اختر صورة الشخصية",
     "BrowseButtonText": "تصفح",
-    "SuccessMessage": "تم إنشاء شخصية Dungeons And Dragons بنجاح!"
+    "SuccessMessage": "تم إنشاء شخصية Dungeons And Dragons بنجاح!",
+    "BackButtonText": "رجوع",
+    "FinishButtonText": "إنهاء",
+    "ErrorMessage": "حدث خطأ أثناء إنشاء الشخصية."
 }

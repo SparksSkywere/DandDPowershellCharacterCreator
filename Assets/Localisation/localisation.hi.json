@@ -8,5 +8,8 @@
     "AgeLabel": "कैरेक्टर की उम्र:",
     "SelectImageLabel": "कैरेक्टर की छवि चुनें",
     "BrowseButtonText": "ब्राउज़ करें",
-    "SuccessMessage": "Dungeons And Dragons कैरेक्टर सफलतापूर्वक बनाया गया!"
+    "SuccessMessage": "Dungeons And Dragons कैरेक्टर सफलतापूर्वक बनाया गया!",
+    "BackButtonText": "वापस",
+    "FinishButtonText": "समाप्त",
+    "ErrorMessage": "कैरेक्टर बनाने में त्रुटि हुई।"
 }

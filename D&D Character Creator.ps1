@@ -88,41 +88,64 @@ Set-Localisation
 function New-ProgramForm {
     param (
         [string]$Title,
-        [int]$Width,
-        [int]$Height,
-        [string]$AcceptButtonText,
-        [string]$SkipButtonText,
-        [string]$CancelButtonText
+        [int]$Width = 600,
+        [int]$Height = 450,
+        [string]$AcceptButtonText = "OK",
+        [string]$SkipButtonText = "Skip",
+        [string]$CancelButtonText = "Cancel"
     )
 
     $form = New-Object System.Windows.Forms.Form
     $form.Text = $Title
     $form.Size = New-Object System.Drawing.Size($Width, $Height)
     $form.StartPosition = 'CenterScreen'
-    $form.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon("$PSScriptRoot\Assets\installer.ico")
-    $form.BackgroundImage = [System.Drawing.Image]::FromFile("$PSScriptRoot\Assets\form_background.png")
-    $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
+    
+    # Try to load the icon and background image, but don't fail if they don't exist
+    try {
+        $form.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon("$PSScriptRoot\Assets\installer.ico")
+    } catch {
+        Write-Log "Could not load form icon: $_" -Level WARN
+    }
+    
+    try {
+        $form.BackgroundImage = [System.Drawing.Image]::FromFile("$PSScriptRoot\Assets\form_background.png")
+        $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
+    } catch {
+        Write-Log "Could not load form background: $_" -Level WARN
+    }
 
+    # Create button panel
     $buttonPanel = New-Object System.Windows.Forms.Panel
     $buttonPanel.Dock = [System.Windows.Forms.DockStyle]::Bottom
     $buttonPanel.Height = 50
     $form.Controls.Add($buttonPanel)
 
+    # Create buttons with localized text
     $buttons = @(
-        @{Text = $AcceptButtonText; DialogResult = [System.Windows.Forms.DialogResult]::OK},
-        @{Text = $SkipButtonText; DialogResult = [System.Windows.Forms.DialogResult]::Ignore},
-        @{Text = $CancelButtonText; DialogResult = [System.Windows.Forms.DialogResult]::Cancel}
+        @{
+            Text = $AcceptButtonText
+            DialogResult = [System.Windows.Forms.DialogResult]::OK
+            Location = New-Object System.Drawing.Point(10, 10)
+        },
+        @{
+            Text = $SkipButtonText
+            DialogResult = [System.Windows.Forms.DialogResult]::Ignore
+            Location = New-Object System.Drawing.Point(95, 10)
+        },
+        @{
+            Text = $CancelButtonText
+            DialogResult = [System.Windows.Forms.DialogResult]::Cancel
+            Location = New-Object System.Drawing.Point(180, 10)
+        }
     )
 
-    $i = 0
-    foreach ($button in $buttons) {
-        $btn = New-Object System.Windows.Forms.Button
-        $btn.Location = New-Object System.Drawing.Point([int]($i * 85), 10)
-        $btn.Size = New-Object System.Drawing.Size(75, 30)
-        $btn.Text = $button.Text
-        $btn.DialogResult = $button.DialogResult
-        $buttonPanel.Controls.Add($btn)
-        $i++
+    foreach ($buttonInfo in $buttons) {
+        $button = New-Object System.Windows.Forms.Button
+        $button.Location = $buttonInfo.Location
+        $button.Size = New-Object System.Drawing.Size(75, 30)
+        $button.Text = $buttonInfo.Text
+        $button.DialogResult = $buttonInfo.DialogResult
+        $buttonPanel.Controls.Add($button)
     }
 
     return $form
@@ -539,7 +562,7 @@ function Show-BasicInfoForm {
 
     # Add KeyPress event handler to Age textbox to only allow numbers
     $controls.Age[1].Add_KeyPress({
-        param($sender, $e)
+        param($s, $e)
         if (-not [char]::IsDigit($e.KeyChar) -and $e.KeyChar -ne [char]8) {
             $e.Handled = $true
         }
@@ -989,8 +1012,8 @@ function Show-ChooseSkillsForm {
 
     # Create list box controls for selecting up to 3 skills
     $skill1Controls = Set-ListBox -LabelText 'Select Skill 1:' -X 10 -Y 20 -Width 360 -Height 150 -DataSource $global:SelectedClass.Skills
-    $skill2Controls = Set-ListBox -LabelText 'Select Skill 2:' -X 10 -Y 190 -Width 360 -Height 150 -DataSource $global:SelectedClass.Skills
-    $skill3Controls = Set-ListBox -LabelText 'Select Skill 3:' -X 10 -Y 360 -Width 360 -Height 150 -DataSource $global:SelectedClass.Skills
+    $skill2Controls = Set-ListBox -LabelText 'Select Skill 2:' -X 10 -Y 200 -Width 360 -Height 150 -DataSource $global:SelectedClass.Skills
+    $skill3Controls = Set-ListBox -LabelText 'Select Skill 3:' -X 10 -Y 380 -Width 360 -Height 150 -DataSource $global:SelectedClass.Skills
 
     # Add controls to the form
     $form.Controls.AddRange($skill1Controls)
@@ -1352,6 +1375,140 @@ if ($SaveResult -eq [System.Windows.Forms.DialogResult]::OK) {
 } elseif ($SaveResult -eq [System.Windows.Forms.DialogResult]::Cancel) {
     exit
 }
+
+# Ensure default values are set to avoid null array errors
+if (-not $global:Weapons) {
+    $global:Weapons = @(
+        @{ Name = ""; Damage = ""; ATK_Bonus = ""; Weight = 0; Properties = "" },
+        @{ Name = ""; Damage = ""; ATK_Bonus = ""; Weight = 0; Properties = "" },
+        @{ Name = ""; Damage = ""; ATK_Bonus = ""; Weight = 0; Properties = "" }
+    )
+}
+
+# Ensure default values for other global variables
+$global:Class = $global:Class -or ""
+$global:WrittenPlayername = $global:WrittenPlayername -or ""
+$global:WrittenCharactername = $global:WrittenCharactername -or ""
+$global:ExportBackground = $global:ExportBackground -or ""
+$global:ExportRace = $global:ExportRace -or ""
+$global:Alignment = $global:Alignment -or ""
+$global:XP = $global:XP -or 0
+$global:Inspiration = $global:Inspiration -or 0
+$global:STR = $global:STR -or 0
+$global:ProficencyBonus = $global:ProficencyBonus -or 0
+$global:ArmourClass = $global:ArmourClass -or 0
+$global:InitiativeTotal = $global:InitiativeTotal -or 0
+$global:Speed = $global:Speed -or 0
+$global:PersonalityTraits = $global:PersonalityTraits -or ""
+$global:STRmod = $global:STRmod -or 0
+$global:ST_STR = $global:ST_STR -or 0
+$global:DEX = $global:DEX -or 0
+$global:Ideals = $global:Ideals -or ""
+$global:DEXmod = $global:DEXmod -or 0
+$global:Bonds = $global:Bonds -or ""
+$global:CON = $global:CON -or 0
+$global:HitDiceTotal = $global:HitDiceTotal -or 0
+$global:Check12 = $global:Check12 -or ""
+$global:Check13 = $global:Check13 -or ""
+$global:Check14 = $global:Check14 -or ""
+$global:CONmod = $global:CONmod -or 0
+$global:Check15 = $global:Check15 -or ""
+$global:Check16 = $global:Check16 -or ""
+$global:Check17 = $global:Check17 -or ""
+$global:HD = $global:HD -or 0
+$global:Flaws = $global:Flaws -or ""
+$global:INT = $global:INT -or 0
+$global:ST_DEX = $global:ST_DEX -or 0
+$global:ST_CON = $global:ST_CON -or 0
+$global:ST_INT = $global:ST_INT -or 0
+$global:ST_WIS = $global:ST_WIS -or 0
+$global:ST_CHA = $global:ST_CHA -or 0
+$global:Acrobatics = $global:Acrobatics -or 0
+$global:AnimalHandling = $global:AnimalHandling -or 0
+$global:Athletics = $global:Athletics -or 0
+$global:Deception = $global:Deception -or 0
+$global:History = $global:History -or 0
+$global:Insight = $global:Insight -or 0
+$global:Intimidation = $global:Intimidation -or 0
+$global:Investigation = $global:Investigation -or 0
+$global:Medicine = $global:Medicine -or 0
+$global:Nature = $global:Nature -or 0
+$global:Perception = $global:Perception -or 0
+$global:Performance = $global:Performance -or 0
+$global:Persuation = $global:Persuation -or 0
+$global:Religion = $global:Religion -or 0
+$global:SleightOfHand = $global:SleightOfHand -or 0
+$global:Stealth = $global:Stealth -or 0
+$global:Survival = $global:Survival -or 0
+$global:Passive = $global:Passive -or 0
+$global:Check11 = $global:Check11 -or ""
+$global:Check18 = $global:Check18 -or ""
+$global:Check19 = $global:Check19 -or ""
+$global:Check20 = $global:Check20 -or ""
+$global:Check21 = $global:Check21 -or ""
+$global:Check22 = $global:Check22 -or ""
+$global:INTmod = $global:INTmod -or 0
+$global:WIS = $global:WIS -or 0
+$global:Arcana = $global:Arcana -or 0
+$global:WISmod = $global:WISmod -or 0
+$global:CHA = $global:CHA -or 0
+$global:Nature = $global:Nature -or 0
+$global:Performance = $global:Performance -or 0
+$global:Medicine = $global:Medicine -or 0
+$global:Religion = $global:Religion -or 0
+$global:Stealth = $global:Stealth -or 0
+$global:Check23 = $global:Check23 -or ""
+$global:Check24 = $global:Check24 -or ""
+$global:Check25 = $global:Check25 -or ""
+$global:Check26 = $global:Check26 -or ""
+$global:Check27 = $global:Check27 -or ""
+$global:Check28 = $global:Check28 -or ""
+$global:Check29 = $global:Check29 -or ""
+$global:Check30 = $global:Check30 -or ""
+$global:Check31 = $global:Check31 -or ""
+$global:Check32 = $global:Check32 -or ""
+$global:Check33 = $global:Check33 -or ""
+$global:Check34 = $global:Check34 -or ""
+$global:Check35 = $global:Check35 -or ""
+$global:Check36 = $global:Check36 -or ""
+$global:Check37 = $global:Check37 -or ""
+$global:Check38 = $global:Check38 -or ""
+$global:Check39 = $global:Check39 -or ""
+$global:Check40 = $global:Check40 -or ""
+$global:Persuation = $global:Persuation -or 0
+$global:HPMax = $global:HPMax -or 0
+$global:HP = $global:HP -or 0
+$global:SleightOfHand = $global:SleightOfHand -or 0
+$global:CHAmod = $global:CHAmod -or 0
+$global:Survival = $global:Survival -or 0
+$global:WeaponDescription = $global:WeaponDescription -or ""
+$global:CopperCP = $global:CopperCP -or 0
+$global:SpokenLanguages = $global:SpokenLanguages -or ""
+$global:SilverSP = $global:SilverSP -or 0
+$global:ElectrumEP = $global:ElectrumEP -or 0
+$global:GoldGP = $global:GoldGP -or 0
+$global:PlatinumPP = $global:PlatinumPP -or 0
+$global:TotalEquiptment = $global:TotalEquiptment -or ""
+$global:Feature1TTraits1 = $global:Feature1TTraits1 -or ""
+$global:WrittenCharactername = $global:WrittenCharactername -or ""
+$global:WrittenAge = $global:WrittenAge -or ""
+$global:Height = $global:Height -or ""
+$global:Size = $global:Size -or ""
+$global:Eyes = $global:Eyes -or ""
+$global:Skin = $global:Skin -or ""
+$global:Hair = $global:Hair -or ""
+$global:FactionSymbol = $global:FactionSymbol -or ""
+$global:Allies = $global:Allies -or ""
+$global:factionname = $global:factionname -or ""
+$global:Characterbackstory = $global:Characterbackstory -or ""
+$global:AddionalfeatTraits = $global:AddionalfeatTraits -or ""
+$global:SpellCastingClass = $global:SpellCastingClass -or ""
+$global:SpellCastingAbility = $global:SpellCastingAbility -or ""
+$global:SpellCastingSaveDC = $global:SpellCastingSaveDC -or 0
+$global:SpellCastingAttackBonus = $global:SpellCastingAttackBonus -or 0
+$global:Cantrip01 = $global:Cantrip01 -or ""
+$global:Cantrip02 = $global:Cantrip02 -or ""
+$global:Cantrip03 = $global:Cantrip03 -or ""
 
 # PDF Values Import before save
 $characterparameters = @{

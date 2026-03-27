@@ -45,8 +45,28 @@ function Debug-Log {
     }
 }
 
+# Invoke-AppExit: Hard-stop the app from any UI path (Exit button / ESC key).
+function Invoke-AppExit {
+    param(
+        [int]$Code = 0,
+        [string]$Reason = "User requested exit"
+    )
+
+    Write-Log "Exiting application: $Reason" -Level INFO
+
+    # Close WinForms loops first, then terminate the host process.
+    try { [System.Windows.Forms.Application]::ExitThread() } catch {}
+    try { [System.Windows.Forms.Application]::Exit() } catch {}
+
+    try {
+        [System.Environment]::Exit($Code)
+    } catch {
+        Stop-Process -Id $PID -Force
+    }
+}
+
 # Change the line below to show debugging information
-Show-Console -Show
+Show-Console -Hide
 Write-Log "Console shown [Debugging Enabled]" -Level DEBUG
 
 # Detect system language and load corresponding localisation file
@@ -84,69 +104,445 @@ function Set-DefaultLocalisation {
 # Load the localisation based on system language
 Set-Localisation
 
-# Function to create a form with specific buttons and styles
+# Type loader, forms
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName PresentationCore,PresentationFramework
+
+# Imports Modules + Add Types
+Import-Module -Name "$PSScriptRoot\Assets\iText\PDFForm" | Out-Null
+Add-Type -Path "$PSScriptRoot\Assets\iText\itextsharp.dll"
+
+# Shared UI style values for consistent readability across all dialogs.
+$script:UIStyle = @{
+    FormFont = New-Object System.Drawing.Font("Segoe UI", 10)
+    LabelFont = New-Object System.Drawing.Font("Segoe UI", 10, [System.Drawing.FontStyle]::Bold)
+    InputFont = New-Object System.Drawing.Font("Segoe UI", 10)
+    ButtonFont = New-Object System.Drawing.Font("Segoe UI", 9, [System.Drawing.FontStyle]::Bold)
+    FormBackColor = [System.Drawing.Color]::FromArgb(246, 240, 240)
+    SurfaceColor = [System.Drawing.Color]::FromArgb(253, 249, 249)
+    AccentColor = [System.Drawing.Color]::FromArgb(166, 24, 32)
+    InputBackColor = [System.Drawing.Color]::FromArgb(255, 252, 252)
+    AccentTextColor = [System.Drawing.Color]::FromArgb(108, 16, 22)
+    PrimaryButtonForeColor = [System.Drawing.Color]::White
+    SecondaryButtonBackColor = [System.Drawing.Color]::FromArgb(248, 240, 240)
+    SecondaryButtonBorderColor = [System.Drawing.Color]::FromArgb(205, 176, 178)
+    ExitButtonBackColor = [System.Drawing.Color]::FromArgb(250, 230, 231)
+    ExitButtonBorderColor = [System.Drawing.Color]::FromArgb(196, 92, 98)
+    DisabledButtonBackColor = [System.Drawing.Color]::FromArgb(236, 228, 228)
+    DisabledButtonForeColor = [System.Drawing.Color]::FromArgb(151, 141, 141)
+    ButtonWidth = 96
+    ButtonHeight = 34
+    ButtonSpacing = 12
+    ButtonPanelHeight = 64
+    LabelHeight = 24
+    VerticalGap = 32
+    FormPadding = 24
+    ColumnGap = 28
+    SectionGap = 26
+}
+
+# Set-ProgramButtonStyle: Applies a consistent visual hierarchy to wizard actions.
+function Set-ProgramButtonStyle {
+    param (
+        [System.Windows.Forms.Button]$Button,
+        [string]$Action,
+        [switch]$Disabled
+    )
+
+    $Button.FlatStyle = [System.Windows.Forms.FlatStyle]::Flat
+    $Button.UseVisualStyleBackColor = $false
+    $Button.FlatAppearance.BorderSize = 1
+    $Button.FlatAppearance.MouseDownBackColor = $script:UIStyle.SecondaryButtonBackColor
+    $Button.FlatAppearance.MouseOverBackColor = $script:UIStyle.SurfaceColor
+    $Button.ForeColor = $script:UIStyle.AccentTextColor
+    $Button.BackColor = $script:UIStyle.SecondaryButtonBackColor
+    $Button.FlatAppearance.BorderColor = $script:UIStyle.SecondaryButtonBorderColor
+    $Button.Cursor = [System.Windows.Forms.Cursors]::Hand
+
+    switch ($Action) {
+        'accept' {
+            $Button.BackColor = $script:UIStyle.AccentColor
+            $Button.ForeColor = $script:UIStyle.PrimaryButtonForeColor
+            $Button.FlatAppearance.BorderColor = $script:UIStyle.AccentColor
+            $Button.FlatAppearance.MouseOverBackColor = [System.Drawing.Color]::FromArgb(188, 36, 45)
+            $Button.FlatAppearance.MouseDownBackColor = [System.Drawing.Color]::FromArgb(138, 18, 26)
+        }
+        'exit' {
+            $Button.BackColor = $script:UIStyle.ExitButtonBackColor
+            $Button.ForeColor = $script:UIStyle.AccentTextColor
+            $Button.FlatAppearance.BorderColor = $script:UIStyle.ExitButtonBorderColor
+            $Button.FlatAppearance.MouseOverBackColor = [System.Drawing.Color]::FromArgb(245, 216, 218)
+            $Button.FlatAppearance.MouseDownBackColor = [System.Drawing.Color]::FromArgb(236, 201, 204)
+        }
+        default {
+            $Button.FlatAppearance.MouseOverBackColor = [System.Drawing.Color]::FromArgb(251, 244, 244)
+            $Button.FlatAppearance.MouseDownBackColor = [System.Drawing.Color]::FromArgb(240, 229, 229)
+        }
+    }
+
+    if ($Disabled) {
+        $Button.BackColor = $script:UIStyle.DisabledButtonBackColor
+        $Button.ForeColor = $script:UIStyle.DisabledButtonForeColor
+        $Button.FlatAppearance.BorderColor = $script:UIStyle.SecondaryButtonBorderColor
+        $Button.FlatAppearance.MouseOverBackColor = $script:UIStyle.DisabledButtonBackColor
+        $Button.FlatAppearance.MouseDownBackColor = $script:UIStyle.DisabledButtonBackColor
+        $Button.Cursor = [System.Windows.Forms.Cursors]::Default
+    }
+}
+
+# Get-ScaledFormBounds: Fits a requested form size within the active monitor working area.
+function Get-ScaledFormBounds {
+    param (
+        [int]$RequestedWidth,
+        [int]$RequestedHeight
+    )
+
+    $screen = [System.Windows.Forms.Screen]::FromPoint([System.Windows.Forms.Cursor]::Position)
+    $workingArea = $screen.WorkingArea
+    $horizontalPadding = 40
+    $verticalPadding = 40
+    $availableWidth = [Math]::Max(480, $workingArea.Width - $horizontalPadding)
+    $availableHeight = [Math]::Max(360, $workingArea.Height - $verticalPadding)
+    $width = [Math]::Min($RequestedWidth, $availableWidth)
+    $height = [Math]::Min($RequestedHeight, $availableHeight)
+    $minimumWidth = [Math]::Min(640, $availableWidth)
+    $minimumHeight = [Math]::Min(480, $availableHeight)
+
+    return @{
+        Size = New-Object System.Drawing.Size($width, $height)
+        MinimumSize = New-Object System.Drawing.Size($minimumWidth, $minimumHeight)
+        MaximumSize = New-Object System.Drawing.Size($availableWidth, $availableHeight)
+    }
+}
+
+# Save-ResponsiveControlLayout: Captures original bounds and font data for proportional resizing.
+function Save-ResponsiveControlLayout {
+    param (
+        [System.Windows.Forms.Control]$Parent,
+        [hashtable]$LayoutState
+    )
+
+    foreach ($control in $Parent.Controls) {
+        if ($control.Dock -ne [System.Windows.Forms.DockStyle]::None) {
+            continue
+        }
+
+        $LayoutState.Controls[$control] = @{
+            Bounds = New-Object System.Drawing.Rectangle($control.Left, $control.Top, $control.Width, $control.Height)
+            FontFamily = $control.Font.FontFamily
+            FontSize = $control.Font.Size
+            FontStyle = $control.Font.Style
+        }
+
+        if ($control.Controls.Count -gt 0) {
+            Save-ResponsiveControlLayout -Parent $control -LayoutState $LayoutState
+        }
+    }
+}
+
+# Update-ResponsiveControlLayout: Resizes controls proportionally from their captured baseline state.
+function Update-ResponsiveControlLayout {
+    param (
+        [hashtable]$LayoutState,
+        [int]$ClientWidth,
+        [int]$ClientHeight
+    )
+
+    if (-not $LayoutState -or -not $LayoutState.BaselineSize -or $LayoutState.BaselineSize.Width -le 0 -or $LayoutState.BaselineSize.Height -le 0) {
+        return
+    }
+
+    $scaleX = $ClientWidth / [double]$LayoutState.BaselineSize.Width
+    $scaleY = $ClientHeight / [double]$LayoutState.BaselineSize.Height
+    $fontScale = [Math]::Max(0.85, [Math]::Min(1.4, [Math]::Min($scaleX, $scaleY)))
+
+    foreach ($entry in $LayoutState.Controls.GetEnumerator()) {
+        $control = $entry.Key
+        $metadata = $entry.Value
+
+        if ($null -eq $control -or $control.IsDisposed) {
+            continue
+        }
+
+        $originalBounds = $metadata.Bounds
+        $newLeft = [int][Math]::Round($originalBounds.Left * $scaleX)
+        $newTop = [int][Math]::Round($originalBounds.Top * $scaleY)
+        $newWidth = [int][Math]::Round($originalBounds.Width * $scaleX)
+        $newHeight = [int][Math]::Round($originalBounds.Height * $scaleY)
+
+        $control.SetBounds(
+            $newLeft,
+            $newTop,
+            [Math]::Max(48, $newWidth),
+            [Math]::Max(22, $newHeight)
+        )
+
+        $newFontSize = [Math]::Max(8, [Math]::Round($metadata.FontSize * $fontScale, 1))
+        $control.Font = New-Object System.Drawing.Font($metadata.FontFamily, $newFontSize, $metadata.FontStyle)
+    }
+}
+
+# Register-ResponsiveFormLayout: Enables proportional resizing for controls added to shared dialog forms.
+function Register-ResponsiveFormLayout {
+    param (
+        [System.Windows.Forms.Form]$Form
+    )
+
+    $responsiveForm = $Form
+    $responsiveState = @{
+        LayoutState = $null
+        IsApplying = $false
+    }
+
+    $initializeLayoutHandler = {
+        param($sender)
+
+        if ($null -ne $responsiveState.LayoutState) {
+            return
+        }
+
+        $layoutState = @{
+            BaselineSize = New-Object System.Drawing.Size($sender.ClientSize.Width, $sender.ClientSize.Height)
+            Controls = @{}
+        }
+
+        Save-ResponsiveControlLayout -Parent $sender -LayoutState $layoutState
+        $responsiveState.LayoutState = $layoutState
+    }.GetNewClosure()
+
+    $shownHandler = {
+        param($sender, $e)
+
+        & $initializeLayoutHandler $sender
+    }.GetNewClosure()
+
+    $resizeHandler = {
+        param($sender, $e)
+
+        & $initializeLayoutHandler $sender
+
+        if ($null -eq $responsiveState.LayoutState -or $responsiveState.IsApplying) {
+            return
+        }
+
+        $responsiveState.IsApplying = $true
+        try {
+            Update-ResponsiveControlLayout -LayoutState $responsiveState.LayoutState -ClientWidth $sender.ClientSize.Width -ClientHeight $sender.ClientSize.Height
+        } finally {
+            $responsiveState.IsApplying = $false
+        }
+    }.GetNewClosure()
+
+    $closedHandler = {
+        param($sender, $e)
+
+        $responsiveState.LayoutState = $null
+        $responsiveState.IsApplying = $false
+    }.GetNewClosure()
+
+    $responsiveForm.Add_Shown($shownHandler)
+    $responsiveForm.Add_Resize($resizeHandler)
+    $responsiveForm.Add_FormClosed($closedHandler)
+}
+
+# New-ProgramForm: Creates a standard wizard-style form with explicit button actions.
 function New-ProgramForm {
     param (
         [string]$Title,
-        [int]$Width = 600,
-        [int]$Height = 450,
+        [int]$Width = 720,
+        [int]$Height = 520,
         [string]$AcceptButtonText = "OK",
         [string]$SkipButtonText = "Skip",
-        [string]$CancelButtonText = "Cancel"
+        [string]$CancelButtonText = "Exit",
+        [string]$BackButtonText = "Back",
+        [switch]$ShowBackButton = $true,
+        [switch]$DisableBackButton = $false
     )
+
+    $formBounds = Get-ScaledFormBounds -RequestedWidth $Width -RequestedHeight $Height
 
     $form = New-Object System.Windows.Forms.Form
     $form.Text = $Title
-    $form.Size = New-Object System.Drawing.Size($Width, $Height)
+    $form.Size = $formBounds.Size
+    $form.MinimumSize = $formBounds.MinimumSize
+    $form.MaximumSize = $formBounds.MaximumSize
     $form.StartPosition = 'CenterScreen'
+    $form.Font = $script:UIStyle.FormFont
+    $form.AutoScaleMode = [System.Windows.Forms.AutoScaleMode]::Dpi
+    $form.AutoScroll = $true
+    $form.MaximizeBox = $false
+    $form.BackColor = $script:UIStyle.FormBackColor
     
-    # Try to load the icon and background image, but don't fail if they don't exist
+    # Try to load the icon, but keep the form background color-driven so controls remain readable.
     try {
         $form.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon("$PSScriptRoot\Assets\installer.ico")
     } catch {
         Write-Log "Could not load form icon: $_" -Level WARN
     }
-    
-    try {
-        $form.BackgroundImage = [System.Drawing.Image]::FromFile("$PSScriptRoot\Assets\form_background.png")
-        $form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
-    } catch {
-        Write-Log "Could not load form background: $_" -Level WARN
-    }
+
+    $headerStrip = New-Object System.Windows.Forms.Panel
+    $headerStrip.Dock = [System.Windows.Forms.DockStyle]::Top
+    $headerStrip.Height = 10
+    $headerStrip.BackColor = $script:UIStyle.AccentColor
+    SafeAddControl $form $headerStrip
 
     # Create button panel
     $buttonPanel = New-Object System.Windows.Forms.Panel
     $buttonPanel.Dock = [System.Windows.Forms.DockStyle]::Bottom
-    $buttonPanel.Height = 50
-    $form.Controls.Add($buttonPanel)
+    $buttonPanel.Height = $script:UIStyle.ButtonPanelHeight
+    $buttonPanel.BackColor = $script:UIStyle.SurfaceColor
+    SafeAddControl $form $buttonPanel
 
-    # Create buttons with localized text
-    $buttons = @(
-        @{
-            Text = $AcceptButtonText
-            DialogResult = [System.Windows.Forms.DialogResult]::OK
-            Location = New-Object System.Drawing.Point(10, 10)
-        },
-        @{
-            Text = $SkipButtonText
-            DialogResult = [System.Windows.Forms.DialogResult]::Ignore
-            Location = New-Object System.Drawing.Point(95, 10)
-        },
-        @{
-            Text = $CancelButtonText
-            DialogResult = [System.Windows.Forms.DialogResult]::Cancel
-            Location = New-Object System.Drawing.Point(180, 10)
+    $baseClientSize = New-Object System.Drawing.Size($form.ClientSize.Width, $form.ClientSize.Height)
+    $footerMetrics = @{
+        PanelHeight = $script:UIStyle.ButtonPanelHeight
+        ButtonWidth = $script:UIStyle.ButtonWidth
+        ButtonHeight = $script:UIStyle.ButtonHeight
+        ButtonSpacing = $script:UIStyle.ButtonSpacing
+        PanelPadding = 10
+        FontSize = $script:UIStyle.ButtonFont.Size
+    }
+    $baseButtonFont = $script:UIStyle.ButtonFont
+
+    # Create buttons with explicit action identifiers
+    $buttons = @()
+    
+    # Accept button
+    $buttons += @{
+        Text = $AcceptButtonText
+        Action = 'accept'
+    }
+    
+    # Skip button
+    $buttons += @{
+        Text = $SkipButtonText
+        Action = 'skip'
+    }
+    
+    # Back button (conditionally added)
+    if ($ShowBackButton) {
+        $buttons += @{
+            Text = $BackButtonText
+            Action = 'back'
         }
-    )
+    }
+    
+    # Cancel button
+    $buttons += @{
+        Text = $CancelButtonText
+        Action = 'exit'
+    }
+
+    # Calculate right-aligned button positions for a clearer wizard flow.
+    $buttonCount = $buttons.Count
+
+    $layoutButtons = {
+        param($sender, $e)
+
+        $targetPanel = if ($sender -is [System.Windows.Forms.Panel]) { $sender } else { $buttonPanel }
+        if ($null -eq $targetPanel -or $targetPanel.IsDisposed) {
+            return
+        }
+
+        $safeFontSize = [single]$script:UIStyle.ButtonFont.Size
+        if ($footerMetrics -and $footerMetrics.ContainsKey('FontSize') -and $footerMetrics.FontSize) {
+            $safeFontSize = [single]$footerMetrics.FontSize
+        }
+        if ($safeFontSize -le 0) {
+            $safeFontSize = 8
+        }
+
+        $targetPanel.Height = $footerMetrics.PanelHeight
+        $buttonY = [int](($targetPanel.Height - $footerMetrics.ButtonHeight) / 2)
+        $localButtonX = $targetPanel.Width - (($footerMetrics.ButtonWidth + $footerMetrics.ButtonSpacing) * $buttonCount) - $footerMetrics.PanelPadding
+        if ($localButtonX -lt $footerMetrics.PanelPadding) { $localButtonX = $footerMetrics.PanelPadding }
+        foreach ($ctrl in $targetPanel.Controls) {
+            if ($ctrl -is [System.Windows.Forms.Button]) {
+                $ctrl.Font = New-Object System.Drawing.Font("Segoe UI", [single]$safeFontSize, [System.Drawing.FontStyle]::Bold, [System.Drawing.GraphicsUnit]::Point)
+                $ctrl.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+                $ctrl.Location = New-Object System.Drawing.Point($localButtonX, $buttonY)
+                $ctrl.Size = New-Object System.Drawing.Size($footerMetrics.ButtonWidth, $footerMetrics.ButtonHeight)
+                $localButtonX += ($footerMetrics.ButtonWidth + $footerMetrics.ButtonSpacing)
+            }
+        }
+    }.GetNewClosure()
+
+    $updateFooterMetrics = {
+        param($sender, $e)
+
+        $targetForm = if ($sender -is [System.Windows.Forms.Form]) { $sender } else { $form }
+        if ($null -eq $targetForm -or $targetForm.IsDisposed) {
+            return
+        }
+
+        $currentClientWidth = [Math]::Max(1, $targetForm.ClientSize.Width)
+        $currentClientHeight = [Math]::Max(1, $targetForm.ClientSize.Height)
+
+        # Scale footer directly from current form dimensions so resizing is always visible.
+        $footerMetrics.PanelHeight = [Math]::Max(54, [Math]::Min(140, [int][Math]::Round($currentClientHeight * 0.14)))
+        $footerMetrics.ButtonSpacing = [Math]::Max(8, [Math]::Min(24, [int][Math]::Round($currentClientWidth * 0.012)))
+        $footerMetrics.PanelPadding = [Math]::Max(8, [Math]::Min(36, [int][Math]::Round($currentClientWidth * 0.01)))
+
+        $availableButtonRowWidth = [Math]::Max(200, $currentClientWidth - ($footerMetrics.PanelPadding * 2))
+        $targetButtonWidth = [int][Math]::Floor(($availableButtonRowWidth - (($buttonCount - 1) * $footerMetrics.ButtonSpacing)) / [Math]::Max(1, $buttonCount))
+        $footerMetrics.ButtonWidth = [Math]::Max(82, [Math]::Min(220, $targetButtonWidth))
+
+        $footerMetrics.ButtonHeight = [Math]::Max(30, [Math]::Min(72, [int][Math]::Round($footerMetrics.PanelHeight * 0.58)))
+        $footerMetrics.FontSize = [Math]::Max(8, [Math]::Min(16, [Math]::Round($footerMetrics.ButtonHeight * 0.34, 1)))
+        & $layoutButtons $buttonPanel $null
+    }.GetNewClosure()
 
     foreach ($buttonInfo in $buttons) {
         $button = New-Object System.Windows.Forms.Button
-        $button.Location = $buttonInfo.Location
-        $button.Size = New-Object System.Drawing.Size(75, 30)
+        $button.Location = New-Object System.Drawing.Point(0, 0)
+        $button.Size = New-Object System.Drawing.Size($footerMetrics.ButtonWidth, $footerMetrics.ButtonHeight)
         $button.Text = $buttonInfo.Text
-        $button.DialogResult = $buttonInfo.DialogResult
-        $buttonPanel.Controls.Add($button)
+        $button.Font = $script:UIStyle.ButtonFont
+        $button.UseCompatibleTextRendering = $true
+        $button.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+        $button.Margin = New-Object System.Windows.Forms.Padding(6, 4, 6, 4)
+        $button.Tag = $buttonInfo.Action
+        Set-ProgramButtonStyle -Button $button -Action $buttonInfo.Action
+        if ($buttonInfo.Action -eq 'back' -and $DisableBackButton) {
+            # Keep a stable layout while making Back visibly unavailable on the first step.
+            $button.Enabled = $false
+            $button.TabStop = $false
+            Set-ProgramButtonStyle -Button $button -Action $buttonInfo.Action -Disabled
+        }
+        $button.Add_Click({
+            param($sender, $e)
+            # Persist the clicked button action for Show-Form and close this dialog.
+            $form.Tag = [string]$sender.Tag
+            $form.Close()
+        })
+        SafeAddControl $buttonPanel $button
     }
+
+    # Reflow button row when the form is resized (DPI / accessibility friendly).
+    $buttonPanel.Add_Resize($layoutButtons)
+    $form.Add_Resize($updateFooterMetrics)
+    $form.Add_SizeChanged($updateFooterMetrics)
+    $form.Add_Shown($updateFooterMetrics)
+    & $layoutButtons $buttonPanel $null
+    & $updateFooterMetrics $form $null
+
+    Register-ResponsiveFormLayout -Form $form
+
+    # Set keyboard shortcuts for navigation
+    $form.KeyPreview = $true
+    $form.Add_KeyDown({
+        param($sender, $e)
+        if ($e.KeyCode -eq 'Enter') {
+            $form.Tag = 'accept'
+            $form.Close()
+        }
+        elseif ($e.KeyCode -eq 'Escape') {
+            # ESC maps to the same action as the Exit button
+            $form.Tag = 'exit'
+            $form.Close()
+        }
+    })
 
     return $form
 }
@@ -164,14 +560,20 @@ function Set-TextBox {
     )
     $label = New-Object System.Windows.Forms.Label
     $label.Location = New-Object System.Drawing.Point([int]$X, [int]$Y)
-    $label.Size = New-Object System.Drawing.Size($Width, 18)
+    $label.Size = New-Object System.Drawing.Size($Width, $script:UIStyle.LabelHeight)
     $label.Text = $LabelText
-    $label.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
+    $label.Font = $script:UIStyle.LabelFont
+    $label.AutoEllipsis = $true
+    $label.BackColor = [System.Drawing.Color]::Transparent
 
     $textBox = New-Object System.Windows.Forms.TextBox
-    $textBox.Location = New-Object System.Drawing.Point([int]$X, [int]($Y + 25))
+    $textBox.Location = New-Object System.Drawing.Point([int]$X, [int]($Y + $script:UIStyle.VerticalGap))
     $textBox.Size = New-Object System.Drawing.Size($Width, $Height)
     $textBox.MaxLength = $MaxLength
+    $textBox.Font = $script:UIStyle.InputFont
+    $textBox.Margin = New-Object System.Windows.Forms.Padding(6, 4, 6, 4)
+    $textBox.BackColor = $script:UIStyle.InputBackColor
+    $textBox.BorderStyle = [System.Windows.Forms.BorderStyle]::FixedSingle
 
     if ($TooltipText) {
         $toolTip = New-Object System.Windows.Forms.ToolTip
@@ -190,57 +592,106 @@ function Set-ListBox {
         [int]$Width,
         [int]$Height,
         [array]$DataSource,
-        [string]$DisplayMember
+        [string]$DisplayMember = ""
     )
     $label = New-Object System.Windows.Forms.Label
     $label.Location = New-Object System.Drawing.Point([int]$X, [int]$Y)
-    $label.Size = New-Object System.Drawing.Size($Width, 18)
+    $label.Size = New-Object System.Drawing.Size($Width, $script:UIStyle.LabelHeight)
     $label.Text = $LabelText
-    $label.Font = New-Object System.Drawing.Font("Arial", 10, [System.Drawing.FontStyle]::Bold)
+    $label.Font = $script:UIStyle.LabelFont
+    $label.AutoEllipsis = $true
+    $label.BackColor = [System.Drawing.Color]::Transparent
 
     $listBox = New-Object System.Windows.Forms.ListBox
-    $listBox.Location = New-Object System.Drawing.Point([int]$X, [int]($Y + 25))
+    $listBox.Location = New-Object System.Drawing.Point([int]$X, [int]($Y + $script:UIStyle.VerticalGap))
     $listBox.Size = New-Object System.Drawing.Size($Width, $Height)
     $listBox.DataSource = [System.Collections.ArrayList]$DataSource
-    $listBox.DisplayMember = $DisplayMember
+    if (-not [string]::IsNullOrWhiteSpace($DisplayMember)) {
+        $listBox.DisplayMember = $DisplayMember
+    }
+    $listBox.Font = $script:UIStyle.InputFont
+    $listBox.IntegralHeight = $false
+    $listBox.BackColor = $script:UIStyle.InputBackColor
+    $listBox.BorderStyle = [System.Windows.Forms.BorderStyle]::FixedSingle
 
     return @($label, $listBox)
 }
 
-# Function to display a form and get user input
+# Get-SelectedListValue: Returns the selected list item as a string for both objects and plain text items.
+function Get-SelectedListValue {
+    param(
+        [System.Windows.Forms.ListBox]$ListBox
+    )
+
+    if ($null -eq $ListBox -or $null -eq $ListBox.SelectedItem) {
+        return $null
+    }
+
+    $selectedItem = $ListBox.SelectedItem
+
+    if ($selectedItem -is [string]) {
+        return $selectedItem
+    }
+
+    if ($selectedItem.PSObject.Properties['Name']) {
+        return [string]$selectedItem.Name
+    }
+
+    return [string]$selectedItem
+}
+
+# Show-Form: Displays a form and routes by explicit action tag (accept/skip/back/exit).
 function Show-Form {
     param (
         [System.Windows.Forms.Form]$form,
         [ScriptBlock]$onOK,
         [ScriptBlock]$onIgnore,
+        [ScriptBlock]$onBack,
         [ScriptBlock]$onCancel
     )
 
     $form.Topmost = $true
     $form.Add_Shown({$form.Activate()})
-    $result = $form.ShowDialog()
 
-    switch ($result) {
-        [System.Windows.Forms.DialogResult]::OK {
+    Write-Log "Showing form: $($form.Text)" -Level DEBUG
+
+    # Reset action and show the dialog.
+    $form.Tag = $null
+    [void]$form.ShowDialog()
+
+    switch ($form.Tag) {
+        'accept' {
+            # User clicked Next/Accept - run the acceptance handler and move forward
+            $script:NavDirection = 1
             & $onOK
         }
-        [System.Windows.Forms.DialogResult]::Ignore {
-            & $onIgnore
+        'skip' {
+            # User clicked Skip - treat as forward without saving data
+            $script:NavDirection = 1
+            if ($onIgnore) { & $onIgnore }
         }
-        [System.Windows.Forms.DialogResult]::Cancel {
-            & $onCancel
+        'back' {
+            # Back button action
+            Write-Log "Back button clicked" -Level DEBUG
+            $script:NavDirection = -1
+            # Call the explicit back handler if one was provided
+            if ($onBack) { & $onBack }
+        }
+        'exit' {
+            # Exit pressed - close the app immediately
+            Write-Log "Character creation cancelled by user" -Level INFO
+            $script:NavDirection = 0
+            # Force termination from here so all forms behave consistently.
+            Invoke-AppExit -Code 0 -Reason "Exit button pressed"
+        }
+        default {
+            # Closed window by title-bar X or other non-button route: treat as exit.
+            Write-Log "Form closed without explicit action; exiting" -Level WARN
+            $script:NavDirection = 0
+            Invoke-AppExit -Code 0 -Reason "Form closed without explicit action"
         }
     }
 }
-
-# Type loader, forms
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-Add-Type -AssemblyName PresentationCore,PresentationFramework
-
-# Imports Modules + Add Types
-Import-Module -Name "$PSScriptRoot\Assets\iText\PDFForm" | Out-Null
-Add-Type -Path "$PSScriptRoot\Assets\iText\itextsharp.dll"
 
 # Optimize JSON loading with caching
 $script:JsonCache = @{}
@@ -299,6 +750,7 @@ $global:Class = $defaultJSON.ClassLevel
 $global:HP = $defaultJSON.HP
 $global:HD = $defaultJSON.HD
 $global:Speed = $defaultJSON.SpeedTotal
+$global:STR = $defaultJSON.STR
 $global:DEX = $defaultJSON.DEX
 $global:CON = $defaultJSON.CON
 $global:INT = $defaultJSON.INT
@@ -367,6 +819,27 @@ $global:Equipment = $defaultJSON.Equipment
 $global:FeaturesAndTraits = $defaultJSON.'Features and Traits'
 $global:Comma = ", "
 Write-Log "Loaded Defaults" -Level DEBUG
+
+# Initialize default class and race objects to prevent errors
+$global:SelectedClass = @{
+    SavingThrows = @()
+    InitiativeBonus = 0
+    SkillProficiencies = @()
+    HitDice = 8
+    SpellCastingClass = ""
+    SpellCastingAbility = ""
+    SpellCastingSaveDC = 0
+}
+$global:SelectedRace = @{
+    Name = "Human"
+}
+
+# Initialize other variables that might be needed
+$global:Weapon1Weight = 0
+$global:Weapon2Weight = 0 
+$global:Weapon3Weight = 0
+$global:GearWeight = 0
+$global:ArmourWeight = 0
 
 # Function to calculate ability modifiers and other derived stats
 function CharacterStats {
@@ -478,55 +951,71 @@ function Get-SpellSlots {
     return $slots
 }
 
-# Form state management
+# Function to roll 4d6 and drop the lowest
+function Roll-Stat {
+    $rolls = @()
+    for ($i = 0; $i -lt 4; $i++) {
+        $rolls += Get-Random -Minimum 1 -Maximum 7
+    }
+    $rolls = $rolls | Sort-Object -Descending
+    $total = ($rolls[0] + $rolls[1] + $rolls[2])
+    Write-Log "Rolled 4d6: $($rolls -join ',') - Total: $total" -Level DEBUG
+    return $total
+}
+
+# Form state management - tracks navigation history and current position
 $script:FormState = @{
     CurrentForm = $null
     PreviousForm = $null
     FormData = @{}
+    History = @()
+    CurrentFormIndex = -1
 }
+# Shared navigation direction flag: 1 = forward, -1 = back, 0 = cancel
+$script:NavDirection = 1
 
-# Generic form creation function
+# New-DndForm: Wrapper around ProgramForm that accepts a hashtable of controls and
+# wires up the Accept/Back/Cancel script blocks via Show-Form automatically.
 function New-DndForm {
     param (
         [string]$Title,
         [hashtable]$Controls,
         [scriptblock]$OnAccept,
-        [scriptblock]$OnCancel
+        [scriptblock]$OnCancel,
+        [scriptblock]$OnBack,  # Optional - called when Back is pressed (overrides NavDirection default)
+        [switch]$HideBackButton
     )
     
-    $form = New-ProgramForm -Title $Title -Width 600 -Height 450 `
+    $form = New-ProgramForm -Title $Title -Width 720 -Height 520 `
         -AcceptButtonText $global:Localisation.AcceptButtonText `
         -SkipButtonText $global:Localisation.SkipButtonText `
-        -CancelButtonText $global:Localisation.CancelButtonText
+        -CancelButtonText "Exit" `
+        -BackButtonText $(if ([string]::IsNullOrWhiteSpace([string]$global:Localisation.BackButtonText)) { "Back" } else { [string]$global:Localisation.BackButtonText }) `
+        -ShowBackButton $true `
+        -DisableBackButton $HideBackButton
+
+    if ($null -eq $form) {
+        throw "Failed to create form '$Title'."
+    }
 
     # Modified to handle array of controls properly
     foreach ($control in $Controls.GetEnumerator()) {
         if ($control.Value -is [Array]) {
             foreach ($ctrl in $control.Value) {
-                $form.Controls.Add($ctrl)
+                SafeAddControl $form $ctrl
             }
         } else {
-            $form.Controls.Add($control.Value)
+            SafeAddControl $form $control.Value
         }
     }
 
     $form.Add_Shown({ $form.Activate() })
     $script:FormState.CurrentForm = $form
     
-    $result = $form.ShowDialog()
-    
-    switch ($result) {
-        ([System.Windows.Forms.DialogResult]::OK) { 
-            & $OnAccept 
-        }
-        ([System.Windows.Forms.DialogResult]::Cancel) { 
-            Write-Log "Form cancelled by user" -Level INFO
-            & $OnCancel
-        }
-    }
+    Show-Form -form $form -onOK $OnAccept -onBack $OnBack -onCancel $OnCancel
 }
 
-# Validation functions
+# Test-RequiredFields: Returns $false and logs an error if any named field in the hashtable is blank.
 function Test-RequiredFields {
     param (
         [hashtable]$Fields,
@@ -550,15 +1039,21 @@ $script:CharacterState = @{
     Skills = @{}
 }
 
-# Function to display the basic information form
+# Show-BasicInfoForm: First step in the wizard - collects character name, player name, and age.
+# The Back button is hidden here because there is no previous step.
 function Show-BasicInfoForm {
     Write-Log "Displaying Basic Info Form" -Level DEBUG
     
     $controls = @{
-        CharacterName = Set-TextBox -LabelText $global:Localisation.CharacterNameLabel -X 10 -Y 20 -Width 200 -Height 20 -MaxLength 30
-        Age = Set-TextBox -LabelText "Age:" -X 10 -Y 75 -Width 58 -Height 20 -MaxLength 3
-        PlayerName = Set-TextBox -LabelText $global:Localisation.PlayerNameLabel -X 10 -Y 125 -Width 200 -Height 20 -MaxLength 30
+        CharacterName = Set-TextBox -LabelText $global:Localisation.CharacterNameLabel -X 24 -Y 24 -Width 300 -Height 28 -MaxLength 30
+        Age = Set-TextBox -LabelText "Age:" -X 24 -Y 108 -Width 96 -Height 28 -MaxLength 3
+        PlayerName = Set-TextBox -LabelText $global:Localisation.PlayerNameLabel -X 24 -Y 192 -Width 300 -Height 28 -MaxLength 30
     }
+
+    # Set tab order: CharacterName (0) -> Age (1) -> PlayerName (2)
+    $controls.CharacterName[1].TabIndex = 0
+    $controls.Age[1].TabIndex = 1
+    $controls.PlayerName[1].TabIndex = 2
 
     # Add KeyPress event handler to Age textbox to only allow numbers
     $controls.Age[1].Add_KeyPress({
@@ -568,7 +1063,7 @@ function Show-BasicInfoForm {
         }
     })
     
-    New-DndForm -Title $global:Localisation.FormTitle -Controls $controls -OnAccept {
+    New-DndForm -Title $global:Localisation.FormTitle -Controls $controls -HideBackButton -OnAccept {
         $script:CharacterState.BasicInfo = @{
             CharacterName = $controls.CharacterName[1].Text
             Age = $controls.Age[1].Text
@@ -598,32 +1093,33 @@ function Show-BasicInfoForm {
         }
         
         Write-Log "Basic info captured successfully" -Level INFO
+        $global:WrittenCharactername = $controls.CharacterName[1].Text
         $global:WrittenAge = $controls.Age[1].Text
+        $global:WrittenPlayername = $controls.PlayerName[1].Text
         Write-Log "Age set to: $global:WrittenAge" -Level DEBUG
     } -OnCancel {
         exit
     }
 }
 
-# Function to display the race selection form
+# Show-RaceForm: Lets the user pick their character's race and background.
+# Race data drives HP, speed, size, languages, and stat modifiers.
 function Show-RaceForm {
     Write-Log "Displaying Race Form" -Level DEBUG
-    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 450 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 640 -Height 460 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Exit'
 
-    $backgroundControls = Set-ListBox -LabelText 'Select a Background:' -X 10 -Y 20 -Width 200 -Height 170 -DataSource $CharacterBackgroundJSON -DisplayMember 'name'
-    $raceControls = Set-ListBox -LabelText 'Select a Race:' -X 220 -Y 20 -Width 150 -Height 170 -DataSource $RacesJSON -DisplayMember 'name'
+    $backgroundControls = Set-ListBox -LabelText 'Select a Background:' -X 24 -Y 24 -Width 270 -Height 260 -DataSource $CharacterBackgroundJSON -DisplayMember 'name'
+    $raceControls = Set-ListBox -LabelText 'Select a Race:' -X 322 -Y 24 -Width 270 -Height 260 -DataSource $RacesJSON -DisplayMember 'name'
 
-    $form.Controls.AddRange($backgroundControls)
-    $form.Controls.AddRange($raceControls)
+    SafeAddRange $form $backgroundControls
+    SafeAddRange $form $raceControls
 
-    $form.Topmost = $true
-    $form.Add_Shown({$form.Activate()})
-    $result = $form.ShowDialog()
-
-    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+    # Route through Show-Form - Back sets NavDirection = -1, returning to BasicInfo via Navigate-Forms
+    Show-Form -form $form -onOK {
         $global:ExportBackground = $backgroundControls[1].SelectedItem.Name
         $global:SelectedRace = $raceControls[1].SelectedItem
         $global:ExportRace = $global:SelectedRace.Name
+        # Race description populates the Features and Traits field on the sheet
         $global:Feature1TTraits1 = $global:SelectedRace.Description
         $global:HP = $global:SelectedRace.HP
         $global:Speed = $global:SelectedRace.Speed
@@ -631,116 +1127,98 @@ function Show-RaceForm {
         $global:Height = $global:SelectedRace.Height
         $global:SpokenLanguages = $global:SelectedRace.Languages
         $global:Special = $global:SelectedRace.Special
+        # Racial ability score modifiers - applied on top of the point-buy values
         $global:STRMod = $global:SelectedRace.StrengthMod
         $global:DEXMod = $global:SelectedRace.DexterityMod
         $global:CONMod = $global:SelectedRace.ConstitutionMod
         $global:INTMod = $global:SelectedRace.IntelligenceMod
         $global:WISMod = $global:SelectedRace.WisdomMod
         $global:CHAMod = $global:SelectedRace.CharismaMod
-
-        # Assign default image if no image was selected by the user
+        # Use the race's default art if the user has not chosen a custom image
         if (-not $global:ImageSelected) {
             $global:CharacterImage = Join-Path $PSScriptRoot "Assets\Races\Images\$($global:SelectedRace.image)"
-            Write-Log "No image selected, setting default race image: $($global:CharacterImage)" -Level DEBUG
+            Write-Log "Default race image set: $($global:CharacterImage)" -Level DEBUG
         }
-
-        # Debugging Character
-        Write-Log "$global:ExportBackground" -Level DEBUG
-        Write-Log "$global:SelectedRace" -Level DEBUG
-        Write-Log "$global:ExportRace" -Level DEBUG
-        Write-Log "$global:Feature1TTraits1" -Level DEBUG
-        Write-Log "$global:HP" -Level DEBUG
-        Write-Log "$global:Speed" -Level DEBUG
-        Write-Log "$global:Size" -Level DEBUG
-        Write-Log "$global:Height" -Level DEBUG
-        Write-Log "$global:SpokenLanguages" -Level DEBUG
-        Write-Log "$global:Special" -Level DEBUG
-        # Debugging: Output the ability scores
-        Write-Log "`n[Debug] Ability Scores:" -Level DEBUG
-        Write-Log "STRMod: $global:STRMod, DEXMod: $global:DEXMod, CONMod: $global:CONMod, INTMod: $global:INTMod, WISMod: $global:WISMod, CHAMod: $global:CHAMod" -Level DEBUG
-        Write-Log "ST_STR: $global:ST_STR, ST_DEX: $global:ST_DEX, ST_CON: $global:ST_CON, ST_INT: $global:ST_INT, ST_WIS: $global:ST_WIS, ST_CHA: $global:ST_CHA" -Level DEBUG
-    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Write-Log "Form was canceled by the user." -Level DEBUG
+        Write-Log "Background: $global:ExportBackground" -Level DEBUG
+        Write-Log "Race: $($global:SelectedRace.Name)" -Level DEBUG
+    } -onIgnore {
+        # Skip - keep default race values
+        Write-Log "Race and background selection skipped" -Level DEBUG
+    } -onCancel {
         exit
     }
 }
 
-# Function to display the subrace form
+# Show-SubRaceForm: Lets the user pick a subrace for races that have them.
+# Skipped automatically by Navigate-Forms if no subraces exist.
 function Show-SubRaceForm {
     Write-Log "Displaying SubRace Form" -Level DEBUG
-    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 680 -Height 460 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Exit'
 
     if ($global:SelectedRace.subraces -and $global:SelectedRace.subraces.Count -gt 0) {
-        $subRaceControls = Set-ListBox -LabelText 'Select a SubRace:' -X 10 -Y 20 -Width 260 -Height 200 -DataSource $global:SelectedRace.subraces -DisplayMember 'name'
-        $form.Controls.AddRange($subRaceControls)
+        # Build the subrace list only when the selected race actually has subraces
+        $subRaceControls = Set-ListBox -LabelText 'Select a SubRace:' -X 24 -Y 24 -Width 610 -Height 280 -DataSource $global:SelectedRace.subraces -DisplayMember 'name'
+        SafeAddRange $form $subRaceControls
 
-        $form.Topmost = $true
-        $form.Add_Shown({$form.Activate()})
-        $result = $form.ShowDialog()
-
-        if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+        # Route through Show-Form so Back and Cancel are handled consistently
+        Show-Form -form $form -onOK {
             $global:SelectedSubRace = $subRaceControls[1].SelectedItem
             $global:ExportSubrace = $global:SelectedSubRace.Name
-
             Write-Log "SelectedSubRace: $($global:SelectedSubRace)" -Level DEBUG
             Write-Log "ExportSubrace: $($global:ExportSubrace)" -Level DEBUG
-        } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-            Write-Log "Form was canceled by the user." -Level DEBUG
-            exit
-        }
+        } -onIgnore {
+            # Skip pressed - leave subrace unset
+            Write-Log "SubRace selection skipped" -Level DEBUG
+        } -onCancel { exit }
     } else {
-        Write-Log "No subraces available for the selected race." -Level DEBUG
+        # No subraces for this race - treat as a transparent forward step
+        Write-Log "No subraces available for the selected race - skipping SubRace form" -Level DEBUG
     }
 }
 
-# Function to display the character features form
+# Show-CharacterFeaturesForm: Lets the user choose physical appearance - eyes, hair, and skin.
 function Show-CharacterFeaturesForm {
     Write-Log "Displaying Character Features Form" -Level DEBUG
-    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 680 -Height 460 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Exit'
 
-    $eyesControls = Set-ListBox -LabelText 'Select Eyes:' -X 10 -Y 20 -Width 110 -Height 170 -DataSource $EyesJSON -DisplayMember 'name'
-    $hairControls = Set-ListBox -LabelText 'Select Hair:' -X 125 -Y 20 -Width 110 -Height 170 -DataSource $HairJSON -DisplayMember 'name'
-    $skinControls = Set-ListBox -LabelText 'Select Skin:' -X 240 -Y 20 -Width 110 -Height 170 -DataSource $SkinJSON -DisplayMember 'name'
+    # Three side-by-side list boxes for appearance options
+    $eyesControls = Set-ListBox -LabelText 'Select Eyes:' -X 24 -Y 24 -Width 180 -Height 240 -DataSource $EyesJSON -DisplayMember 'name'
+    $hairControls = Set-ListBox -LabelText 'Select Hair:' -X 230 -Y 24 -Width 180 -Height 240 -DataSource $HairJSON -DisplayMember 'name'
+    $skinControls = Set-ListBox -LabelText 'Select Skin:' -X 436 -Y 24 -Width 180 -Height 240 -DataSource $SkinJSON -DisplayMember 'name'
 
-    $form.Controls.AddRange($eyesControls)
-    $form.Controls.AddRange($hairControls)
-    $form.Controls.AddRange($skinControls)
+    SafeAddRange $form $eyesControls
+    SafeAddRange $form $hairControls
+    SafeAddRange $form $skinControls
 
-    $form.Topmost = $true
-    $form.Add_Shown({$form.Activate()})
-    $result = $form.ShowDialog()
-
-    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+    # Route through Show-Form for consistent Back/Cancel handling
+    Show-Form -form $form -onOK {
         $global:Eyes = $eyesControls[1].SelectedItem.Name
         $global:Hair = $hairControls[1].SelectedItem.Name
         $global:Skin = $skinControls[1].SelectedItem.Name
-
         Write-Log "Eyes: $($global:Eyes)" -Level DEBUG
         Write-Log "Hair: $($global:Hair)" -Level DEBUG
         Write-Log "Skin: $($global:Skin)" -Level DEBUG
-    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Write-Log "Form was canceled by the user." -Level DEBUG
-        exit
-    }
+    } -onIgnore {
+        # Skip - keep default appearance values
+        Write-Log "Character features selection skipped" -Level DEBUG
+    } -onCancel { exit }
 }
 
-# Function to display the class and alignment selection form
+# Show-ClassAndAlignmentForm: Lets the user pick their primary class and moral alignment.
+# Note: the Cantrip form is driven by Navigate-Forms based on CanCastCantrips; it is NOT called from here.
 function Show-ClassAndAlignmentForm {
     Write-Log "Displaying Class and Alignment Form" -Level DEBUG
-    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 680 -Height 460 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Exit'
 
-    $classControls = Set-ListBox -LabelText 'Select a Primary Class:' -X 10 -Y 20 -Width 160 -Height 200 -DataSource $ClassesJSON -DisplayMember 'name'
-    $alignmentControls = Set-ListBox -LabelText 'Select an Alignment:' -X 200 -Y 20 -Width 160 -Height 200 -DataSource $AlignmentJSON -DisplayMember 'name'
+    $classControls = Set-ListBox -LabelText 'Select a Primary Class:' -X 24 -Y 24 -Width 280 -Height 260 -DataSource $ClassesJSON -DisplayMember 'name'
+    $alignmentControls = Set-ListBox -LabelText 'Select an Alignment:' -X 332 -Y 24 -Width 280 -Height 260 -DataSource $AlignmentJSON -DisplayMember 'name'
 
-    $form.Controls.AddRange($classControls)
-    $form.Controls.AddRange($alignmentControls)
+    SafeAddRange $form $classControls
+    SafeAddRange $form $alignmentControls
 
-    $form.Topmost = $true
-    $form.Add_Shown({$form.Activate()})
-    $result = $form.ShowDialog()
-
-    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
-        # All the values that are pulled from the json files
+    # Route through Show-Form for consistent Back/Cancel handling
+    Show-Form -form $form -onOK {
+        # Pull all class-specific values from the JSON data
         $global:SelectedClass = $classControls[1].SelectedItem
         $global:Class = $global:SelectedClass.Name
         $global:HD = $global:SelectedClass.HitDice
@@ -749,17 +1227,15 @@ function Show-ClassAndAlignmentForm {
         $global:SpellCastingSaveDC = $global:SelectedClass.SpellCastingSaveDC
         $global:SelectedPack = $global:SelectedClass.backpack
         $global:Alignment = $alignmentControls[1].SelectedItem.Name
-        # All checks
+        # Saving throw proficiency check boxes for the PDF
         $global:Check11 = $global:SelectedClass.Check11
         $global:Check18 = $global:SelectedClass.Check18
         $global:Check19 = $global:SelectedClass.Check19
         $global:Check20 = $global:SelectedClass.Check20
         $global:Check21 = $global:SelectedClass.Check21
         $global:Check22 = $global:SelectedClass.Check22
-
-        # Convert CanCastCantrips to a boolean
+        # Convert CanCastCantrips to a boolean so the Cantrip step can be gated
         $global:CanCastCantrips = [bool]::Parse($global:SelectedClass.CanCastCantrips)
-
         Write-Log "SelectedClass: $($global:SelectedClass)" -Level DEBUG
         Write-Log "Class: $($global:Class)" -Level DEBUG
         Write-Log "Alignment: $($global:Alignment)" -Level DEBUG
@@ -769,166 +1245,147 @@ function Show-ClassAndAlignmentForm {
         Write-Log "SpellCastingSaveDC: $($global:SpellCastingSaveDC)" -Level DEBUG
         Write-Log "SelectedPack: $($global:SelectedPack)" -Level DEBUG
         Write-Log "CanCastCantrips: $($global:CanCastCantrips)" -Level DEBUG
-        Write-Log "The Following Checks are enabled" -Level DEBUG
-        Write-Log "Strength: $global:Check11" -Level DEBUG
-        Write-Log "Dexterity: $global:Check18" -Level DEBUG
-        Write-Log "Constitution: $global:Check19" -Level DEBUG
-        Write-Log "Intelligence: $global:Check20" -Level DEBUG
-        Write-Log "Wisdom: $global:Check21" -Level DEBUG
-        Write-Log "Charisma: $global:Check22" -Level DEBUG
-
-        # Conditionally display the Cantrip Form if the class can cast cantrips
-        if ($global:CanCastCantrips) {
-            Show-CantripForm
-        } else {
-            Write-Log "Skipping Cantrip Selection as the class cannot cast cantrips." -Level DEBUG
-        }
-    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Write-Log "[Debug] Form was canceled by the user." -Level DEBUG
-        exit
-    }
+        Write-Log "Strength check enabled: $global:Check11" -Level DEBUG
+        Write-Log "Dexterity check enabled: $global:Check18" -Level DEBUG
+        Write-Log "Constitution check enabled: $global:Check19" -Level DEBUG
+        Write-Log "Intelligence check enabled: $global:Check20" -Level DEBUG
+        Write-Log "Wisdom check enabled: $global:Check21" -Level DEBUG
+        Write-Log "Charisma check enabled: $global:Check22" -Level DEBUG
+    } -onIgnore {
+        # Skip - keep default class values
+        Write-Log "Class and alignment selection skipped" -Level DEBUG
+    } -onCancel { exit }
 }
 
-# Function to display the subclass selection form
+# Show-SubClassForm: Lets the user pick a subclass when one is available for the selected class.
+# Transparent forward step if the class has no subclasses.
 function Show-SubClassForm {
     Write-Log "Displaying SubClass Form" -Level DEBUG
-    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 350 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 680 -Height 460 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Exit'
 
     if ($global:SelectedClass.Subclasses -and $global:SelectedClass.Subclasses.Count -gt 0) {
-        $subClassControls = Set-ListBox -LabelText 'Select a SubClass:' -X 10 -Y 20 -Width 260 -Height 200 -DataSource $global:SelectedClass.Subclasses
-        $form.Controls.AddRange($subClassControls)
+        # Only show the list when subclasses actually exist
+        $subClassControls = Set-ListBox -LabelText 'Select a SubClass:' -X 24 -Y 24 -Width 610 -Height 280 -DataSource $global:SelectedClass.Subclasses
+        SafeAddRange $form $subClassControls
 
-        $form.Topmost = $true
-        $form.Add_Shown({$form.Activate()})
-        $result = $form.ShowDialog()
-
-        if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+        # Route through Show-Form for consistent Back/Cancel handling
+        Show-Form -form $form -onOK {
             if ($subClassControls[1].SelectedItem) {
                 $global:SubClass = $subClassControls[1].SelectedItem
+                # Store the combined class + subclass label used on the character sheet
                 $global:ClassAndSubClass = "$($global:Class) - $($global:SubClass)"
                 Write-Log "SubClass Selected: $($global:SubClass)" -Level DEBUG
                 Write-Log "Final Selection: $($global:ClassAndSubClass)" -Level DEBUG
             }
-        } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-            Write-Log "Form was canceled by the user." -Level DEBUG
-            exit
-        }
+        } -onIgnore {
+            # Skip without selecting a subclass
+            Write-Log "SubClass selection skipped" -Level DEBUG
+        } -onCancel { exit }
     } else {
-        Write-Log "No subclasses available for the selected class." -Level DEBUG
+        # No subclasses for this class - move forward transparently
+        Write-Log "No subclasses available for the selected class - skipping SubClass form" -Level DEBUG
     }
 }
 
-# Function to display the cantrip selection form
+# Show-CantripForm: Lets spellcasting classes pick up to 3 cantrips filtered to their class.
+# Navigate-Forms gates this step using $global:CanCastCantrips.
 function Show-CantripForm {
     Write-Log "Displaying Cantrip Selection Form" -Level DEBUG
 
-    # Filter cantrips based on the selected class
+    # Only show cantrips that belong to the character's chosen class
     $filteredCantrips = $CantripsJSON | Where-Object { $_.classes -contains $global:Class }
 
-    $form = New-ProgramForm -Title 'Select Cantrips' -Width 500 -Height 600 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+    $form = New-ProgramForm -Title 'Select Cantrips' -Width 640 -Height 700 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Exit'
 
-    # Create list box controls for selecting up to 3 cantrips using the filtered cantrips
-    $cantrip1Controls = Set-ListBox -LabelText 'Select Cantrip 1:' -X 10 -Y 20 -Width 460 -Height 150 -DataSource $filteredCantrips -DisplayMember 'name'
-    $cantrip2Controls = Set-ListBox -LabelText 'Select Cantrip 2:' -X 10 -Y 180 -Width 460 -Height 150 -DataSource $filteredCantrips -DisplayMember 'name'
-    $cantrip3Controls = Set-ListBox -LabelText 'Select Cantrip 3:' -X 10 -Y 340 -Width 460 -Height 150 -DataSource $filteredCantrips -DisplayMember 'name'
+    # Three stacked list boxes - one per cantrip slot
+    $cantrip1Controls = Set-ListBox -LabelText 'Select Cantrip 1:' -X 24 -Y 24 -Width 560 -Height 140 -DataSource $filteredCantrips -DisplayMember 'name'
+    $cantrip2Controls = Set-ListBox -LabelText 'Select Cantrip 2:' -X 24 -Y 212 -Width 560 -Height 140 -DataSource $filteredCantrips -DisplayMember 'name'
+    $cantrip3Controls = Set-ListBox -LabelText 'Select Cantrip 3:' -X 24 -Y 400 -Width 560 -Height 140 -DataSource $filteredCantrips -DisplayMember 'name'
 
-    # Add controls to the form
-    $form.Controls.AddRange($cantrip1Controls)
-    $form.Controls.AddRange($cantrip2Controls)
-    $form.Controls.AddRange($cantrip3Controls)
+    SafeAddRange $form $cantrip1Controls
+    SafeAddRange $form $cantrip2Controls
+    SafeAddRange $form $cantrip3Controls
 
-    $form.Topmost = $true
-    $form.Add_Shown({$form.Activate()})
-    $result = $form.ShowDialog()
-
-    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
-        # Store the selected cantrips in global variables
+    # Route through Show-Form for consistent Back/Cancel handling
+    Show-Form -form $form -onOK {
+        # Store each selected cantrip in the matching PDF spell slot global
         $global:Cantrip01 = $cantrip1Controls[1].SelectedItem.name
         $global:Cantrip02 = $cantrip2Controls[1].SelectedItem.name
         $global:Cantrip03 = $cantrip3Controls[1].SelectedItem.name
-
-        # Debugging output
         Write-Log "Selected Cantrip 1: $($global:Cantrip01)" -Level DEBUG
         Write-Log "Selected Cantrip 2: $($global:Cantrip02)" -Level DEBUG
         Write-Log "Selected Cantrip 3: $($global:Cantrip03)" -Level DEBUG
-    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Write-Log "Form was canceled by the user." -Level DEBUG
-        exit
-    }
+    } -onIgnore {
+        # Skip - leave cantrip slots empty
+        Write-Log "Cantrip selection skipped" -Level DEBUG
+    } -onCancel { exit }
 }
 
-# Function to display the weapon and armor selection form
+# Show-WeaponAndArmourForm: Lets the user pick up to 3 weapons, select armour, choose
+# extra gear, and optionally add a shield (+2 AC).
 function Show-WeaponAndArmourForm {
     Write-Log "Displaying Weapon and Armor Form" -Level DEBUG
     
     # Create the form
-    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 500 -Height 600 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 820 -Height 720 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Exit'
 
     # Create individual ListBox controls for weapon selection
-    $weapon1Controls = Set-ListBox -LabelText "Select Weapon 1" -X 15 -Y 20 -Width 140 -Height 230 -DataSource $WeaponJSON -DisplayMember 'name'
-    $weapon2Controls = Set-ListBox -LabelText "Select Weapon 2" -X 165 -Y 20 -Width 140 -Height 230 -DataSource $WeaponJSON -DisplayMember 'name'
-    $weapon3Controls = Set-ListBox -LabelText "Select Weapon 3" -X 315 -Y 20 -Width 140 -Height 230 -DataSource $WeaponJSON -DisplayMember 'name'
+    $weapon1Controls = Set-ListBox -LabelText "Select Weapon 1" -X 24 -Y 24 -Width 220 -Height 250 -DataSource $WeaponJSON -DisplayMember 'name'
+    $weapon2Controls = Set-ListBox -LabelText "Select Weapon 2" -X 290 -Y 24 -Width 220 -Height 250 -DataSource $WeaponJSON -DisplayMember 'name'
+    $weapon3Controls = Set-ListBox -LabelText "Select Weapon 3" -X 556 -Y 24 -Width 220 -Height 250 -DataSource $WeaponJSON -DisplayMember 'name'
     
     # Add controls to the form
-    $form.Controls.AddRange($weapon1Controls)
-    $form.Controls.AddRange($weapon2Controls)
-    $form.Controls.AddRange($weapon3Controls)
+    SafeAddRange $form $weapon1Controls
+    SafeAddRange $form $weapon2Controls
+    SafeAddRange $form $weapon3Controls
 
     # Additional controls for armor and gear
-    $gearControls = Set-ListBox -LabelText 'Select Extra Adventuring Gear:' -X 240 -Y 275 -Width 220 -Height 200 -DataSource $GearJSON -DisplayMember 'name'
-    $armorControls = Set-ListBox -LabelText 'Select Armour:' -X 10 -Y 275 -Width 220 -Height 200 -DataSource $ArmourJSON -DisplayMember 'name'
+    $gearControls = Set-ListBox -LabelText 'Select Extra Adventuring Gear:' -X 412 -Y 328 -Width 364 -Height 220 -DataSource $GearJSON -DisplayMember 'name'
+    $armorControls = Set-ListBox -LabelText 'Select Armour:' -X 24 -Y 328 -Width 360 -Height 220 -DataSource $ArmourJSON -DisplayMember 'name'
 
     $checkboxShield = New-Object System.Windows.Forms.CheckBox
-    $checkboxShield.Location = New-Object System.Drawing.Point(25, 487)
-    $checkboxShield.Size = New-Object System.Drawing.Size(120, 40)
+    $checkboxShield.Location = New-Object System.Drawing.Point(24, 588)
+    $checkboxShield.Size = New-Object System.Drawing.Size(160, 32)
+    $checkboxShield.Font = $script:UIStyle.InputFont
     $checkboxShield.Text = "Shield?"
     $checkboxShield.Checked = $false
 
-    $form.Controls.AddRange($gearControls)
-    $form.Controls.AddRange($armorControls)
-    $form.Controls.Add($checkboxShield)
+    SafeAddRange $form $gearControls
+    SafeAddRange $form $armorControls
+    SafeAddControl $form $checkboxShield
 
-    # Display the form and process result
-    $form.Topmost = $true
-    $form.Add_Shown({$form.Activate()})
-    $result = $form.ShowDialog()
-
-    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
-        # Initialize weapons array and weapon descriptions
+    # Route through Show-Form for consistent Back/Cancel handling
+    Show-Form -form $form -onOK {
+        # Reset weapon collection before repopulating from the form
         $global:Weapons = @()
-        Write-Log "Weapons Array: $Weapons" -Level DEBUG
+        Write-Log "Weapons Array initialised" -Level DEBUG
         $global:WeaponDescription = ""
 
-        # Handle individual weapon slots and build the weapon description
+        # Build the flat weapon description string used in the PDF AttacksSpellcasting field
         $global:WeaponDescription += WeaponSelection -selectedWeapon $weapon1Controls[1].SelectedItem -slotNumber 1
         $global:WeaponDescription += WeaponSelection -selectedWeapon $weapon2Controls[1].SelectedItem -slotNumber 2
         $global:WeaponDescription += WeaponSelection -selectedWeapon $weapon3Controls[1].SelectedItem -slotNumber 3
-
-        # Remove trailing comma and space from the description
+        # Remove any trailing separator left by the last weapon slot
         $global:WeaponDescription = $global:WeaponDescription.TrimEnd(", ")
 
-        # Handle armor and gear selection
+        # Calculate armour class from the selected armour type and DEX modifier
         $selectedArmor = $armorControls[1].SelectedItem
         if ($selectedArmor) {
             $baseAC = [int]$selectedArmor.BaseAC
             $armorType = $selectedArmor.Type
             $maxDexBonus = [int]$selectedArmor.MaxDexBonus
             $dexModifier = [int]$global:DEXMod
-
+            # Medium armour caps the DEX bonus contribution to AC
             if ($selectedArmor.DexModifierApplicable -and $armorType -eq 'Medium') {
                 $dexModifier = [math]::Min($dexModifier, $maxDexBonus)
             }
-
             $global:ArmourClass = $baseAC + $dexModifier
-
+            # A shield adds a flat +2 to AC
             if ($checkboxShield.Checked) {
                 $global:ArmourClass += 2
             }
-
-            # Set weights
             $global:ArmourWeight = $selectedArmor.Weight
             $global:GearWeight = $gearControls[1].SelectedItem.Weight
-
             Write-Log "Selected Armor: $($selectedArmor.Name)" -Level DEBUG
             Write-Log "Armor Type: $armorType" -Level DEBUG
             Write-Log "Base AC: $baseAC" -Level DEBUG
@@ -939,13 +1396,11 @@ function Show-WeaponAndArmourForm {
         } else {
             Write-Log "No Armor Selected" -Level DEBUG
         }
-
-        # Debug the combined WeaponDescription
         Write-Log "Combined Weapon Description: $($global:WeaponDescription)" -Level DEBUG
-    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Write-Log "Form was canceled by the user." -Level DEBUG
-        exit
-    }
+    } -onIgnore {
+        # Skip - keep default weapon/armour values
+        Write-Log "Weapon and armour selection skipped" -Level DEBUG
+    } -onCancel { exit }
 }
 
 function WeaponSelection {
@@ -974,7 +1429,22 @@ function WeaponSelection {
     }
 }
 
-# Function to display the choose skills form
+# Helper functions to suppress output from control additions
+function SafeAddControl {
+    param([System.Windows.Forms.Control]$parent, [System.Windows.Forms.Control]$child)
+    [void]$parent.Controls.Add($child)
+}
+function SafeAddRange {
+    param([System.Windows.Forms.Control]$parent, [System.Windows.Forms.Control[]]$children)
+    [void]$parent.Controls.AddRange($children)
+}
+function SafeItemsAdd {
+    param($items, $item)
+    [void]$items.Add($item)
+}
+
+# Show-ChooseSkillsForm: Lets the user pick up to 3 skill proficiencies from the class skill list.
+# Selected skills are mapped to their PDF checkbox field names via SkillToCheckboxMap.
 function Show-ChooseSkillsForm {
     Write-Log "Displaying Choose Skills Form" -Level DEBUG
 
@@ -1006,124 +1476,174 @@ function Show-ChooseSkillsForm {
         "Stealth"           = 'Check Box 39'
         "Survival"          = 'Check Box 40'
     }
+
+    $skillOptions = @($global:SelectedClass.Skills | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) })
+    Write-Log "Available class skills: $($skillOptions -join ', ')" -Level DEBUG
     
     # Create the form
-    $form = New-ProgramForm -Title 'Select Skills' -Width 400 -Height 600 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+    $form = New-ProgramForm -Title 'Select Skills' -Width 620 -Height 680 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Exit'
 
-    # Create list box controls for selecting up to 3 skills
-    $skill1Controls = Set-ListBox -LabelText 'Select Skill 1:' -X 10 -Y 20 -Width 360 -Height 150 -DataSource $global:SelectedClass.Skills
-    $skill2Controls = Set-ListBox -LabelText 'Select Skill 2:' -X 10 -Y 200 -Width 360 -Height 150 -DataSource $global:SelectedClass.Skills
-    $skill3Controls = Set-ListBox -LabelText 'Select Skill 3:' -X 10 -Y 380 -Width 360 -Height 150 -DataSource $global:SelectedClass.Skills
+    $instructionsLabel = New-Object System.Windows.Forms.Label
+    $instructionsLabel.Location = New-Object System.Drawing.Point(24, 20)
+    $instructionsLabel.Size = New-Object System.Drawing.Size(560, 42)
+    $instructionsLabel.Text = 'Choose up to three class skill proficiencies. Duplicate picks are ignored when the character sheet is generated.'
+    $instructionsLabel.Font = $script:UIStyle.FormFont
+    $instructionsLabel.BackColor = [System.Drawing.Color]::Transparent
+    SafeAddControl $form $instructionsLabel
 
-    # Add controls to the form
-    $form.Controls.AddRange($skill1Controls)
-    $form.Controls.AddRange($skill2Controls)
-    $form.Controls.AddRange($skill3Controls)
+    if ($skillOptions.Count -eq 0) {
+        $emptyStateLabel = New-Object System.Windows.Forms.Label
+        $emptyStateLabel.Location = New-Object System.Drawing.Point(48, 250)
+        $emptyStateLabel.Size = New-Object System.Drawing.Size(512, 80)
+        $emptyStateLabel.Text = 'No class skills were loaded for the selected class. Use Skip to continue or reselect the class.'
+        $emptyStateLabel.Font = $script:UIStyle.LabelFont
+        $emptyStateLabel.ForeColor = $script:UIStyle.AccentTextColor
+        $emptyStateLabel.BackColor = [System.Drawing.Color]::Transparent
+        $emptyStateLabel.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+        SafeAddControl $form $emptyStateLabel
+    }
 
-    $form.Topmost = $true
-    $form.Add_Shown({$form.Activate()})
-    $result = $form.ShowDialog()
+    $skill1Controls = $null
+    $skill2Controls = $null
+    $skill3Controls = $null
 
-    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
-        # Initialize SelectedSkills
-        $global:SelectedSkills = @()
+    if ($skillOptions.Count -gt 0) {
+        # Create list box controls for selecting up to 3 skills
+        $skill1Controls = Set-ListBox -LabelText 'Select Skill 1:' -X 24 -Y 86 -Width 560 -Height 140 -DataSource $skillOptions
+        $skill2Controls = Set-ListBox -LabelText 'Select Skill 2:' -X 24 -Y 274 -Width 560 -Height 140 -DataSource $skillOptions
+        $skill3Controls = Set-ListBox -LabelText 'Select Skill 3:' -X 24 -Y 462 -Width 560 -Height 100 -DataSource $skillOptions
 
-        # Capture the selected skills
-        if ($skill1Controls[1].SelectedItem) {
-            $global:SelectedSkills += $skill1Controls[1].SelectedItem.Name
-            Write-Log "[Debug] Selected Skill 1: $($skill1Controls[1].SelectedItem.Name)" -Level DEBUG
-        } else {
-            Write-Log "[Debug] Skill 1 was not selected." -Level DEBUG
+        # Add controls to the form
+        SafeAddRange $form $skill1Controls
+        SafeAddRange $form $skill2Controls
+        SafeAddRange $form $skill3Controls
+    }
+
+    # Route through Show-Form for consistent Back/Cancel handling
+    Show-Form -form $form -onOK {
+        # Collect up to three selected skill proficiencies
+        $selectedSkillValues = @(
+            if ($skill1Controls) { Get-SelectedListValue -ListBox $skill1Controls[1] }
+            if ($skill2Controls) { Get-SelectedListValue -ListBox $skill2Controls[1] }
+            if ($skill3Controls) { Get-SelectedListValue -ListBox $skill3Controls[1] }
+        ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+
+        for ($index = 0; $index -lt $selectedSkillValues.Count; $index++) {
+            Write-Log "Selected Skill $($index + 1): $($selectedSkillValues[$index])" -Level DEBUG
         }
 
-        if ($skill2Controls[1].SelectedItem) {
-            $global:SelectedSkills += $skill2Controls[1].SelectedItem.Name
-            Write-Log "[Debug] Selected Skill 2: $($skill2Controls[1].SelectedItem.Name)" -Level DEBUG
-        } else {
-            Write-Log "[Debug] Skill 2 was not selected." -Level DEBUG
-        }
-
-        if ($skill3Controls[1].SelectedItem) {
-            $global:SelectedSkills += $skill3Controls[1].SelectedItem.Name
-            Write-Log "[Debug] Selected Skill 3: $($skill3Controls[1].SelectedItem.Name)" -Level DEBUG
-        } else {
-            Write-Log "[Debug] Skill 3 was not selected." -Level DEBUG
-        }
-
-        # Debugging the captured skills
+        $global:SelectedSkills = @($selectedSkillValues | Select-Object -Unique)
+        $global:SelectedClass.SkillProficiencies = @($global:SelectedSkills)
         Write-Log "Selected Skills: $($global:SelectedSkills -join ', ')" -Level DEBUG
-
-        # Dynamically set the skill checkboxes based on the selected skills
+        # Mark the corresponding PDF checkbox fields to 'Yes' for chosen skills
         foreach ($skill in $global:SelectedSkills) {
             if ($skill -and $global:SkillToCheckboxMap.ContainsKey($skill)) {
                 $checkboxField = $global:SkillToCheckboxMap[$skill]
                 if ($checkboxField) {
                     $global:CharacterParameters.Fields[$checkboxField] = "Yes"
-                    Write-Log "[Debug] Set checkbox field '$checkboxField' to 'Yes' for skill '$skill'" -Level DEBUG
+                    Write-Log "Set checkbox '$checkboxField' = Yes for skill '$skill'" -Level DEBUG
                 }
             }
         }
-
-        # Set other skills as "off" if not selected
+        # Explicitly mark unselected skills as 'off' so the PDF is clean
         foreach ($key in $global:SkillToCheckboxMap.Keys) {
             if (-not $global:SelectedSkills -contains $key) {
                 $checkboxField = $global:SkillToCheckboxMap[$key]
                 if ($checkboxField) {
                     $global:CharacterParameters.Fields[$checkboxField] = "off"
-                    Write-Log "[Debug] Set checkbox field '$checkboxField' to 'off' for skill '$key'" -Level DEBUG
+                    Write-Log "Set checkbox '$checkboxField' = off for skill '$key'" -Level DEBUG
                 }
             }
         }
-
-    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Write-Log "Form was canceled by the user." -Level DEBUG
-        exit
-    }
+    } -onIgnore {
+        # Skip - no skill proficiencies marked
+        $global:SelectedSkills = @()
+        $global:SelectedClass.SkillProficiencies = @()
+        Write-Log "Skill selection skipped" -Level DEBUG
+    } -onCancel { exit }
 }
 
-# Function to display the stats chooser form
+# Show-StatsChooserForm: Point-buy stat allocation form.
+# Each stat starts at 8 and the player distributes 27 points using + / - buttons.
 function Show-StatsChooserForm {
     Write-Log "Displaying Stats Chooser Form" -Level DEBUG
 
-    $form = New-ProgramForm -Title 'Allocate Character Stats' -Width 400 -Height 350 -AcceptButtonText 'OK' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+    $form = New-ProgramForm -Title 'Allocate Character Stats' -Width 620 -Height 500 -AcceptButtonText 'OK' -SkipButtonText 'Skip' -CancelButtonText 'Exit'
+    $statOrder = @('STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA')
     
     $remainingPointsLabel = New-Object System.Windows.Forms.Label
-    $remainingPointsLabel.Location = New-Object System.Drawing.Point(10, 10)
-    $remainingPointsLabel.Size = New-Object System.Drawing.Size(150, 20)
+    $remainingPointsLabel.Location = New-Object System.Drawing.Point(24, 20)
+    $remainingPointsLabel.Size = New-Object System.Drawing.Size(260, 24)
     $remainingPointsLabel.Text = "Remaining Points: $($global:TotalPoints)"
-    $form.Controls.Add($remainingPointsLabel)
+    $remainingPointsLabel.Font = $script:UIStyle.LabelFont
+    SafeAddControl $form $remainingPointsLabel
+
+    $instructionsLabel = New-Object System.Windows.Forms.Label
+    $instructionsLabel.Location = New-Object System.Drawing.Point(24, 50)
+    $instructionsLabel.Size = New-Object System.Drawing.Size(540, 40)
+    $instructionsLabel.Text = 'Use 27-point buy. Scores start at 8, can go to 15, and 14-15 cost 2 points each.'
+    $instructionsLabel.Font = $script:UIStyle.FormFont
+    SafeAddControl $form $instructionsLabel
 
     $resetButton = New-Object System.Windows.Forms.Button
-    $resetButton.Location = New-Object System.Drawing.Point(170, 7)
-    $resetButton.Size = New-Object System.Drawing.Size(60, 23)
+    $resetButton.Location = New-Object System.Drawing.Point(470, 16)
+    $resetButton.Size = New-Object System.Drawing.Size(90, 30)
     $resetButton.Text = 'Reset'
+    $resetButton.Font = $script:UIStyle.ButtonFont
     $resetButton.Add_Click({
+        $global:TotalPoints = 27
         $global:StatIncrements.Keys | ForEach-Object { $global:StatIncrements[$_] = 0 }
         UpdateFormControls -form $form -remainingPointsLabel $remainingPointsLabel
     })
-    $form.Controls.Add($resetButton)
+    SafeAddControl $form $resetButton
 
-    $yPosition = 40
+    $statHeaderLabel = New-Object System.Windows.Forms.Label
+    $statHeaderLabel.Location = New-Object System.Drawing.Point(24, 106)
+    $statHeaderLabel.Size = New-Object System.Drawing.Size(90, 24)
+    $statHeaderLabel.Text = 'Stat'
+    $statHeaderLabel.Font = $script:UIStyle.LabelFont
+    SafeAddControl $form $statHeaderLabel
 
-    foreach ($stat in $global:BaseStats.Keys) {
+    $adjustHeaderLabel = New-Object System.Windows.Forms.Label
+    $adjustHeaderLabel.Location = New-Object System.Drawing.Point(180, 106)
+    $adjustHeaderLabel.Size = New-Object System.Drawing.Size(120, 24)
+    $adjustHeaderLabel.Text = 'Adjust'
+    $adjustHeaderLabel.Font = $script:UIStyle.LabelFont
+    SafeAddControl $form $adjustHeaderLabel
+
+    $valueHeaderLabel = New-Object System.Windows.Forms.Label
+    $valueHeaderLabel.Location = New-Object System.Drawing.Point(340, 106)
+    $valueHeaderLabel.Size = New-Object System.Drawing.Size(90, 24)
+    $valueHeaderLabel.Text = 'Score'
+    $valueHeaderLabel.Font = $script:UIStyle.LabelFont
+    SafeAddControl $form $valueHeaderLabel
+
+    $costHeaderLabel = New-Object System.Windows.Forms.Label
+    $costHeaderLabel.Location = New-Object System.Drawing.Point(440, 106)
+    $costHeaderLabel.Size = New-Object System.Drawing.Size(100, 24)
+    $costHeaderLabel.Text = 'Next Cost'
+    $costHeaderLabel.Font = $script:UIStyle.LabelFont
+    SafeAddControl $form $costHeaderLabel
+
+    $yPosition = 138
+
+    foreach ($stat in $statOrder) {
         Write-Log "[Debug] Creating controls for stat: $stat at yPosition: $yPosition" -Level DEBUG
         Add-StatControls -form $form -stat $stat -yPosition $yPosition -remainingPointsLabel $remainingPointsLabel
-        $yPosition += 30
+        $yPosition += 42
     }
 
-    $form.Topmost = $true
-    $form.Add_Shown({ $form.Activate() })
-    $result = $form.ShowDialog()
-
-    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
-        foreach ($stat in $global:BaseStats.Keys) {
+    # Route through Show-Form for consistent Back/Cancel handling
+    Show-Form -form $form -onOK {
+        # Apply the point-buy increments on top of the base stat values
+        foreach ($stat in $statOrder) {
             Set-Variable -Name $stat -Value ($global:BaseStats[$stat] + $global:StatIncrements[$stat]) -Scope Global
         }
-        Write-Log "[Debug] Stats allocated: STR=$($global:STR), DEX=$($global:DEX), CON=$($global:CON), INT=$($global:INT), WIS=$($global:WIS), CHA=$($global:CHA)" -Level DEBUG
-    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Write-Log "Form canceled by the user." -Level DEBUG
-        exit
-    }
+        Write-Log "Stats allocated: STR=$($global:STR), DEX=$($global:DEX), CON=$($global:CON), INT=$($global:INT), WIS=$($global:WIS), CHA=$($global:CHA)" -Level DEBUG
+    } -onIgnore {
+        # Skip - keep current stat values
+        Write-Log "Stats allocation skipped" -Level DEBUG
+    } -onCancel { exit }
 }
 
 # Add-StatControls: Adds the controls for each stat
@@ -1135,86 +1655,172 @@ function Add-StatControls {
         [System.Windows.Forms.Label]$remainingPointsLabel
     )
 
+    $buttonYPosition = [int]($yPosition - 2)
+
     # Create a label for the stat name
     $label = New-Object System.Windows.Forms.Label
-    $label.Location = New-Object System.Drawing.Point(10, $yPosition)
-    $label.Size = New-Object System.Drawing.Size(80, 20)
+    $label.Location = New-Object System.Drawing.Point(24, $yPosition)
+    $label.Size = New-Object System.Drawing.Size(110, 24)
     $label.Text = $stat
-    $form.Controls.Add($label)
+    $label.Font = $script:UIStyle.LabelFont
+    SafeAddControl $form $label
 
     # Create the value label to display the current stat value
     $valueLabel = New-Object System.Windows.Forms.Label
-    $valueLabel.Location = New-Object System.Drawing.Point(200, $yPosition)
-    $valueLabel.Size = New-Object System.Drawing.Size(40, 20)
+    $valueLabel.Name = "StatValue_$stat"
+    $valueLabel.Location = New-Object System.Drawing.Point(340, $yPosition)
+    $valueLabel.Size = New-Object System.Drawing.Size(70, 24)
     $valueLabel.Text = ($global:BaseStats[$stat] + $global:StatIncrements[$stat]).ToString()
+    $valueLabel.Font = $script:UIStyle.InputFont
     $valueLabel.Tag = $stat  # Tag the value label with the stat name
-    $form.Controls.Add($valueLabel)
+    $valueLabel.TextAlign = [System.Drawing.ContentAlignment]::MiddleCenter
+    SafeAddControl $form $valueLabel
+
+    $costLabel = New-Object System.Windows.Forms.Label
+    $costLabel.Name = "StatCost_$stat"
+    $costLabel.Location = New-Object System.Drawing.Point(440, $yPosition)
+    $costLabel.Size = New-Object System.Drawing.Size(100, 24)
+    $costLabel.Font = $script:UIStyle.FormFont
+    $costLabel.TextAlign = [System.Drawing.ContentAlignment]::MiddleLeft
+    SafeAddControl $form $costLabel
 
     Write-Log "[Debug] Created valueLabel for stat: $stat at yPosition: $yPosition with initial value: $($valueLabel.Text)" -Level DEBUG
 
     # Create the "+" button and associate it with the correct stat
     $upButton = New-Object System.Windows.Forms.Button
-    $upButton.Location = New-Object System.Drawing.Point(100, $yPosition)
-    $upButton.Size = New-Object System.Drawing.Size(40, 23)
+    $upButton.Location = New-Object System.Drawing.Point(180, $buttonYPosition)
+    $upButton.Size = New-Object System.Drawing.Size(48, 28)
     $upButton.Text = "+"
-    $upButton.Tag = $valueLabel  # Correctly tag the button with the value label
+    $upButton.Font = $script:UIStyle.ButtonFont
+    $upButton.Tag = $stat
     $upButton.Add_Click({
-        Write-Log "[Debug] Up button clicked for stat: $stat" -Level DEBUG
-        HandleButtonClick -stat $stat -direction 'up' -valueLabel $valueLabel -remainingPointsLabel $remainingPointsLabel
+        $currentStat = [string]$this.Tag
+        Write-Log "[Debug] Up button clicked for stat: $currentStat" -Level DEBUG
+        HandleButtonClick -form $this.FindForm() -stat $currentStat -direction 'up' -remainingPointsLabel $remainingPointsLabel
     })
-    $form.Controls.Add($upButton)
+    SafeAddControl $form $upButton
 
     # Create the "-" button and associate it with the correct stat
     $downButton = New-Object System.Windows.Forms.Button
-    $downButton.Location = New-Object System.Drawing.Point(150, $yPosition)
-    $downButton.Size = New-Object System.Drawing.Size(40, 23)
+    $downButton.Location = New-Object System.Drawing.Point(236, $buttonYPosition)
+    $downButton.Size = New-Object System.Drawing.Size(48, 28)
     $downButton.Text = "-"
-    $downButton.Tag = $valueLabel  # Correctly tag the button with the value label
+    $downButton.Font = $script:UIStyle.ButtonFont
+    $downButton.Tag = $stat
     $downButton.Add_Click({
-        Write-Log "[Debug] Down button clicked for stat: $stat" -Level DEBUG
-        HandleButtonClick -stat $stat -direction 'down' -valueLabel $valueLabel -remainingPointsLabel $remainingPointsLabel
+        $currentStat = [string]$this.Tag
+        Write-Log "[Debug] Down button clicked for stat: $currentStat" -Level DEBUG
+        HandleButtonClick -form $this.FindForm() -stat $currentStat -direction 'down' -remainingPointsLabel $remainingPointsLabel
     })
-    $form.Controls.Add($downButton)
+    SafeAddControl $form $downButton
+
+    UpdateStatRowDisplay -form $form -stat $stat
+}
+
+# Get-PointBuyIncrementCost: Returns the cost to increase a stat by one point.
+function Get-PointBuyIncrementCost {
+    param (
+        [int]$currentValue
+    )
+
+    if ($currentValue -lt 8 -or $currentValue -ge 15) {
+        return 0
+    }
+
+    if ($currentValue -ge 13) {
+        return 2
+    }
+
+    return 1
+}
+
+# Get-PointBuyDecrementRefund: Returns the refunded cost when reducing a stat by one point.
+function Get-PointBuyDecrementRefund {
+    param (
+        [int]$currentValue
+    )
+
+    if ($currentValue -le 8) {
+        return 0
+    }
+
+    if ($currentValue -gt 13) {
+        return 2
+    }
+
+    return 1
+}
+
+# UpdateStatRowDisplay: Refreshes the score and next-cost labels for a stat row.
+function UpdateStatRowDisplay {
+    param (
+        [System.Windows.Forms.Form]$form,
+        [string]$stat
+    )
+
+    $currentValue = $global:BaseStats[$stat] + $global:StatIncrements[$stat]
+    $valueLabel = $form.Controls["StatValue_$stat"]
+    $costLabel = $form.Controls["StatCost_$stat"]
+
+    if ($null -ne $valueLabel) {
+        $valueLabel.Text = $currentValue.ToString()
+    }
+
+    if ($null -ne $costLabel) {
+        if ($currentValue -ge 15) {
+            $costLabel.Text = 'Max'
+        } else {
+            $costLabel.Text = (Get-PointBuyIncrementCost -currentValue $currentValue).ToString()
+        }
+    }
 }
 
 # HandleButtonClick: Handles the increment and decrement of stats
 function HandleButtonClick {
     param (
+        [System.Windows.Forms.Form]$form,
         [string]$stat,
         [string]$direction,
-        [System.Windows.Forms.Label]$valueLabel,
         [System.Windows.Forms.Label]$remainingPointsLabel
     )
 
-    # Validate that the stat and valueLabel are correct
+    # Validate that the stat and form are correct
     if (-not $stat) {
         Write-Log "[Error] The stat variable is empty or undefined." -Level ERROR
         return
     }
 
-    if ($null -eq $valueLabel) {
-        Write-Log "[Error] The valueLabel is null or not associated correctly for stat: $stat." -Level ERROR
+    if ($null -eq $form) {
+        Write-Log "[Error] The stat form reference is null for stat: $stat." -Level ERROR
         return
     }
 
     # Debug log for tracking button clicks and their intended effect
     Write-Log "[Debug] Button Click Detected: Stat = $stat, Direction = $direction, Current Stat Increment = $($global:StatIncrements[$stat]), Remaining Points = $($global:TotalPoints)" -Level DEBUG
 
+    $currentValue = $global:BaseStats[$stat] + $global:StatIncrements[$stat]
+
     # Update stat based on the button direction
-    if ($direction -eq 'up' -and $global:TotalPoints -gt 0) {
-        $global:StatIncrements[$stat]++
-        $global:TotalPoints--
-        Write-Log "[Debug] Incremented $stat New Increment Value = $($global:StatIncrements[$stat]), Remaining Points = $($global:TotalPoints)" -Level DEBUG
+    if ($direction -eq 'up') {
+        $pointCost = Get-PointBuyIncrementCost -currentValue $currentValue
+        if ($pointCost -gt 0 -and $global:TotalPoints -ge $pointCost) {
+            $global:StatIncrements[$stat]++
+            $global:TotalPoints -= $pointCost
+            Write-Log "[Debug] Incremented $stat New Increment Value = $($global:StatIncrements[$stat]), Cost = $pointCost, Remaining Points = $($global:TotalPoints)" -Level DEBUG
+        } else {
+            Write-Log "[Debug] Cannot increment $stat Current Value = $currentValue, Cost = $pointCost, Remaining Points = $($global:TotalPoints)" -Level DEBUG
+        }
     } elseif ($direction -eq 'down' -and $global:StatIncrements[$stat] -gt 0) {
+        $refund = Get-PointBuyDecrementRefund -currentValue $currentValue
         $global:StatIncrements[$stat]--
-        $global:TotalPoints++
-        Write-Log "[Debug] Decremented $stat New Increment Value = $($global:StatIncrements[$stat]), Remaining Points = $($global:TotalPoints)" -Level DEBUG
+        $global:TotalPoints += $refund
+        Write-Log "[Debug] Decremented $stat New Increment Value = $($global:StatIncrements[$stat]), Refund = $refund, Remaining Points = $($global:TotalPoints)" -Level DEBUG
     } else {
         Write-Log "[Debug] No stat change applied: Direction = $direction, Stat = $stat, Current Stat Increment = $($global:StatIncrements[$stat])" -Level DEBUG
     }
 
     # Update and refresh labels to reflect changes
-    $valueLabel.Text = ($global:BaseStats[$stat] + $global:StatIncrements[$stat]).ToString()
+    UpdateStatRowDisplay -form $form -stat $stat
     $remainingPointsLabel.Text = "Remaining Points: $($global:TotalPoints)"
 }
 
@@ -1226,10 +1832,8 @@ function UpdateFormControls {
     )
 
     $remainingPointsLabel.Text = "Remaining Points: $($global:TotalPoints)"
-    foreach ($control in $form.Controls) {
-        if ($control.Tag -and $global:BaseStats.ContainsKey($control.Tag)) {
-            $control.Text = ($global:BaseStats[$control.Tag] + $global:StatIncrements[$control.Tag]).ToString()
-        }
+    foreach ($stat in @('STR', 'DEX', 'CON', 'INT', 'WIS', 'CHA')) {
+        UpdateStatRowDisplay -form $form -stat $stat
     }
 }
 
@@ -1252,108 +1856,172 @@ $global:StatIncrements = @{
     CHA = 0
 }
 
-# Function to display the character backstory form
+# Show-BackstoryForm: Captures the character's backstory, personality, ideals, bonds, and flaws.
 function Show-BackstoryForm {
     Write-Log "Displaying Backstory Form" -Level DEBUG
-    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 800 -Height 605 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 980 -Height 760 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Exit'
 
-    $backstoryControls = Set-TextBox -LabelText 'Write your backstory:' -X 10 -Y 20 -Width 400 -Height 500 -MaxLength 0
+    $backstoryControls = Set-TextBox -LabelText 'Write your backstory:' -X 24 -Y 24 -Width 430 -Height 560 -MaxLength 0
     $backstoryControls[1].Multiline = $true
     $backstoryControls[1].ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
 
-    $personalityControls = Set-TextBox -LabelText 'Write your Personality Traits:' -X 420 -Y 20 -Width 300 -Height 100 -MaxLength 0
+    $personalityControls = Set-TextBox -LabelText 'Write your Personality Traits:' -X 490 -Y 24 -Width 430 -Height 96 -MaxLength 0
     $personalityControls[1].Multiline = $true
     $personalityControls[1].ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
 
-    $idealsControls = Set-TextBox -LabelText 'Write your Ideals:' -X 420 -Y 150 -Width 300 -Height 100 -MaxLength 0
+    $idealsControls = Set-TextBox -LabelText 'Write your Ideals:' -X 490 -Y 174 -Width 430 -Height 96 -MaxLength 0
     $idealsControls[1].Multiline = $true
     $idealsControls[1].ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
 
-    $bondsControls = Set-TextBox -LabelText 'Write About your Bonds:' -X 420 -Y 280 -Width 300 -Height 100 -MaxLength 0
+    $bondsControls = Set-TextBox -LabelText 'Write About your Bonds:' -X 490 -Y 324 -Width 430 -Height 96 -MaxLength 0
     $bondsControls[1].Multiline = $true
     $bondsControls[1].ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
 
-    $flawsControls = Set-TextBox -LabelText 'Write your Flaws:' -X 420 -Y 410 -Width 300 -Height 100 -MaxLength 0
+    $flawsControls = Set-TextBox -LabelText 'Write your Flaws:' -X 490 -Y 474 -Width 430 -Height 96 -MaxLength 0
     $flawsControls[1].Multiline = $true
     $flawsControls[1].ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
 
-    $form.Controls.AddRange($backstoryControls)
-    $form.Controls.AddRange($personalityControls)
-    $form.Controls.AddRange($idealsControls)
-    $form.Controls.AddRange($bondsControls)
-    $form.Controls.AddRange($flawsControls)
+    SafeAddRange $form $backstoryControls
+    SafeAddRange $form $personalityControls
+    SafeAddRange $form $idealsControls
+    SafeAddRange $form $bondsControls
+    SafeAddRange $form $flawsControls
 
-    $form.Topmost = $true
-    $form.Add_Shown({$form.Activate()})
-    $result = $form.ShowDialog()
-
-    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+    # Route through Show-Form for consistent Back/Cancel handling
+    Show-Form -form $form -onOK {
+        # Capture all roleplay text fields into globals for the PDF
         $global:Characterbackstory = $backstoryControls[1].Text
-        $global:PersonalityTraits = $personalityControls[1].Text
-        $global:Ideals = $idealsControls[1].Text
-        $global:Bonds = $bondsControls[1].Text
-        $global:Flaws = $flawsControls[1].Text
-
+        $global:PersonalityTraits  = $personalityControls[1].Text
+        $global:Ideals             = $idealsControls[1].Text
+        $global:Bonds              = $bondsControls[1].Text
+        $global:Flaws              = $flawsControls[1].Text
         Write-Log "Characterbackstory: $($global:Characterbackstory)" -Level DEBUG
         Write-Log "PersonalityTraits: $($global:PersonalityTraits)" -Level DEBUG
         Write-Log "Ideals: $($global:Ideals)" -Level DEBUG
         Write-Log "Bonds: $($global:Bonds)" -Level DEBUG
         Write-Log "Flaws: $($global:Flaws)" -Level DEBUG
-    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Write-Log "Form was canceled by the user." -Level DEBUG
-        exit
-    }
+    } -onIgnore {
+        # Skip - leave backstory fields at their default values
+        Write-Log "Backstory skipped" -Level DEBUG
+    } -onCancel { exit }
 }
 
-# Function to display the additional details form
+# Show-AdditionalDetailsForm: Captures allies, organisations, faction name, and additional traits.
 function Show-AdditionalDetailsForm {
     Write-Log "Displaying Additional Details Form" -Level DEBUG
-    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 790 -Height 620 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Cancel'
+    $form = New-ProgramForm -Title 'Sparks D&D Character Creator' -Width 980 -Height 760 -AcceptButtonText 'Next' -SkipButtonText 'Skip' -CancelButtonText 'Exit'
 
-    $alliesControls = Set-TextBox -LabelText 'Write about your Allies and Organisations:' -X 10 -Y 20 -Width 360 -Height 480 -MaxLength 0
+    $alliesControls = Set-TextBox -LabelText 'Write about your Allies and Organisations:' -X 24 -Y 24 -Width 430 -Height 560 -MaxLength 0
     $alliesControls[1].Multiline = $true
     $alliesControls[1].ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
 
-    $featTraitsControls = Set-TextBox -LabelText 'Write your Additional features and traits:' -X 400 -Y 20 -Width 360 -Height 480 -MaxLength 0
+    $featTraitsControls = Set-TextBox -LabelText 'Write your Additional features and traits:' -X 490 -Y 24 -Width 430 -Height 560 -MaxLength 0
     $featTraitsControls[1].Multiline = $true
     $featTraitsControls[1].ScrollBars = [System.Windows.Forms.ScrollBars]::Vertical
 
-    $factionNameControls = Set-TextBox -LabelText 'Faction Name:' -X 10 -Y 530 -Width 360 -Height 20 -MaxLength 0
+    $factionNameControls = Set-TextBox -LabelText 'Faction Name:' -X 24 -Y 620 -Width 430 -Height 28 -MaxLength 0
 
-    $form.Controls.AddRange($alliesControls)
-    $form.Controls.AddRange($featTraitsControls)
-    $form.Controls.AddRange($factionNameControls)
+    SafeAddRange $form $alliesControls
+    SafeAddRange $form $featTraitsControls
+    SafeAddRange $form $factionNameControls
 
-    $form.Topmost = $true
-    $form.Add_Shown({$form.Activate()})
-    $result = $form.ShowDialog()
-
-    if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
-        $global:Allies = $alliesControls[1].Text
+    # Route through Show-Form for consistent Back/Cancel handling
+    Show-Form -form $form -onOK {
+        # Capture organisation, faction, and additional trait text for the PDF
+        $global:Allies            = $alliesControls[1].Text
         $global:AddionalfeatTraits = $featTraitsControls[1].Text
-        $global:factionname = $factionNameControls[1].Text
-
+        $global:factionname       = $factionNameControls[1].Text
         Write-Log "Allies: $($global:Allies)" -Level DEBUG
         Write-Log "AddionalfeatTraits: $($global:AddionalfeatTraits)" -Level DEBUG
         Write-Log "FactionName: $($global:factionname)" -Level DEBUG
-    } elseif ($result -eq [System.Windows.Forms.DialogResult]::Cancel) {
-        Write-Log "Form was canceled by the user." -Level DEBUG
-        exit
+    } -onIgnore {
+        # Skip - leave additional details at their defaults
+        Write-Log "Additional details skipped" -Level DEBUG
+    } -onCancel { exit }
+}
+
+# Navigate-Forms: Drives the wizard-style form flow using an index.
+# After each form, $script:NavDirection controls whether we advance (1), go back (-1), or exit (0).
+# This allows the Back button to re-display the previous step correctly.
+function Navigate-Forms {
+    param (
+        [string[]]$FormSequence,
+        [hashtable]$FormHandlers
+    )
+
+    # Start at the first form
+    $i = 0
+    while ($i -ge 0 -and $i -lt $FormSequence.Count) {
+        $formName = $FormSequence[$i]
+        $handler = $FormHandlers[$formName]
+
+        if ($handler) {
+            Write-Log "Navigating to form: $formName (Step $($i+1) of $($FormSequence.Count))" -Level DEBUG
+            # Reset direction to forward before each form; the form sets it via Show-Form
+            $script:NavDirection = 1
+
+            # Gate the Cantrip step: only show it for spellcasting classes
+            if ($formName -eq 'Cantrip' -and -not $global:CanCastCantrips) {
+                Write-Log "Skipping Cantrip form - class cannot cast cantrips" -Level DEBUG
+                # NavDirection stays 1 so we skip forward automatically
+            } else {
+                & $handler
+            }
+        } else {
+            Write-Log "No handler found for form: $formName" -Level WARN
+            # Skip missing handlers by moving forward
+            $script:NavDirection = 1
+        }
+
+        # Move forward or backward depending on what the user pressed
+        if ($script:NavDirection -eq 0) {
+            # Cancel was confirmed - exit the entire wizard
+            Write-Log "Navigation cancelled at step: $formName" -Level INFO
+            exit
+        }
+        $i += $script:NavDirection
+        # Clamp to zero so going back from the first form stays at the first form
+        if ($i -lt 0) { $i = 0 }
     }
 }
 
-# Show all forms in order
-Show-BasicInfoForm
-Show-RaceForm
-Show-SubRaceForm
-Show-CharacterFeaturesForm
-Show-ClassAndAlignmentForm
-Show-SubClassForm
-Show-WeaponAndArmourForm
-Show-ChooseSkillsForm
-Show-StatsChooserForm
-Show-BackstoryForm
-Show-AdditionalDetailsForm
+# The ordered list of wizard steps - Navigate-Forms walks through these in sequence.
+# Back button decrements the index; forward/skip increments it.
+# 'Cantrip' is gated inside Navigate-Forms by $global:CanCastCantrips.
+# 'SubRace' and 'SubClass' are transparent forwards when no options exist.
+$formSequence = @(
+    'BasicInfo',        # Character name, player name, age
+    'Race',             # Race and background selection
+    'SubRace',          # Subrace (skipped if race has none)
+    'CharacterFeatures',# Eyes, hair, skin appearance
+    'ClassAndAlignment',# Class and alignment
+    'SubClass',         # Subclass (skipped if class has none)
+    'Cantrip',          # Cantrip selection (gated by CanCastCantrips)
+    'WeaponAndArmour',  # Weapons, armour, gear
+    'ChooseSkills',     # Skill proficiency selection
+    'StatsChooser',     # Point-buy stat allocation
+    'Backstory',        # Backstory and personality fields
+    'AdditionalDetails' # Allies, faction, additional traits
+)
+
+# Map each step name to the PowerShell function that shows its form
+$formHandlers = @{
+    'BasicInfo'         = { Show-BasicInfoForm }
+    'Race'              = { Show-RaceForm }
+    'SubRace'           = { Show-SubRaceForm }
+    'CharacterFeatures' = { Show-CharacterFeaturesForm }
+    'ClassAndAlignment' = { Show-ClassAndAlignmentForm }
+    'SubClass'          = { Show-SubClassForm }
+    'Cantrip'           = { Show-CantripForm }
+    'WeaponAndArmour'   = { Show-WeaponAndArmourForm }
+    'ChooseSkills'      = { Show-ChooseSkillsForm }
+    'StatsChooser'      = { Show-StatsChooserForm }
+    'Backstory'         = { Show-BackstoryForm }
+    'AdditionalDetails' = { Show-AdditionalDetailsForm }
+}
+
+# Start form navigation sequence - no try/catch so exit in cancel handlers propagates correctly
+Navigate-Forms -FormSequence $formSequence -FormHandlers $formHandlers
 
 Write-Log "Calculating stats" -Level DEBUG
 CharacterStats
@@ -1385,204 +2053,80 @@ if (-not $global:Weapons) {
     )
 }
 
-# Ensure default values for other global variables
-$global:Class = $global:Class -or ""
-$global:WrittenPlayername = $global:WrittenPlayername -or ""
-$global:WrittenCharactername = $global:WrittenCharactername -or ""
-$global:ExportBackground = $global:ExportBackground -or ""
-$global:ExportRace = $global:ExportRace -or ""
-$global:Alignment = $global:Alignment -or ""
-$global:XP = $global:XP -or 0
-$global:Inspiration = $global:Inspiration -or 0
-$global:STR = $global:STR -or 0
-$global:ProficencyBonus = $global:ProficencyBonus -or 0
-$global:ArmourClass = $global:ArmourClass -or 0
-$global:InitiativeTotal = $global:InitiativeTotal -or 0
-$global:Speed = $global:Speed -or 0
-$global:PersonalityTraits = $global:PersonalityTraits -or ""
-$global:STRmod = $global:STRmod -or 0
-$global:ST_STR = $global:ST_STR -or 0
-$global:DEX = $global:DEX -or 0
-$global:Ideals = $global:Ideals -or ""
-$global:DEXmod = $global:DEXmod -or 0
-$global:Bonds = $global:Bonds -or ""
-$global:CON = $global:CON -or 0
-$global:HitDiceTotal = $global:HitDiceTotal -or 0
-$global:Check12 = $global:Check12 -or ""
-$global:Check13 = $global:Check13 -or ""
-$global:Check14 = $global:Check14 -or ""
-$global:CONmod = $global:CONmod -or 0
-$global:Check15 = $global:Check15 -or ""
-$global:Check16 = $global:Check16 -or ""
-$global:Check17 = $global:Check17 -or ""
-$global:HD = $global:HD -or 0
-$global:Flaws = $global:Flaws -or ""
-$global:INT = $global:INT -or 0
-$global:ST_DEX = $global:ST_DEX -or 0
-$global:ST_CON = $global:ST_CON -or 0
-$global:ST_INT = $global:ST_INT -or 0
-$global:ST_WIS = $global:ST_WIS -or 0
-$global:ST_CHA = $global:ST_CHA -or 0
-$global:Acrobatics = $global:Acrobatics -or 0
-$global:AnimalHandling = $global:AnimalHandling -or 0
-$global:Athletics = $global:Athletics -or 0
-$global:Deception = $global:Deception -or 0
-$global:History = $global:History -or 0
-$global:Insight = $global:Insight -or 0
-$global:Intimidation = $global:Intimidation -or 0
-$global:Investigation = $global:Investigation -or 0
-$global:Medicine = $global:Medicine -or 0
-$global:Nature = $global:Nature -or 0
-$global:Perception = $global:Perception -or 0
-$global:Performance = $global:Performance -or 0
-$global:Persuation = $global:Persuation -or 0
-$global:Religion = $global:Religion -or 0
-$global:SleightOfHand = $global:SleightOfHand -or 0
-$global:Stealth = $global:Stealth -or 0
-$global:Survival = $global:Survival -or 0
-$global:Passive = $global:Passive -or 0
-$global:Check11 = $global:Check11 -or ""
-$global:Check18 = $global:Check18 -or ""
-$global:Check19 = $global:Check19 -or ""
-$global:Check20 = $global:Check20 -or ""
-$global:Check21 = $global:Check21 -or ""
-$global:Check22 = $global:Check22 -or ""
-$global:INTmod = $global:INTmod -or 0
-$global:WIS = $global:WIS -or 0
-$global:Arcana = $global:Arcana -or 0
-$global:WISmod = $global:WISmod -or 0
-$global:CHA = $global:CHA -or 0
-$global:Nature = $global:Nature -or 0
-$global:Performance = $global:Performance -or 0
-$global:Medicine = $global:Medicine -or 0
-$global:Religion = $global:Religion -or 0
-$global:Stealth = $global:Stealth -or 0
-$global:Check23 = $global:Check23 -or ""
-$global:Check24 = $global:Check24 -or ""
-$global:Check25 = $global:Check25 -or ""
-$global:Check26 = $global:Check26 -or ""
-$global:Check27 = $global:Check27 -or ""
-$global:Check28 = $global:Check28 -or ""
-$global:Check29 = $global:Check29 -or ""
-$global:Check30 = $global:Check30 -or ""
-$global:Check31 = $global:Check31 -or ""
-$global:Check32 = $global:Check32 -or ""
-$global:Check33 = $global:Check33 -or ""
-$global:Check34 = $global:Check34 -or ""
-$global:Check35 = $global:Check35 -or ""
-$global:Check36 = $global:Check36 -or ""
-$global:Check37 = $global:Check37 -or ""
-$global:Check38 = $global:Check38 -or ""
-$global:Check39 = $global:Check39 -or ""
-$global:Check40 = $global:Check40 -or ""
-$global:Persuation = $global:Persuation -or 0
-$global:HPMax = $global:HPMax -or 0
-$global:HP = $global:HP -or 0
-$global:SleightOfHand = $global:SleightOfHand -or 0
-$global:CHAmod = $global:CHAmod -or 0
-$global:Survival = $global:Survival -or 0
-$global:WeaponDescription = $global:WeaponDescription -or ""
-$global:CopperCP = $global:CopperCP -or 0
-$global:SpokenLanguages = $global:SpokenLanguages -or ""
-$global:SilverSP = $global:SilverSP -or 0
-$global:ElectrumEP = $global:ElectrumEP -or 0
-$global:GoldGP = $global:GoldGP -or 0
-$global:PlatinumPP = $global:PlatinumPP -or 0
-$global:TotalEquiptment = $global:TotalEquiptment -or ""
-$global:Feature1TTraits1 = $global:Feature1TTraits1 -or ""
-$global:WrittenCharactername = $global:WrittenCharactername -or ""
-$global:WrittenAge = $global:WrittenAge -or ""
-$global:Height = $global:Height -or ""
-$global:Size = $global:Size -or ""
-$global:Eyes = $global:Eyes -or ""
-$global:Skin = $global:Skin -or ""
-$global:Hair = $global:Hair -or ""
-$global:FactionSymbol = $global:FactionSymbol -or ""
-$global:Allies = $global:Allies -or ""
-$global:factionname = $global:factionname -or ""
-$global:Characterbackstory = $global:Characterbackstory -or ""
-$global:AddionalfeatTraits = $global:AddionalfeatTraits -or ""
-$global:SpellCastingClass = $global:SpellCastingClass -or ""
-$global:SpellCastingAbility = $global:SpellCastingAbility -or ""
-$global:SpellCastingSaveDC = $global:SpellCastingSaveDC -or 0
-$global:SpellCastingAttackBonus = $global:SpellCastingAttackBonus -or 0
-$global:Cantrip01 = $global:Cantrip01 -or ""
-$global:Cantrip02 = $global:Cantrip02 -or ""
-$global:Cantrip03 = $global:Cantrip03 -or ""
-
 # PDF Values Import before save
 $characterparameters = @{
     Fields = @{
-        'ClassLevel' = $Class;
-        'PlayerName' = $WrittenPlayername;
-        'CharacterName' = $WrittenCharactername;
-        'Background' = $ExportBackground;
-        'Race ' = $ExportRace;
-        'Alignment' = $Alignment;
-        'XP' = $XP;
-        'Inspiration' = $Inspiration;
-        'STR' = $STR;
-        'ProfBonus' = $ProficencyBonus;
-        'AC' = $ArmourClass;
-        'Initiative' = $InitiativeTotal;
-        'Speed' = $Speed;
-        'PersonalityTraits ' = $PersonalityTraits;
-        'STRmod' = $STRmod;
-        'ST Strength' = $ST_STR;
-        'DEX' = $DEX;
-        'Ideals' = $Ideals;
-        'DEXmod ' = $DEXmod;
-        'Bonds' = $Bonds;
-        'CON' = $CON;
-        'HDTotal' = $HitDiceTotal;
-        'Check Box 12' = $Check12; #first success button (from left)
-        'Check Box 13' = $Check13; #second success button
-        'Check Box 14' = $Check14; #last success button
-        'CONmod' = $CONmod;
-        'Check Box 15' = $Check15; #first failure button (from left)
-        'Check Box 16' = $Check16; #second failure button
-        'Check Box 17' = $Check17; #last failure button
-        'HD' = $HD;
-        'Flaws' = $Flaws;
-        'INT' = $INT;
-        'ST Dexterity' = $ST_DEX;
-        'ST Constitution' = $ST_CON;
-        'ST Intelligence' = $ST_INT;
-        'ST Wisdom' = $ST_WIS;
-        'ST Charisma' = $ST_CHA;
-        'Acrobatics' = $Acrobatics;
-        'Animal' = $AnimalHandling;
-        'Athletics' = $Athletics;
-        'Deception ' = $Deception;
-        'History ' = $History;
-        'Wpn Name' = $global:Weapons[0].Name;
-        'Wpn1 AtkBonus' = $global:Weapons[0].ATK_Bonus;
-        'Wpn1 Damage' = $global:Weapons[0].Damage;
-        'Insight' = $Insight;
-        'Intimidation' = $Intimidation;
-        'Wpn Name 2' = $global:Weapons[1].Name;
-        'Wpn2 AtkBonus ' = $global:Weapons[1].ATK_Bonus;
-        'Wpn Name 3' = $global:Weapons[2].Name;
-        'Wpn3 AtkBonus  ' = $global:Weapons[2].ATK_Bonus;
+        # Base character information
+        'ClassLevel' = [string]$Class;
+        'PlayerName' = [string]$WrittenPlayername;
+        'CharacterName' = [string]$WrittenCharactername;
+        'Background' = [string]$ExportBackground;
+        'Race ' = [string]$ExportRace;
+        'Alignment' = [string]$Alignment;
+        'XP' = [string]$XP;
+        'Inspiration' = [string]$Inspiration;
+        'STR' = [string]$STR;
+        'ProfBonus' = [string]$ProficencyBonus;
+        'AC' = [string]$ArmourClass;
+        'Initiative' = [string]$InitiativeTotal;
+        'Speed' = [string]$Speed;
+        'PersonalityTraits ' = [string]$PersonalityTraits;
+        'STRmod' = [string]$STRMod;
+        'ST Strength' = [string]$ST_STR;
+        'DEX' = [string]$DEX;
+        'Ideals' = [string]$Ideals;
+        'DEXmod ' = [string]$DEXMod;
+        'Bonds' = [string]$Bonds;
+        'CON' = [string]$CON;
+        'HDTotal' = [string]$HitDiceTotal;
+        'Check Box 12' = if ($Check12) { "Yes" } else { "off" }; #first success button (from left)
+        'Check Box 13' = if ($Check13) { "Yes" } else { "off" }; #second success button
+        'Check Box 14' = if ($Check14) { "Yes" } else { "off" }; #last success button
+        'CONmod' = [string]$CONMod;
+        'Check Box 15' = if ($Check15) { "Yes" } else { "off" }; #first failure button (from left)
+        'Check Box 16' = if ($Check16) { "Yes" } else { "off" }; #second failure button
+        'Check Box 17' = if ($Check17) { "Yes" } else { "off" }; #last failure button
+        'HD' = [string]$HD;
+        'Flaws' = [string]$Flaws;
+        'INT' = [string]$INT;
+        'ST Dexterity' = [string]$ST_DEX;
+        'ST Constitution' = [string]$ST_CON;
+        'ST Intelligence' = [string]$ST_INT;
+        'ST Wisdom' = [string]$ST_WIS;
+        'ST Charisma' = [string]$ST_CHA;
+        'Acrobatics' = [string]$Acrobatics;
+        'Animal' = [string]$AnimalHandling;
+        'Athletics' = [string]$Athletics;
+        'Deception ' = [string]$Deception;
+        'History ' = [string]$History;
+        'Wpn Name' = [string]($global:Weapons[0].Name);
+        'Wpn1 AtkBonus' = [string]($global:Weapons[0].ATK_Bonus);
+        'Wpn1 Damage' = [string]($global:Weapons[0].Damage);
+        'Insight' = [string]$Insight;
+        'Intimidation' = [string]$Intimidation;
+        'Wpn Name 2' = [string]($global:Weapons[1].Name);
+        'Wpn2 AtkBonus ' = [string]($global:Weapons[1].ATK_Bonus);
+        'Wpn Name 3' = [string]($global:Weapons[2].Name);
+        'Wpn3 AtkBonus  ' = [string]($global:Weapons[2].ATK_Bonus);
         'Check Box 11' = if ($Check11) { "Yes" } else { "off" }; #Strength Button
         'Check Box 18' = if ($Check18) { "Yes" } else { "off" }; #Dexterity Button
         'Check Box 19' = if ($Check19) { "Yes" } else { "off" }; #Constitution Button
         'Check Box 20' = if ($Check20) { "Yes" } else { "off" }; #Intelligence Button
         'Check Box 21' = if ($Check21) { "Yes" } else { "off" }; #Wisdom Button
         'Check Box 22' = if ($Check22) { "Yes" } else { "off" }; #Charisma Button
-        'INTmod' = $INTmod;
-        'Wpn2 Damage ' = $global:Weapons[1].Damage;
-        'Investigation ' = $Investigation;
-        'WIS' = $WIS;
-        'Arcana' = $Arcana;
-        'Perception ' = $Perception;
-        'WISmod' = $WISmod;
-        'CHA' = $CHA;
-        'Nature' = $Nature;
-        'Performance' = $Performance;
-        'Medicine' = $Medicine;
-        'Religion' = $Religion;
-        'Stealth ' =  $Stealth;
+        'INTmod' = [string]$INTMod;
+        'Wpn2 Damage ' = [string]($global:Weapons[1].Damage);
+        'Investigation ' = [string]$Investigation;
+        'WIS' = [string]$WIS;
+        'Arcana' = [string]$Arcana;
+        'Perception ' = [string]$Perception;
+        'WISmod' = [string]$WISMod;
+        'CHA' = [string]$CHA;
+        'Nature' = [string]$Nature;
+        'Performance' = [string]$Performance;
+        'Medicine' = [string]$Medicine;
+        'Religion' = [string]$Religion;
+        'Stealth ' = [string]$Stealth;
         'Check Box 23' = if ($Check23) { "Yes" } else { "off" }; #Acrobatics Button
         'Check Box 24' = if ($Check24) { "Yes" } else { "off" }; #Animal Handling Button
         'Check Box 25' = if ($Check25) { "Yes" } else { "off" }; #Arcana Button
@@ -1601,53 +2145,53 @@ $characterparameters = @{
         'Check Box 38' = if ($Check38) { "Yes" } else { "off" }; #Slight of Hand Button
         'Check Box 39' = if ($Check39) { "Yes" } else { "off" }; #Stealth Button
         'Check Box 40' = if ($Check40) { "Yes" } else { "off" }; #Survival Button
-        'Persuasion' = $Persuation;
-        'HPMax' = $HPMax;
-        'HPCurrent' = $HP;
+        'Persuasion' = [string]$Persuation;
+        'HPMax' = [string]$HPMax;
+        'HPCurrent' = [string]$HP;
         #'HPTemp' = ;
-        'Wpn3 Damage ' = $global:Weapons[2].Damage;
-        'SleightofHand' = $SleightOfHand;
-        'CHamod' = $CHAmod;
-        'Survival' = $Survival;
-        'AttacksSpellcasting' = $WeaponDescription;
-        'Passive' = $Passive;
-        'CP' = $CopperCP;
-        'ProficienciesLang' = $SpokenLanguages;
-        'SP' = $SilverSP;
-        'EP' = $ElectrumEP;
-        'GP' = $GoldGP;
-        'PP' = $PlatinumPP;
-        'Equipment' = $TotalEquiptment;
-        'Features and Traits' = $Feature1TTraits1;
-        'CharacterName 2' = $WrittenCharactername;
-        'Age' = $WrittenAge;
-        'Height' = $Height;
-        'Weight' = $Size;
-        'Eyes' = $Eyes;
-        'Skin' = $Skin;
-        'Hair' = $Hair;
+        'Wpn3 Damage ' = [string]($global:Weapons[2].Damage);
+        'SleightofHand' = [string]$SleightOfHand;
+        'CHamod' = [string]$CHAMod;
+        'Survival' = [string]$Survival;
+        'AttacksSpellcasting' = [string]$WeaponDescription;
+        'Passive' = [string]$Passive;
+        'CP' = [string]$CopperCP;
+        'ProficienciesLang' = [string]$SpokenLanguages;
+        'SP' = [string]$SilverSP;
+        'EP' = [string]$ElectrumEP;
+        'GP' = [string]$GoldGP;
+        'PP' = [string]$PlatinumPP;
+        'Equipment' = [string]$TotalEquiptment;
+        'Features and Traits' = [string]$Feature1TTraits1;
+        'CharacterName 2' = [string]$WrittenCharactername;
+        'Age' = [string]$WrittenAge;
+        'Height' = [string]$Height;
+        'Weight' = [string]$Size;
+        'Eyes' = [string]$Eyes;
+        'Skin' = [string]$Skin;
+        'Hair' = [string]$Hair;
         #'CHARACTER IMAGE' = $CharacterImage; # Do not uncomment this line
-        'Faction Symbol Image' = $FactionSymbol;
-        'Allies' = $Allies.Text;
-        'FactionName' = $Factionname.Text;
-        'Backstory' = $Characterbackstory.Text;
-        'Feat+Traits' = $AddionalfeatTraits.Text;
+        'Faction Symbol Image' = [string]$FactionSymbol;
+        'Allies' = [string]$Allies;
+        'FactionName' = [string]$factionname;
+        'Backstory' = [string]$Characterbackstory;
+        'Feat+Traits' = [string]$AddionalfeatTraits;
         #'Treasure' = ;
-        'Spellcasting Class 2' = $SpellCastingClass;
-        'SpellcastingAbility 2' = $SpellCastingAbility;
-        'SpellSaveDC  2' = $SpellCastingSaveDC;
-        'SpellAtkBonus 2' = $SpellCastingAttackBonus;
+        'Spellcasting Class 2' = [string]$SpellCastingClass;
+        'SpellcastingAbility 2' = [string]$SpellCastingAbility;
+        'SpellSaveDC  2' = [string]$SpellCastingSaveDC;
+        'SpellAtkBonus 2' = [string]$SpellCastingAttackBonus;
         #'SlotsTotal 19' =  ;
         #'SlotsRemaining 19' =  ;
-        'Spells 1014' = $Cantrip01; #Cantrip 0 slot 1 (top)
-        'Spells 1015' = $Cantrip11; #Cantrip 1 slot 1 (top)
-        'Spells 1016' = $Cantrip02; #Cantrip 0 slot 2
-        'Spells 1017' = $Cantrip03; #Cantrip 0 slot 3
-        'Spells 1018' = $Cantrip04; #Cantrip 0 slot 4
-        'Spells 1019' = $Cantrip05; #Cantrip 0 slot 5
-        'Spells 1020' = $Cantrip06; #Cantrip 0 slot 6
-        'Spells 1021' = $Cantrip07; #Cantrip 0 slot 7
-        'Spells 1022' = $Cantrip08; #Cantrip 0 slot 8
+        'Spells 1014' = [string]$Cantrip01; #Cantrip 0 slot 1 (top)
+        'Spells 1015' = [string]$Cantrip11; #Cantrip 1 slot 1 (top)
+        'Spells 1016' = [string]$Cantrip02; #Cantrip 0 slot 2
+        'Spells 1017' = [string]$Cantrip03; #Cantrip 0 slot 3
+        'Spells 1018' = [string]$Cantrip04; #Cantrip 0 slot 4
+        'Spells 1019' = [string]$Cantrip05; #Cantrip 0 slot 5
+        'Spells 1020' = [string]$Cantrip06; #Cantrip 0 slot 6
+        'Spells 1021' = [string]$Cantrip07; #Cantrip 0 slot 7
+        'Spells 1022' = [string]$Cantrip08; #Cantrip 0 slot 8
         #'Check Box 314' =  ;
         #'Check Box 3031' =  ;
         #'Check Box 3032' =  ;

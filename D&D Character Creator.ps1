@@ -408,10 +408,10 @@ function New-ProgramForm {
     # Create buttons with explicit action identifiers
     $buttons = @()
     
-    # Accept button
+    # Exit button first so it appears away from the primary Next/Accept action
     $buttons += @{
-        Text = $AcceptButtonText
-        Action = 'accept'
+        Text = $CancelButtonText
+        Action = 'exit'
     }
     
     # Skip button
@@ -428,10 +428,10 @@ function New-ProgramForm {
         }
     }
     
-    # Cancel button
+    # Accept button last so it remains the right-most primary action
     $buttons += @{
-        Text = $CancelButtonText
-        Action = 'exit'
+        Text = $AcceptButtonText
+        Action = 'accept'
     }
 
     # Calculate right-aligned button positions for a clearer wizard flow.

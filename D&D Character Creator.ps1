@@ -744,6 +744,22 @@ $global:Eyes = $defaultJSON.Characterfeatureseyes
 $global:Hair = $defaultJSON.characterfeatureshair
 $global:Skin = $defaultJSON.characterfeaturesskin
 $global:FactionSymbol = $defaultJSON.FactionSymbol
+$global:CharacterImage = [string]$defaultJSON.PlayerIcon
+$global:ImageSelected = $false
+if (-not [string]::IsNullOrWhiteSpace($global:CharacterImage)) {
+    $resolvedDefaultIconPath = $global:CharacterImage
+    if (-not [System.IO.Path]::IsPathRooted($resolvedDefaultIconPath)) {
+        $resolvedDefaultIconPath = Join-Path $PSScriptRoot $resolvedDefaultIconPath
+    }
+
+    if (Test-Path -LiteralPath $resolvedDefaultIconPath) {
+        $global:CharacterImage = $resolvedDefaultIconPath
+        $global:ImageSelected = $true
+    } else {
+        Write-Log "Default PlayerIcon path not found: $resolvedDefaultIconPath" -Level WARN
+        $global:CharacterImage = $null
+    }
+}
 $global:PersonalityTraits = $defaultJSON.PersonalityTraits
 $global:ProficencyBonus = $defaultJSON.ProficencyBonus
 $global:Class = $defaultJSON.ClassLevel
@@ -832,6 +848,7 @@ $global:SelectedClass = @{
 }
 $global:SelectedRace = @{
     Name = "Human"
+    image = "Human.png"
 }
 
 # Initialize other variables that might be needed
@@ -1048,12 +1065,53 @@ function Show-BasicInfoForm {
         CharacterName = Set-TextBox -LabelText $global:Localisation.CharacterNameLabel -X 24 -Y 24 -Width 300 -Height 28 -MaxLength 30
         Age = Set-TextBox -LabelText "Age:" -X 24 -Y 108 -Width 96 -Height 28 -MaxLength 3
         PlayerName = Set-TextBox -LabelText $global:Localisation.PlayerNameLabel -X 24 -Y 192 -Width 300 -Height 28 -MaxLength 30
+        PlayerIcon = Set-TextBox -LabelText "Player Icon (optional):" -X 24 -Y 276 -Width 400 -Height 28 -MaxLength 1024
     }
 
-    # Set tab order: CharacterName (0) -> Age (1) -> PlayerName (2)
+    $controls.PlayerIcon[1].ReadOnly = $true
+
+    $playerIconBrowseButton = New-Object System.Windows.Forms.Button
+    $playerIconBrowseButton.Text = "Browse..."
+    $playerIconBrowseButton.Location = New-Object System.Drawing.Point(436, 299)
+    $playerIconBrowseButton.Size = New-Object System.Drawing.Size(92, 30)
+    Set-ProgramButtonStyle -Button $playerIconBrowseButton -Role Secondary
+
+    $playerIconClearButton = New-Object System.Windows.Forms.Button
+    $playerIconClearButton.Text = "Clear"
+    $playerIconClearButton.Location = New-Object System.Drawing.Point(538, 299)
+    $playerIconClearButton.Size = New-Object System.Drawing.Size(74, 30)
+    Set-ProgramButtonStyle -Button $playerIconClearButton -Role Ghost
+
+    if ($global:ImageSelected -and -not [string]::IsNullOrWhiteSpace([string]$global:CharacterImage)) {
+        $controls.PlayerIcon[1].Text = [string]$global:CharacterImage
+    }
+
+    $playerIconBrowseButton.Add_Click({
+        $fileDialog = New-Object System.Windows.Forms.OpenFileDialog
+        $fileDialog.Title = "Select Player Icon"
+        $fileDialog.Filter = "Image Files (*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.webp)|*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.webp|All Files (*.*)|*.*"
+        $fileDialog.CheckFileExists = $true
+        $fileDialog.Multiselect = $false
+
+        if ($fileDialog.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+            $controls.PlayerIcon[1].Text = $fileDialog.FileName
+        }
+    })
+
+    $playerIconClearButton.Add_Click({
+        $controls.PlayerIcon[1].Text = ""
+    })
+
+    $controls.PlayerIconBrowse = $playerIconBrowseButton
+    $controls.PlayerIconClear = $playerIconClearButton
+
+    # Set tab order: CharacterName (0) -> Age (1) -> PlayerName (2) -> PlayerIcon (3) -> Browse/Clear
     $controls.CharacterName[1].TabIndex = 0
     $controls.Age[1].TabIndex = 1
     $controls.PlayerName[1].TabIndex = 2
+    $controls.PlayerIcon[1].TabIndex = 3
+    $playerIconBrowseButton.TabIndex = 4
+    $playerIconClearButton.TabIndex = 5
 
     # Add KeyPress event handler to Age textbox to only allow numbers
     $controls.Age[1].Add_KeyPress({
@@ -1064,6 +1122,23 @@ function Show-BasicInfoForm {
     })
     
     New-DndForm -Title $global:Localisation.FormTitle -Controls $controls -HideBackButton -OnAccept {
+        $selectedPlayerIconPath = [string]$controls.PlayerIcon[1].Text
+        if (-not [string]::IsNullOrWhiteSpace($selectedPlayerIconPath)) {
+            if (Test-Path -LiteralPath $selectedPlayerIconPath) {
+                $global:CharacterImage = $selectedPlayerIconPath
+                $global:ImageSelected = $true
+                Write-Log "Custom player icon selected: $selectedPlayerIconPath" -Level DEBUG
+            } else {
+                [System.Windows.Forms.MessageBox]::Show("The selected player icon file cannot be found.", "Invalid Player Icon",
+                    [System.Windows.Forms.MessageBoxButtons]::OK,
+                    [System.Windows.Forms.MessageBoxIcon]::Warning)
+                return
+            }
+        } else {
+            $global:CharacterImage = $null
+            $global:ImageSelected = $false
+        }
+
         $script:CharacterState.BasicInfo = @{
             CharacterName = $controls.CharacterName[1].Text
             Age = $controls.Age[1].Text
@@ -1136,8 +1211,20 @@ function Show-RaceForm {
         $global:CHAMod = $global:SelectedRace.CharismaMod
         # Use the race's default art if the user has not chosen a custom image
         if (-not $global:ImageSelected) {
-            $global:CharacterImage = Join-Path $PSScriptRoot "Assets\Races\Images\$($global:SelectedRace.image)"
-            Write-Log "Default race image set: $($global:CharacterImage)" -Level DEBUG
+            $raceImageName = [string]$global:SelectedRace.image
+            if (-not [string]::IsNullOrWhiteSpace($raceImageName)) {
+                $raceImagePath = Join-Path $PSScriptRoot "Assets\Races\Images\$raceImageName"
+                if (Test-Path -LiteralPath $raceImagePath) {
+                    $global:CharacterImage = $raceImagePath
+                    Write-Log "Default race image set: $($global:CharacterImage)" -Level DEBUG
+                } else {
+                    $global:CharacterImage = $null
+                    Write-Log "Race image not found for '$($global:SelectedRace.Name)': $raceImagePath" -Level WARN
+                }
+            } else {
+                $global:CharacterImage = $null
+                Write-Log "No race image metadata found for '$($global:SelectedRace.Name)'" -Level WARN
+            }
         }
         Write-Log "Background: $global:ExportBackground" -Level DEBUG
         Write-Log "Race: $($global:SelectedRace.Name)" -Level DEBUG
